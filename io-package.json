@@ -4,7 +4,7 @@
         "version": "0.1.0",
         "title": "Plex Media Server",
         "desc": {
-            "en": "Integration of your Plex Media Server and / or your Tautulli",
+            "en": "Integration of your Plex Media Server and / or your Tautulli"
         },
         "news": {
             "0.1.0": {

@@ -1,0 +1,52 @@
+{
+  "name": "iobroker.plex",
+  "version": "0.1.0",
+  "description": "Integration of your Plex Media Server and / or your Tautulli",
+  "author": {
+    "name": "zefau",
+    "email": "zefau@mailbox.org"
+  },
+  "contributors": [
+    {
+      "name": "zefau",
+      "email": "zefau@mailbox.org"
+    }
+  ],
+  "homepage": "https://github.com/Zefau/ioBroker.plex",
+  "license": "MIT",
+  "keywords": [
+    "ioBroker",
+    "plex",
+    "tautulli",
+    "media server"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zefau/ioBroker.plex"
+  },
+  "dependencies": {
+    "plex-api": "^5.2.1",
+    "tautulli-api": "^1.0.0",
+    "express": "^4.16.4",
+    "body-parser": "^1.18.3",
+    "@iobroker/adapter-core": "^1.0.3"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "mocha": "^6.1.3",
+    "chai": "^4.2.0",
+    "axios": "^0.18.0",
+    "@iobroker/testing": "^1.2.0"
+  },
+  "main": "plex.js",
+  "scripts": {
+    "test": "npm run test:package && npm run test:unit",
+    "test:package": "mocha test/package --exit",
+    "test:unit": "mocha test/unit --exit",
+    "test:integration": "mocha test/integration --exit"
+  },
+  "bugs": {
+    "url": "https://github.com/Zefau/ioBroker.plex/issues"
+  },
+  "readmeFilename": "README.md"
+}

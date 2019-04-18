@@ -1,0 +1,44 @@
+{
+    "common": {
+        "name": "plex",
+        "version": "0.1.0",
+        "title": "Plex Media Server",
+        "desc": {
+            "en": "Integration of your Plex Media Server and / or your Tautulli",
+        },
+        "news": {
+            "0.1.0": {
+                "en": "initial checkin",
+                "de": "Erste version",
+                "ru": "первая версия"
+            }
+        },
+	"license": "MIT",
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "icon": "plex.jpg",
+        "extIcon": "https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/admin/plex.jpg",
+        "keywords": [
+            "tautulli",
+            "plex",
+			"media"
+        ],
+        "readme": "https://github.com/Zefau/ioBroker.plex/blob/master/README.md",
+        "loglevel": "info",
+        "materialize": true,
+        "compact": true,
+        "enabled": true,
+        "type": "multimedia",
+        "authors": [
+            {
+                "name": "Zefau",
+                "email": "zefau@mailbox.org"
+            }
+        ]
+    },
+    "native": {
+    },
+    "objects": [],
+    "instanceObjects": [
+    ]
+}

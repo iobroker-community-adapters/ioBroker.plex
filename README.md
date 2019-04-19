@@ -36,7 +36,20 @@ Navigate to your Plex Media Server and go to ```Settings``` and ```Webhook```. C
 
 This adapter connects to the [Tautulli API](https://github.com/Tautulli/Tautulli/blob/master/API.md) and also receives webhook events from Tautulli.
 
+##### API
 Once Tautulli is installed, open the _Settings_ page from Tautulli dashboard and navigate to _Web Interface_. Scroll down to the _API_ section and make sure ```Enable API``` is checked. Copy the ```API key``` and enter it in the ioBroker.plex settings. Furthermore, add the Tautulli IP address and port to allow API communication.
+
+##### Webhook
+Once installed open the settings page from Tautulli dashboard and navigate to Notification Agents as seen below:
+
+![Tautulli Settings](/img/screenshot_tautulli-settings.png)
+
+Click _Add a new notification agent_ and _Webhook_.
+Enter your ioBroker IP adress with the custom port specified in the ioBroker.plex settings and trailing ```/tautulli``` path, e.g. ```http://192.168.178.29:41891/tautulli```:
+
+![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
+
+Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_. Go to the _Triggers_ tab and select all options.
 
 
 ## Channels & States

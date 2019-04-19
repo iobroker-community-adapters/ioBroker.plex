@@ -19,16 +19,36 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 
 ## Setup instructions
-Check out [Tautulli Preview](https://tautulli.com/#preview) and [install it on your preferred system](https://github.com/Tautulli/Tautulli-Wiki/wiki/Installation) if you are interested.
+### Basic Setup
+tbd
 
-### API settings
-Once Tautulli is installed, open the _Settings_ page from Tautulli dashboard and navigate to _Web Interface_. Scroll down to the _API_ section and make sure ```Enable API``` is checked. Copy the ```API key``` and enter it in the ioBroker.tautulli settings. Furthermore, add the Tautulli IP address and port to allow API communication.
+### Advanced Setup (Plex Pass or Tautulli)
+#### Plex Pass
+tbd
+
+#### Tautulli
+[Tautulli is a 3rd party application](https://tautulli.com/#about) that you can run alongside your Plex Media Server to monitor activity and track various statistics. Most importantly, these statistics include what has been watched, who watched it, when and where they watched it, and how it was watched. All statistics are presented in a nice and clean interface with many tables and graphs, which makes it easy to brag about your server to everyone else. Check out [Tautulli Preview](https://tautulli.com/#preview) and [install it on your preferred system](https://github.com/Tautulli/Tautulli-Wiki/wiki/Installation) if you are interested.
+
+This adapter connects to the [Tautulli API](https://github.com/Tautulli/Tautulli/blob/master/API.md) and also receives webhook events from Tautulli.
+
+Once Tautulli is installed, open the _Settings_ page from Tautulli dashboard and navigate to _Web Interface_. Scroll down to the _API_ section and make sure ```Enable API``` is checked. Copy the ```API key``` and enter it in the ioBroker.plex settings. Furthermore, add the Tautulli IP address and port to allow API communication.
 
 
-## What is Tautulli (optional)
-[Tautulli is a 3rd party application](https://tautulli.com/#about) that you can run alongside your Plex Media Server to monitor activity and track various statistics. Most importantly, these statistics include what has been watched, who watched it, when and where they watched it, and how it was watched. All statistics are presented in a nice and clean interface with many tables and graphs, which makes it easy to brag about your server to everyone else.
+## Channels & States
+###  With Basis Setup
+After sucessful basic setup the following channels and states will be created:
 
-This adapter connects to the [Tautulli API](https://github.com/Tautulli/Tautulli/blob/master/API.md) and also receives webhook events from both Tautulli and Plex (the latter requires Plex Pass).
+| Channel | Folder | State | Description |
+| ------- | ------ | ----- | ----------- |
+| tbd | - | - | tbd |
+
+###  With Advanced Setup
+After sucessful advanced setup the following channels and states will _additionally_ be created:
+
+| Channel | Folder | State | Description | Remark |
+| ------- | ------ | ----- | ----------- | ------ |
+| tbd | - | - | tbd | with Plex Pass or Tautulli |
+| tbd | - | - | tbd | only with Tautulli |
 
 
 ## Changelog

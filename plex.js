@@ -13,8 +13,10 @@ const _multer = require('multer');
  */
 const Library = require(__dirname + '/lib/library.js');
 const Plex = require('plex-api');
+const PlexControl = require('plex-control').PlexControl;
 const Tautulli = require('tautulli-api');
-const params = require(__dirname + '/tautulli-parameters.json');
+//const params = require(__dirname + '/tautulli-parameters.json');
+const _NODES = require(__dirname + '/NODES.json');
 
 
 /*
@@ -47,43 +49,58 @@ function startAdapter(options)
 	 */
 	adapter.on('ready', function()
 	{
-		let plex = new PlexAPI({
-			hostname: '192.168.178.5',
-			port: 32400,
-			https: false,
-			//username:
-			//password,
-			//token
+		// verify Plex settings
+		if (!adapter.config.plexIp)
+		{
+			adapter.log.warn('Plex IP not configured! Please go to settings and fill in Plex IP.');
+			return;
+		}
+		
+		// initialize Plex API
+		plex = new Plex({
+			hostname: adapter.config.plexIp,
+			port: adapter.config.plexPort || 32400,
+			https: adapter.config.plexSecure || false,
 			options: {
-				identifier
+				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',
 				version: '1.0',
 				deviceName: 'ioBroker'
 			}
 		});
 		
+		// test connection
+		plex.query('/status/sessions').catch(function(e) {adapter.log.warn(e)})
 		
-		client.query('/').then(function(res)
+		// verify Tautulli settings
+		if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
 		{
-			adapter.log.debug(JSON.stringify(res))
-		});
-		
-		/*
-		
-		// initialize Tautulli API
-		if (!adapter.config.api_ip || !adapter.config.api_token)
-		{
-			adapter.log.warn('IP or API token missing! Please go to settings and fill in IP and the API token first!');
-			return;
+			adapter.log.debug('Tautulli IP or API token missing!');
+			tautulli = {get: function() {return Promise.reject('Not connected!')}}
 		}
 		
-		// initialize tautulli class
-		tautulli = new Tautulli(adapter.config.api_ip, adapter.config.api_port || '8181', adapter.config.api_token);
+		// initialize Tautulli API
+		else
+		{
+			tautulli = new Tautulli(
+				adapter.config.tautulliIp,
+				adapter.config.tautulliPort || 8181,
+				adapter.config.tautulliToken
+			);
+		}
 		
+		// retrieve data
 		retrieveData();
+		
 		if (adapter.config.refresh !== undefined && adapter.config.refresh > 10)
-			setInterval(function() {retrieveData()}, Math.round(parseInt(adapter.config.refresh)*1000));
-		*/
+		{
+			setTimeout(function updater()
+			{
+				retrieveData();
+				setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+				
+			}, Math.round(parseInt(adapter.config.refresh)*1000));
+		}
 		
 		// listen to events from Plex
 		_http.use(_parser.json());
@@ -148,66 +165,19 @@ function startAdapter(options)
 };
 
 /**
- * Use data received from webhook
+ * Receive event from webhook
  *
  */
 function setEvent(data, source)
 {
 	library.set({node: '_playing', role: 'channel', description: 'Current event being played'}, '');
 	
-	/*
-event
-accountThumb
-accountName
-accountId
-
-serverName
-serverId
-
-playerName
-playerId
-playerIP
-
-     "librarySectionType":"show",
-      "ratingKey":"217824",
-      "key":"/library/metadata/217824",
-      "parentRatingKey":"217823",
-      "grandparentRatingKey":"217822",
-      "guid":"com.plexapp.agents.thetvdb://79491/14/1?lang=en",
-      "librarySectionTitle":"Series",
-      "librarySectionID":3,
-      "librarySectionKey":"/library/sections/3",
-      "type":"episode",
-      "title":"Episode 1",
-      "grandparentKey":"/library/metadata/217822",
-      "parentKey":"/library/metadata/217823",
-      "grandparentTitle":"Germany's Next Topmodel",
-      "parentTitle":"Season 14",
-      "summary":"",
-      "index":1,
-      "parentIndex":14,
-      "viewCount":1,
-      "lastViewedAt":1549792603,
-      "year":2019,
-      "thumb":"/library/metadata/217824/thumb/1549788086",
-      "art":"/library/metadata/217822/art/1549785382",
-      "grandparentThumb":"/library/metadata/217822/thumb/1549785382",
-      "grandparentArt":"/library/metadata/217822/art/1549785382",
-      "originallyAvailableAt":"2019-02-07",
-      "addedAt":1549785275,
-      "updatedAt":1549788086
-
-	*/
-	
-	adapter.log.debug(JSON.stringify(source));
-	adapter.log.debug(JSON.stringify(data));
-	
 	for (var key in data)
-		readData('_playing.' + key, data)
+		readData('_playing.' + key, data[key])
 }
 
 /**
- * Use data received from webhook
+ * Read and write data received from event
  *
  */
 function readData(key, data)
@@ -224,6 +194,7 @@ function readData(key, data)
 	
 	// read data
 	else
+	{
 		library.set(
 			{
 				node: key,
@@ -233,7 +204,7 @@ function readData(key, data)
 			},
 			data
 		);
-	
+	}
 }
 
 /**
@@ -259,216 +230,226 @@ function is(res)
 }
 
 /**
- * Retrieve data from the Tautulli API.
+ * Get Node Description
  *
- * Available API methods:
- *	- add_newsletter_config
- *	- add_notifier_config
- *	- arnold
- *	- backup_config
- *	- backup_db
- *	- delete_all_library_history
- *	- delete_all_user_history
- *	- delete_cache
- *	- delete_hosted_images
- *	- delete_image_cache
- *	- delete_library
- *	- delete_login_log
- *	- delete_lookup_info
- *	- delete_media_info_cache
- *	- delete_mobile_device
- *	- delete_newsletter
- *	- delete_newsletter_log
- *	- delete_notification_log
- *	- delete_notifier
- *	- delete_temp_sessions
- *	- delete_user
- *	- docs
- *	- docs_md
- *	- download_config
- *	- download_database
- *	- download_log
- *	- download_plex_log
- *	- edit_library
- *	- edit_user
- *	- get_activity
- *	- get_apikey
- *	- get_date_formats						not required
- *	- get_geoip_lookup						not required
- *	- get_history
- *	- get_home_stats
- *	- get_libraries							IMPLEMENTED
- *	- get_libraries_table
- *	- get_library							same as -get_libraries-
- *	- get_library_media_info
- *	- get_library_names						reduced set of -get_libraries-
- *	- get_library_user_stats
- *	- get_library_watch_time_stats			IMPLEMENTED
- *	- get_logs
- *	- get_metadata
- *	- get_new_rating_keys
- *	- get_newsletter_config
- *	- get_newsletter_log
- *	- get_newsletters
- *	- get_notification_log
- *	- get_notifier_config
- *	- get_notifier_parameters
- *	- get_notifiers
- *	- get_old_rating_keys
- *	- get_plays_by_date
- *	- get_plays_by_dayofweek
- *	- get_plays_by_hourofday
- *	- get_plays_by_source_resolution
- *	- get_plays_by_stream_resolution
- *	- get_plays_by_stream_type
- *	- get_plays_by_top_10_platforms
- *	- get_plays_by_top_10_users
- *	- get_plays_per_month
- *	- get_plex_log
- *	- get_pms_token
- *	- get_pms_update
- *	- get_recently_added
- *	- get_server_friendly_name				not required
- *	- get_server_id
- *	- get_server_identity
- *	- get_server_list
- *	- get_server_pref
- *	- get_servers_info						IMPLEMENTED
- *	- get_settings
- *	- get_stream_data
- *	- get_stream_type_by_top_10_platforms
- *	- get_stream_type_by_top_10_users
- *	- get_synced_items
- *	- get_user								same as -get_users-
- *	- get_user_ips
- *	- get_user_logins
- *	- get_user_names						reduced set of -get_users-
- *	- get_user_player_stats
- *	- get_user_watch_time_stats				IMPLEMENTED
- *	- get_users								IMPLEMENTED
- *	- get_users_table
- *	- get_whois_lookup
- *	- import_database
- *	- install_geoip_db
- *	- notify
- *	- notify_newsletter
- *	- notify_recently_added
- *	- pms_image_proxy
- *	- refresh_libraries_list
- *	- refresh_users_list
- *	- register_device
- *	- restart
- *	- search
- *	- set_mobile_device_config
- *	- set_newsletter_config
- *	- set_notifier_config
- *	- sql
- *	- terminate_session
- *	- undelete_library
- *	- undelete_user
- *	- uninstall_geoip_db
- *	- update
- *	- update_chec
- *	- update_metadata_details
+ */
+function get(node)
+{
+	return _NODES[node.toLowerCase().replace(/ /, '_')] || {description: '', role: 'text'};
+}
+
+/**
+ * Retrieve data from Plex
  *
  */
 function retrieveData()
 {
-	var watched = {'01-last_24h': 'Watched last 24 hours', '02-last_7d': 'Watched last 7 days', '03-last_30d': 'Watched last month', '00-all_time': 'Watched all times'};
-	adapter.log.info('Retrieving information from Tautulli..');
+	var watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
+	adapter.log.info('Retrieving data from Plex..');
 	
 	//
-	// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_servers_info
+	// GET SERVERS
 	//
-	library.set({node: 'servers', role: 'channel', description: 'Plex Server'}, '');
-	tautulli.get('get_servers_info').then(function(res)
+	plex.query('/servers').then(function(res)
 	{
-		if (!is(res)) return; else data = res.response.data;
+		library.set({node: 'servers', role: get('servers').role, description: get('servers').description}, '');
 		
+		let data = res.MediaContainer.Server;
 		data.forEach(function(entry)
 		{
-			var id = entry['name'].toLowerCase();
-			for (var key in entry)
-				library.set({node: 'servers.' + id + '.' + key}, entry[key]);
-		});
-	});
-	
-	//
-	// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_libraries
-	//
-	library.set({node: 'libraries', role: 'channel', description: 'Plex Libraries'}, '');
-	tautulli.get('get_libraries').then(function(res)
-	{
-		if (!is(res)) return; else data = res.response.data;
-		
-		data.forEach(function(entry)
-		{
-			var libId = entry['section_id'] + '-' + entry['section_name'].toLowerCase();
-			for (var key in entry)
-				library.set({node: 'libraries.' + libId + '.' + key, role: 'text', description: key.replace(/_/gi, ' ')}, entry[key]);
+			var serverId = entry['name'].toLowerCase();
+			library.set({node: 'servers.' + serverId, role: get('server').role, description: get('server').description.replace(/%server%/gi, entry['name'])}, '');
 			
+			for (var key in entry)
+				library.set(
+					{
+						node: 'servers.' + serverId + '.' + key,
+						role: get('servers.' + key).role,
+						description: get('servers.' + key).description
+					},
+					entry[key]
+				);
+		});
+	})
+	.catch(function(e) {adapter.log.warn(e)});
+	
+	//
+	// GET LIBRARIES
+	//
+	plex.query('/library/sections').then(function(res)
+	{
+		library.set({node: 'libraries', role: get('libraries').role, description: get('libraries').description}, '');
+		
+		let data = res.MediaContainer.Directory;
+		data.forEach(function(entry)
+		{
+			var libId = entry['key'] + '-' + entry['title'].toLowerCase();
+			library.set({node: 'libraries.' + libId, role: get('library').role, description: get('library').description.replace(/%library%/gi, entry['title'])}, '');
+			
+			for (var key in entry)
+			{
+				library.set(
+					{
+						node: 'libraries.' + libId + '.' + key.toLowerCase(),
+						type: get('libraries.' + key).type, 
+						role: get('libraries.' + key).role,
+						description: get('libraries.' + key).description
+					},
+					typeof entry[key] == 'object' ? JSON.stringify(entry[key]) : entry[key]
+				);
+			}
+			
+			// get library content
+			plex.query('/library/sections/' + entry['key'] + '/all').then(function(res)
+			{
+				library.set({node: 'libraries.' + libId + '.items', type: get('libraries.items').type, role: get('libraries.items').role, description: get('libraries.items').description}, JSON.stringify(res.MediaContainer.Metadata));
+				library.set({node: 'libraries.' + libId + '.itemsCount', type: get('libraries.itemscount').type, role: get('libraries.itemscount').role, description: get('libraries.itemscount').description}, JSON.stringify(res.MediaContainer.size));
+			});
+			
+			// get statistics / watch time
 			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
-			library.set({node: 'libraries.' + libId + '.watched', role: 'channel', description: 'Library Watch Statistics'}, '');
-			tautulli.get('get_library_watch_time_stats', {'section_id': entry['section_id']}).then(function(res)
+			tautulli.get('get_library_watch_time_stats', {'section_id': entry['key']}).then(function(res)
 			{
 				if (!is(res)) return; else data = res.response.data;
+				library.set({node: 'statistics', role: get('statistics').role, description: get('statistics').description}, '');
+				library.set({node: 'statistics.libraries', role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, '')}, '');
+				library.set({node: 'statistics.libraries.' + libId, role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, entry['title'])}, '');
 				
 				data.forEach(function(entry, i)
 				{
-					var id = Object.keys(watched)[i];
-					library.set({node: 'libraries.' + libId + '.watched.' + id, role: 'channel', description: watched[id]}, '');
+					var id = watched[i];
+					library.set({node: 'statistics.libraries.' + libId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
 						
 					for (var key in entry)
-					{
-						library.set({node: 'libraries.' + libId + '.watched.' + id + '.' + key, role: 'text', description: key.replace(/_/gi, ' ')}, entry[key]);
-					}
+						library.set({node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
 				});
-			});
+			})
+			.catch(function(e) {});
+			
 		});
-	});
+	})
+	.catch(function(e) {adapter.log.warn(e)});
 	
 	//
+	// GET USERS
 	// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_users
 	//
-	library.set({node: 'users', role: 'channel', description: 'Plex Users'}, '');
 	tautulli.get('get_users').then(function(res)
 	{
 		if (!is(res)) return; else data = res.response.data;
+		library.set({node: 'users', role: get('users').role, description: get('users').description}, '');
 		
 		data.forEach(function(entry)
 		{
 			var userId = entry['friendly_name'].toLowerCase().replace(/ /gi, '_');
 			if (userId === 'local') return;
 			
-			library.set({node: 'users.' + userId, role: 'channel', description: 'User ' + entry['friendly_name']}, '');
-			library.set({node: 'users.' + userId + '.data', role: 'channel', description: 'User Information'}, '');
-			library.set({node: 'users.' + userId + '.watched', role: 'channel', description: 'User Watch Statistics'}, '');
+			library.set({node: 'users.' + userId, role: get('user').role, description: get('user').description.replace(/%user%/gi, entry['friendly_name'])}, '');
 			
 			// fill user information
 			for (var key in entry)
 			{
 				if (key === 'server_token') continue;
-				library.set({node: 'users.' + userId + '.data.' + key, role: 'text', description: key.replace(/_/gi, ' ')}, entry[key]);
+				library.set({node: 'users.' + userId + '.' + key, role: get('users.' + key).role, description: get('users.' + key).description}, entry[key]);
 			}
 			
+			// get statistics / watch time
+			//
 			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_user_watch_time_stats
 			tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(function(res)
 			{
 				if (!is(res)) return; else data = res.response.data;
 				
+				library.set({node: 'statistics.users', role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, '')}, '');
+				library.set({node: 'statistics.users.' + userId, role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, entry['friendly_name'])}, '');
+				
 				data.forEach(function(entry, i)
 				{
-					var id = Object.keys(watched)[i];
-					library.set({node: 'users.' + userId + '.watched.' + id, role: 'channel', description: watched[id]}, '');
-						
+					var id = watched[i];
+					library.set({node: 'statistics.users.' + userId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
+					
 					for (var key in entry)
-					{
-						library.set({node: 'users.' + userId + '.watched.' + id + '.' + key, role: 'text', description: key.replace(/_/gi, ' ')}, entry[key]);
-					}
+						library.set({node: 'statistics.users.' + userId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
 				});
-			});
+			})
+			.catch(function(e) {});
+			
+		});
+	})
+	.catch(function(e) {});
+	
+	//
+	// GET SETTINGS
+	//
+	plex.query('/:/prefs').then(function(res)
+	{
+		let data = res.MediaContainer.Setting;
+		library.set({node: 'settings', role: get('settings').role, description: get('settings').description}, '');
+		
+		data.forEach(function(entry)
+		{
+			entry['group'] = !entry['group'] ? 'other' : entry['group'];
+			library.set({node: 'settings.' + entry['group'], role: 'channel', description: 'Settings ' + library.ucFirst(entry['group'])}, '');
+			library.set(
+				{
+					node: 'settings.' + entry['group'] + '.' + entry['id'],
+					type: entry['type'] == 'bool' ? 'boolean' : (entry['type'] == 'int' ? 'number' : entry['type']),
+					role: entry['type'] == 'bool' ? 'indicator' : (entry['type'] == 'int' ? 'value' : 'text'),
+					description: entry['label']
+				},
+				entry['value']
+			);
 		});
 	});
+	
+	//
+	// GET CLIENTS
+	//
+	plex.query('https://plex.tv/devices.xml').then(function(res)
+	{
+		adapter.log.debug(JSON.stringify(res));
+		
+		
+		
+	});
+	
+	//
+	// GET HISTORY
+	//
+	/*
+	plex.query('/status/sessions/history/all').then(function(res)
+	{
+		adapter.log.debug('/status/sessions/history/all')
+		adapter.log.debug(JSON.stringify(res))
+	});
+	
+	// PLAYLISTS
+	plex.query('/playlists').then(function(res)
+	{
+		adapter.log.debug('/playlists')
+		adapter.log.debug(JSON.stringify(res))
+	});
+	
+	// RECENTLY ADDED
+	plex.query('/library/recentlyAdded').then(function(res)
+	{
+		adapter.log.debug('/playlists')
+		adapter.log.debug(JSON.stringify(res))
+	});
+	
+	// ON_DECK
+	plex.query('/library/onDeck').then(function(res)
+	{
+		adapter.log.debug('/library/onDeck')
+		adapter.log.debug(JSON.stringify(res))
+	});
+	*/
+	
+	// PLAYING
+	
+	
+	// COMMANDS
+	
 	
 }
 

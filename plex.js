@@ -245,13 +245,14 @@ function get(node)
 function retrieveData()
 {
 	var watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
-	adapter.log.info('Retrieving data from Plex..');
+	adapter.log.debug('Retrieving data from Plex..');
 	
 	//
 	// GET SERVERS
 	//
 	plex.query('/servers').then(function(res)
 	{
+		adapter.log.debug('Retrieved Servers from Plex.');
 		library.set({node: 'servers', role: get('servers').role, description: get('servers').description}, '');
 		
 		let data = res.MediaContainer.Server;
@@ -271,13 +272,18 @@ function retrieveData()
 				);
 		});
 	})
-	.catch(function(e) {adapter.log.warn(e)});
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Servers from Plex!');
+		adapter.log.debug(e);
+	});
 	
 	//
 	// GET LIBRARIES
 	//
 	plex.query('/library/sections').then(function(res)
 	{
+		adapter.log.debug('Retrieved Libraries from Plex.');
 		library.set({node: 'libraries', role: get('libraries').role, description: get('libraries').description}, '');
 		
 		let data = res.MediaContainer.Directory;
@@ -311,6 +317,8 @@ function retrieveData()
 			tautulli.get('get_library_watch_time_stats', {'section_id': entry['key']}).then(function(res)
 			{
 				if (!is(res)) return; else data = res.response.data;
+				adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
+				
 				library.set({node: 'statistics', role: get('statistics').role, description: get('statistics').description}, '');
 				library.set({node: 'statistics.libraries', role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, '')}, '');
 				library.set({node: 'statistics.libraries.' + libId, role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, entry['title'])}, '');
@@ -328,7 +336,11 @@ function retrieveData()
 			
 		});
 	})
-	.catch(function(e) {adapter.log.warn(e)});
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Libraries from Plex!');
+		adapter.log.debug(e);
+	});
 	
 	//
 	// GET USERS
@@ -337,6 +349,7 @@ function retrieveData()
 	tautulli.get('get_users').then(function(res)
 	{
 		if (!is(res)) return; else data = res.response.data;
+		adapter.log.debug('Retrieved Users from Tautulli.');
 		library.set({node: 'users', role: get('users').role, description: get('users').description}, '');
 		
 		data.forEach(function(entry)
@@ -359,6 +372,7 @@ function retrieveData()
 			tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(function(res)
 			{
 				if (!is(res)) return; else data = res.response.data;
+				adapter.log.debug('Retrieved Watch Statistics for User ' + entry['friendly_name'] + ' from Tautulli.');
 				
 				library.set({node: 'statistics.users', role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, '')}, '');
 				library.set({node: 'statistics.users.' + userId, role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, entry['friendly_name'])}, '');
@@ -376,7 +390,11 @@ function retrieveData()
 			
 		});
 	})
-	.catch(function(e) {});
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Users from Tautulli!');
+		adapter.log.debug(e);
+	});
 	
 	//
 	// GET SETTINGS
@@ -384,6 +402,7 @@ function retrieveData()
 	plex.query('/:/prefs').then(function(res)
 	{
 		let data = res.MediaContainer.Setting;
+		adapter.log.debug('Retrieved Settings from Plex.');
 		library.set({node: 'settings', role: get('settings').role, description: get('settings').description}, '');
 		
 		data.forEach(function(entry)
@@ -400,6 +419,11 @@ function retrieveData()
 				entry['value']
 			);
 		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Settings from Plex!');
+		adapter.log.debug(e);
 	});
 	
 	//

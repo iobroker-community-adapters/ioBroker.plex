@@ -1,0 +1,21 @@
+{
+    "events": "Inschrijven / luisteren naar gebeurtenissen (Configuratie van de webhook)",
+    "eventsInfo": "Luisteren naar evenementen kunt u gebeurtenissen ontvangen van Plex via Tautulli.",
+    "other": "Andere Instellingen",
+    "plexAuth": "Instellingen voor de verbinding van de Plex bijvoorbeeld",
+    "plexAuthInfo": "De verbindingsinstellingen voor de Plex-exemplaar.",
+    "plexIp": "IP-adres",
+    "plexPort": "Poort",
+    "plexSecure": "Secure (https)",
+    "refresh": "Vernieuwen (in seconden)",
+    "refreshInfo": "Tijd voor het vernieuwen van alle instellingen / informatie (in seconden). Indien ingesteld op 0, instellingen wordt alleen vernieuwd aan de adapter opstarten.",
+    "tab_alexa": "Alexa integratie",
+    "tab_config": "Configuratie",
+    "tab_info": "Informatie",
+    "tautulliAuth": "Instellingen voor de verbinding van de Tautulli exemplaar",
+    "tautulliAuthInfo": "De verbindingsinstellingen voor de Tautulli exemplaar. Vind je de API key in de Tautulli dashboard via instellingen -> web interface in de API-gedeelte (aan het einde van de pagina).",
+    "tautulliIp": "IP-adres",
+    "tautulliPort": "Poort",
+    "tautulliToken": "API Token",
+    "webhookPort": "Webhook Poort"
+}

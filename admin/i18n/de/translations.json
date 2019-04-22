@@ -1,0 +1,21 @@
+{
+    "events": "Abonnieren / hören auf Ereignisse (Konfiguration der webhook)",
+    "eventsInfo": "Hören von Ereignissen können Sie Ereignisse empfangen, die von Plex über Tautulli.",
+    "other": "Andere Einstellungen",
+    "plexAuth": "Die Verbindungs-Einstellungen von Plex Instanz",
+    "plexAuthInfo": "Die Verbindung Einstellungen für die Plex-Instanz.",
+    "plexIp": "Die IP-Adresse",
+    "plexPort": "Port",
+    "plexSecure": "Sichere (https -)",
+    "refresh": "Refresh (in Sekunden)",
+    "refreshInfo": "Zeit für Aktualisierung alle Einstellungen / Daten (in Sekunden). Wenn auf 0 gesetzt, die Einstellungen werden nur aktualisiert, adapter starten.",
+    "tab_alexa": "Alexa integration",
+    "tab_config": "Konfiguration",
+    "tab_info": "Informationen",
+    "tautulliAuth": "Verbindungseinstellungen des Tautulli Instanz",
+    "tautulliAuthInfo": "Die Verbindung Einstellungen für die Tautulli Instanz. Sie finden den API-key in die Tautulli dashboard über Einstellungen -> web-Schnittstelle in der API-Abschnitt (am Ende der Seite).",
+    "tautulliIp": "Die IP-Adresse",
+    "tautulliPort": "Port",
+    "tautulliToken": "API-Token",
+    "webhookPort": "Webhook-Port"
+}

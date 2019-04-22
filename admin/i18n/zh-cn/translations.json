@@ -1,0 +1,21 @@
+{
+    "events": "订阅/听到的事件(配置两者)",
+    "eventsInfo": "听到事件可以让你得到事件从丛通过Tautulli的。",
+    "other": "其他的设置",
+    "plexAuth": "连接设置的复杂的实例",
+    "plexAuthInfo": "连接设置的复杂的实例。",
+    "plexIp": "IP地址",
+    "plexPort": "口",
+    "plexSecure": "安全(https)",
+    "refresh": "刷新(秒)",
+    "refreshInfo": "时间用于清爽的所有设置/信息(秒)。 如果设定为0，设置仅将刷新关于适配器启动。",
+    "tab_alexa": "Alexa的一体化",
+    "tab_config": "配置",
+    "tab_info": "的信息",
+    "tautulliAuth": "连接设置的Tautulli实例",
+    "tautulliAuthInfo": "连接设置Tautulli的实例。 你会找到API关键在Tautulli仪表板通过设置->网络界面在API部分(在结束页)。",
+    "tautulliIp": "IP地址",
+    "tautulliPort": "口",
+    "tautulliToken": "API令牌",
+    "webhookPort": "两者口"
+}

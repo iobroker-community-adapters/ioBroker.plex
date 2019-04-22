@@ -1,0 +1,21 @@
+{
+    "events": "Subskrybuj / słuchać zdarzeń (konfiguracja strony-pościgowa)",
+    "eventsInfo": "Nasłuchiwanie zdarzeń pozwala odbierać zdarzenia z plexus przez Tautulli.",
+    "other": "Inne Opcje",
+    "plexAuth": "Parametry instancji plex dnia połączenia ",
+    "plexAuthInfo": "Ustawienia połączenia dla instancji plex dnia.",
+    "plexIp": "Adres IP",
+    "plexPort": "Port",
+    "plexSecure": "Bezpieczne (HTTPS)",
+    "refresh": "Aktualizacje (w sekundach)",
+    "refreshInfo": "Podczas aktualizacji wszystkie ustawienia / informacje (w sekundach). Jeżeli określono wartość 0, ustawienia zostaną zaktualizowane po uruchomieniu zasilacza.",
+    "tab_alexa": "Alexa integracji",
+    "tab_config": "Konfiguracji",
+    "tab_info": "Informacje",
+    "tautulliAuth": "Parametry instancji Tautulli związku ",
+    "tautulliAuthInfo": "Ustawienia połączenia dla instancji Tautulli. Znajdziesz klucz API w desce rozdzielczej Tautulli poprzez ustawienia -> interfejs www w dziale API-interfejs (na końcu strony).",
+    "tautulliIp": "Adres IP",
+    "tautulliPort": "Port",
+    "tautulliToken": "Token API ",
+    "webhookPort": "Port Web-Pościgowa "
+}

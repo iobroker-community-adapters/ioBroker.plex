@@ -1,0 +1,159 @@
+<html>
+<head>
+	<!-- these 4 files always have to be included -->
+	<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
+	<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+
+	<script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+
+	<!-- these files always have to be included -->
+	<script type="text/javascript" src="../../js/translate.js"></script>
+	<script type="text/javascript" src="../../lib/js/materialize.js"></script>
+	<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+	
+	<script type="text/javascript" src="words.js"></script>
+	<script type="text/javascript">
+	<!--
+	// load
+	function load(settings, onChange)
+	{
+		_load(settings, onChange);
+	}
+	
+	// save
+	function save(callback)
+	{
+		_save(callback);
+	}
+	
+	// page loaded
+	$(window).on('load', function()
+	{
+	});
+	// -->
+	</script>
+	<script type="text/javascript" src="admin.js"></script>
+	<link rel="stylesheet" type="text/css" href="admin.css"/>
+	
+</head>
+<body>
+
+
+<div class="m adapter-container" id="settings">
+	
+	<div class="row">
+		
+		<!-- TABS -->
+		<div class="col s12">
+			<ul class="tabs">
+				<li class="tab col s3"><a class="translate active" href="#config">tab_config</a></li>
+				<li class="tab col s3"><a target="_blank" class="translate" href="https://github.com/Zefau/ioBroker.plex#smart-home--alexa-integration-using-iobrokerjavascript">tab_alexa</a></li>
+				<li class="tab col s3"><a target="_blank" class="translate" href="https://github.com/Zefau/ioBroker.plex#iobrokerplex">tab_info</a></li>
+			</ul>
+		</div>
+		
+		<!-- CONFIG -->
+		<div id="config" class="col s12">
+			
+			<!-- Plex -->
+			<div class="row">
+				<div class="col s12 m12">
+					<div class="row" style="margin-bottom: 0">
+						<div class="col s12 m12">
+							<p class="translate title">plexAuth</p>
+						</div>
+					</div>
+					<div class="row box">
+						<p class="subtitle translate">plexAuthInfo</p>
+						
+						<div class="input-field col s4 m4">
+							<input class="value" id="plexIp" type="text" />
+							<label for="plexIp" class="translate">plexIp</label>
+						</div>
+						<div class="input-field col s3 m3">
+							<input class="value" id="plexPort" type="number" placeholder="32400" />
+							<label for="plexPort" class="translate">plexPort</label>
+						</div>
+						<div class="input-field col s3 m3">
+							<input class="value" id="plexSecure" type="checkbox" />
+							<label for="plexSecure" class="translate">plexSecure</label>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			
+			<!-- Tautulli -->
+			<div class="row">
+				<div class="col s12 m12">
+					<div class="row" style="margin-bottom: 0">
+						<div class="col s12 m12">
+							<p class="translate title">tautulliAuth</p>
+						</div>
+					</div>
+					<div class="row box">
+						<p class="subtitle translate">tautulliAuthInfo</p>
+						
+						<div class="input-field col s4 m4">
+							<input class="value" id="tautulliIp" type="text" />
+							<label for="tautulliIp" class="translate">tautulliIp</label>
+						</div>
+						<div class="input-field col s3 m3">
+							<input class="value" id="tautulliPort" type="number" placeholder="8181" />
+							<label for="tautulliPort" class="translate">tautulliPort</label>
+						</div>
+						<div class="input-field col s5 m5">
+							<input class="value" id="tautulliToken" type="text" />
+							<label for="tautulliToken" class="translate">tautulliToken</label>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			
+			<!-- Other & Events -->
+			<div class="row">
+				<div class="col s6 m6">
+					<div class="row" style="margin-bottom: 0">
+						<div class="col s12 m12">
+							<p class="translate title">other</p>
+						</div>
+					</div>
+					<div class="row box">
+						<p class="subtitle translate">refreshInfo</p>
+						
+						<div class="input-field col s4 m4">
+							<input class="value" id="refresh" type="number" placeholder="0" />
+							<label for="refresh" class="translate">refresh</label>
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="col s6 m6">
+					<div class="row" style="margin-bottom: 0">
+						<div class="col s12 m12">
+							<p class="translate title">events</p>
+						</div>
+					</div>
+					<div class="row box">
+						<p class="subtitle translate">eventsInfo</p>
+						
+						<div class="input-field col s4 m4">
+							<input class="value" id="port" type="number" placeholder="41891" />
+							<label for="port" class="translate">webhookPort</label>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+			
+		</div>
+		
+	</div>
+
+</div>
+
+</body>
+</html>

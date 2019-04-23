@@ -1,5 +1,124 @@
 ![Logo](https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/admin/tautulli.jpg)
 
+## Notification configuration
+__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities. __Please be aware__, that the notification types for ```Playback``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"} ``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
+
+### Playback Start
+```
+{
+	"event":"media.play",
+	"user":undefined,
+	"owner":undefined,
+	"Account":{
+		"id":"{user_id}",
+		"thumb":undefined,
+		"title":"{username}"
+	},
+	"Server":{
+		"title":"{server_name}",
+		"uuid":"{server_machine_id}"
+	},
+	"Player":{
+		"local":"{stream_local}",
+		"localAddress":"{ip_address}",
+		"publicAddress":undefined,
+		"title":"{player}",
+		"uuid":"{machine_id}"
+	},
+	"Metadata":{
+		"ratingKey":"{rating_key}",
+		"key":"",
+		"librarySectionTitle":"{library_name}",
+		"librarySectionID":"{section_id}",
+		"studio":"{studio}",
+		"type":"{media_type}",
+		"title":"{title}",
+		"contentRating":"{content_rating}",
+		"summary":"{summary}",
+		"rating":"{rating}",
+		"lastViewedAt":"{last_viewed_date}",
+		"year":"{year}",
+		"tagline":"{tagline}",
+		"thumb":"{thumb}",
+		"duration":"{duration}",
+		"originallyAvailableAt":"{release_date}",
+		"addedAt":"{added_date}",
+		"updatedAt":"{updated_date}",
+
+		"librarySectionType":"movie",
+		"ratingKey":"218084",
+		"key":"/library/metadata/218084",
+		"guid":"com.plexapp.agents.imdb://tt1590193?lang=en",
+		"librarySectionTitle":"Movies",
+		"librarySectionID":4,
+		"librarySectionKey":"/library/sections/4",
+		"studio":"Canal+",
+		"type":"movie",
+		"title":"The Commuter",
+		"titleSort":"Commuter",
+		"contentRating":"PG-13",
+		"summary":"A businessman, on his daily commute home, gets unwittingly caught up in a criminal conspiracy that threatens not only his life but the lives of those around him.",
+		"rating":6.3,
+		"lastViewedAt":1556047643,
+		"year":2018,
+		"tagline":"Lives are on the line",
+		"thumb":"/library/metadata/218084/thumb/1555245397",
+		"art":"/library/metadata/218084/art/1555245397",
+		"duration":6240000,
+		"originallyAvailableAt":"2018-01-11",
+		"addedAt":1555245350,
+		"updatedAt":1555245397,
+		"chapterSource":"media",
+		"primaryExtraKey":"/library/metadata/218085",
+		"ratingImage":"imdb://image.rating",
+
+		"Genre":"{genres}",
+		"Director":"{directors}",
+		"Writer":"{writers}",
+		"Country":undefined,
+		"Producer":undefined,
+		"Role":"{actors}",
+		"Similar":undefined
+	}
+}
+```
+
+### Playback Stop
+```
+{
+  "event":"media.stop"
+}
+```
+
+### Playback Pause
+```
+{
+  "event":"media.pause"
+}
+```
+
+### Playback Resume
+```
+{
+  "event":"media.resume"
+}
+```
+
+### Transcode Decision Change
+### Watched
+### Buffer Warning
+### User Concurrent Streams
+### User New Device
+### Recently Added
+### Plex Server Down
+### Plex Server Back Up
+### Plex Remote Access Down
+### Plex Remote Access Back Up
+### Plex Update Available
+### Tautulli Update Available
+
+
+
 ## List of available parameters
 ### Global
 

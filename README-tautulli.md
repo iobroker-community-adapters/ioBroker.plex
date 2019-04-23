@@ -10,7 +10,8 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 	"user":undefined,
 	"owner":undefined,
 	"Account":{
-		"id":"{user_id}",
+		"userId":"{user_id}",
+		"id":undefined,
 		"thumb":undefined,
 		"title":"{username}"
 	},

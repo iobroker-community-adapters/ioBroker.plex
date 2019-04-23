@@ -13,7 +13,7 @@ const _multer = require('multer');
  */
 const Library = require(__dirname + '/lib/library.js');
 const Plex = require('plex-api');
-const PlexControl = require('plex-control').PlexControl;
+//const PlexControl = require('plex-control').PlexControl;
 const Tautulli = require('tautulli-api');
 //const params = require(__dirname + '/tautulli-parameters.json');
 const _NODES = require(__dirname + '/NODES.json');
@@ -22,10 +22,10 @@ const _NODES = require(__dirname + '/NODES.json');
 /*
  * variables initiation
  */
-var adapter;
-var library;
-var plex, tautulli, data;
-var upload = _multer({ dest: '/tmp/' });
+let adapter;
+let library;
+let plex, tautulli, data;
+let upload = _multer({ dest: '/tmp/' });
 
 
 /*
@@ -108,7 +108,7 @@ function startAdapter(options)
 		
 		_http.post('/plex', upload.single('thumb'), function(req, res, next)
 		{
-			var payload;
+			let payload;
 			try
 			{
 				payload = JSON.parse(req.body.payload);
@@ -121,12 +121,12 @@ function startAdapter(options)
 		// listen to events from Tautulli
 		_http.post('/tautulli', function(req, res, next)
 		{
-			var payload;
+			let payload;
 			try
 			{
 				payload = req.body;
 				adapter.log.debug('Received payload from Tautulli: ' + JSON.stringify(payload));
-				//setEvent(payload, 'tautulli');
+				setEvent(payload, 'tautulli');
 			}
 			catch(e) {adapter.log.warn(e.message)}
 		});
@@ -170,10 +170,39 @@ function startAdapter(options)
  */
 function setEvent(data, source)
 {
-	library.set({node: '_playing', role: 'channel', description: 'Current event being played'}, '');
+	// group by player
+	data['Player'] = data['Player'] !== undefined ? data['Player'] : {};
+	let groupBy = data['Player']['title'] && data['Player']['uuid'] ? data['Player']['title'].toLowerCase().replace(/ /g, '_') + '-' + data['Player']['uuid'] : 'unknown';
 	
-	for (var key in data)
-		readData('_playing.' + key, data[key])
+	// add meta data
+	data.source = source;
+	data.timestamp = Math.floor(Date.now()/1000);
+	data.datetime = library.getDateTime(Date.now());
+	
+	// add or update
+	adapter.getState('_playing.' + groupBy + '.Metadata.key', function(err, state)
+	{
+		// update only
+		if (data['Metadata'] && data['Metadata']['key'] && state && state.val == data['Metadata']['key'])
+		{
+			library._setValue('_playing.' + groupBy + '.event', data.event);
+			library._setValue('_playing.' + groupBy + '.datetime', data.timestamp);
+			library._setValue('_playing.' + groupBy + '.timestamp', data.datetime);
+		}
+		
+		// add (only on new media)
+		else
+		{
+			library.del('_playing.' + groupBy + '.*', function() // delete any previous media states
+			{
+				library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
+				library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
+				
+				for (let key in data)
+					readData('_playing.' + groupBy + '.' + key, data[key])
+			});
+		}
+	});
 }
 
 /**
@@ -185,9 +214,15 @@ function readData(key, data)
 	// loop nested data
 	if (typeof data == 'object')
 	{
-		for (var nestedKey in data)
+		library.set({node: key, role: 'channel', description: key.substr(key.lastIndexOf('.')+1)}, '');
+		
+		for (let nestedKey in data)
 		{
 			library.set({node: key + '.' + nestedKey, role: 'channel', description: nestedKey}, '');
+			
+			if (typeof data[nestedKey] == 'object')
+				library.set({node: key + '.' + nestedKey + '._data', role: 'json', description: nestedKey + ' data'}, JSON.stringify(data[nestedKey]));
+			
 			readData(key + '.' + nestedKey, data[nestedKey])
 		}
 	}
@@ -200,7 +235,7 @@ function readData(key, data)
 				node: key,
 				type: typeof data,
 				role: typeof data == 'boolean' ? 'indicator' : (typeof data == 'number' ? 'value' : 'text'),
-				description: ''
+				description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description
 			},
 			data
 		);
@@ -244,7 +279,7 @@ function get(node)
  */
 function retrieveData()
 {
-	var watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
+	let watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
 	adapter.log.debug('Retrieving data from Plex..');
 	
 	//
@@ -258,10 +293,10 @@ function retrieveData()
 		let data = res.MediaContainer.Server;
 		data.forEach(function(entry)
 		{
-			var serverId = entry['name'].toLowerCase();
+			let serverId = entry['name'].toLowerCase();
 			library.set({node: 'servers.' + serverId, role: get('server').role, description: get('server').description.replace(/%server%/gi, entry['name'])}, '');
 			
-			for (var key in entry)
+			for (let key in entry)
 				library.set(
 					{
 						node: 'servers.' + serverId + '.' + key,
@@ -289,10 +324,10 @@ function retrieveData()
 		let data = res.MediaContainer.Directory;
 		data.forEach(function(entry)
 		{
-			var libId = entry['key'] + '-' + entry['title'].toLowerCase();
+			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
 			library.set({node: 'libraries.' + libId, role: get('library').role, description: get('library').description.replace(/%library%/gi, entry['title'])}, '');
 			
-			for (var key in entry)
+			for (let key in entry)
 			{
 				library.set(
 					{
@@ -325,10 +360,10 @@ function retrieveData()
 				
 				data.forEach(function(entry, i)
 				{
-					var id = watched[i];
+					let id = watched[i];
 					library.set({node: 'statistics.libraries.' + libId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
 						
-					for (var key in entry)
+					for (let key in entry)
 						library.set({node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
 				});
 			})
@@ -354,13 +389,13 @@ function retrieveData()
 		
 		data.forEach(function(entry)
 		{
-			var userId = entry['friendly_name'].toLowerCase().replace(/ /gi, '_');
+			let userId = entry['friendly_name'].toLowerCase().replace(/ /gi, '_');
 			if (userId === 'local') return;
 			
 			library.set({node: 'users.' + userId, role: get('user').role, description: get('user').description.replace(/%user%/gi, entry['friendly_name'])}, '');
 			
 			// fill user information
-			for (var key in entry)
+			for (let key in entry)
 			{
 				if (key === 'server_token') continue;
 				library.set({node: 'users.' + userId + '.' + key, role: get('users.' + key).role, description: get('users.' + key).description}, entry[key]);
@@ -379,10 +414,10 @@ function retrieveData()
 				
 				data.forEach(function(entry, i)
 				{
-					var id = watched[i];
+					let id = watched[i];
 					library.set({node: 'statistics.users.' + userId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
 					
-					for (var key in entry)
+					for (let key in entry)
 						library.set({node: 'statistics.users.' + userId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
 				});
 			})

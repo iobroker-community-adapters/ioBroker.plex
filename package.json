@@ -1,54 +1,75 @@
 {
-  "name": "iobroker.plex",
-  "version": "0.1.0",
-  "description": "Integration of your Plex Media Server and / or your Tautulli",
+  "_from": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+  "_id": "iobroker.plex@0.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-EUraEowLT80IMNySbxpe0zyQGHT7fcWgIthHmznT/jY5ZgfprAmUAEj9/6WtxX07l+1NZovR+q/GtpcEjabHAQ==",
+  "_location": "/iobroker.plex",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+    "rawSpec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+    "saveSpec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+    "fetchSpec": "https://github.com/Zefau/ioBroker.plex/tarball/master"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+  "_shasum": "03819ad831f5bd31270c700df85fea4629ead1e3",
+  "_spec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+  "_where": "/root",
   "author": {
     "name": "zefau",
     "email": "zefau@mailbox.org"
   },
+  "bugs": {
+    "url": "https://github.com/Zefau/ioBroker.plex/issues"
+  },
+  "bundleDependencies": false,
   "contributors": [
     {
       "name": "zefau",
       "email": "zefau@mailbox.org"
     }
   ],
+  "dependencies": {
+    "@iobroker/adapter-core": "^1.0.3",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "multer": "^1.4.1",
+    "plex-api": "^5.2.1",
+    "tautulli-api": "^1.0.0"
+  },
+  "deprecated": false,
+  "description": "Integration of your Plex Media Server and / or your Tautulli",
+  "devDependencies": {
+    "@iobroker/testing": "^1.2.0",
+    "axios": "^0.18.0",
+    "chai": "^4.2.0",
+    "gulp": "^4.0.1",
+    "mocha": "^6.1.4"
+  },
   "homepage": "https://github.com/Zefau/ioBroker.plex",
-  "license": "MIT",
   "keywords": [
     "ioBroker",
     "plex",
     "tautulli",
     "media server"
   ],
+  "license": "MIT",
+  "main": "plex.js",
+  "name": "iobroker.plex",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Zefau/ioBroker.plex"
+    "url": "git+https://github.com/Zefau/ioBroker.plex.git"
   },
-  "dependencies": {
-    "plex-api": "^5.2.1",
-    "plex-control": "^2.0.1",
-    "tautulli-api": "^1.0.0",
-    "express": "^4.16.4",
-    "multer": "^1.4.1",
-    "body-parser": "^1.18.3",
-    "@iobroker/adapter-core": "^1.0.3"
-  },
-  "devDependencies": {
-    "gulp": "^4.0.1",
-    "mocha": "^6.1.4",
-    "chai": "^4.2.0",
-    "axios": "^0.18.0",
-    "@iobroker/testing": "^1.2.0"
-  },
-  "main": "plex.js",
   "scripts": {
     "test": "npm run test:package && npm run test:unit",
+    "test:integration": "mocha test/integration --exit",
     "test:package": "mocha test/package --exit",
-    "test:unit": "mocha test/unit --exit",
-    "test:integration": "mocha test/integration --exit"
+    "test:unit": "mocha test/unit --exit"
   },
-  "bugs": {
-    "url": "https://github.com/Zefau/ioBroker.plex/issues"
-  },
-  "readmeFilename": "README.md"
+  "version": "0.1.0"
 }

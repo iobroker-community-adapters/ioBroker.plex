@@ -50,28 +50,7 @@ Enter your ioBroker IP adress with the custom port specified in the ioBroker.ple
 ![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
 
 Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
-Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the following table:
-
-| Type of Notification | Example of JSON data |
-| -------------------- | -------------------- |
-| Playback Start | ```{"event":"media.play"}``` |
-| Playback Stop | ```{"event":"media.stop"}``` |
-| Playback Pause | ```{"event":"media.pause"}``` |
-| Playback Resume | ```{"event":"media.resume"}``` |
-| Transcode Decision Change | _to be defined_ |
-| Watched | _to be defined_ |
-| Buffer Warning | _to be defined_ |
-| User Concurrent Streams | _to be defined_ |
-| User New Device | _to be defined_ |
-| Recently Added | _to be defined_ |
-| Plex Server Down | _to be defined_ |
-| Plex Server Back Up | _to be defined_ |
-| Plex Remote Access Down | _to be defined_ |
-| Plex Remote Access Back Up | _to be defined_ |
-| Plex Update Available | _to be defined_ |
-| Tautulli Update Available | _to be defined_ |
-
-__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities. __Please be aware__, that the notification types for ```Playback``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"} ``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
+Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here]().
 
 
 ## Channels & States

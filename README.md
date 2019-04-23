@@ -54,10 +54,10 @@ Finally, go to the _Triggers_ tab, select your desired (or simply all) options a
 
 | Type of Notification | Example of JSON data |
 | -------------------- | -------------------- |
-| Playback Start | ```{"title": "Playback of {media_type} started", "message": "{user} ({player}) started playing {title}."}``` |
-| Playback Stop | _to be defined_ |
-| Playback Pause | _to be defined_ |
-| Playback Resume | _to be defined_ |
+| Playback Start | ```{"event":"media.play"}``` |
+| Playback Stop | ```{"event":"media.stop"}``` |
+| Playback Pause | ```{"event":"media.pause"}``` |
+| Playback Resume | ```{"event":"media.resume"}``` |
 | Transcode Decision Change | _to be defined_ |
 | Watched | _to be defined_ |
 | Buffer Warning | _to be defined_ |
@@ -70,6 +70,8 @@ Finally, go to the _Triggers_ tab, select your desired (or simply all) options a
 | Plex Remote Access Back Up | _to be defined_ |
 | Plex Update Available | _to be defined_ |
 | Tautulli Update Available | _to be defined_ |
+
+__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities. __Please be aware__, that the notification types for ```Playback``` __require__ ```{"Player": {"title": "", "uuid": ""} ``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
 
 
 ## Channels & States
@@ -91,8 +93,15 @@ After sucessful advanced setup the following channels and states will _additiona
 
 ## Changelog
 
-### 0.1.0 (2019-04-18)
-* (zefau) initial release
+### 0.2.0 (2019-04-xx) [PLANNED RELEASE]
+- add playback control for players
+- add support for all Tautulli triggers
+- add state description for object tree ```_playing```
+
+### 0.1.0 (2019-04-xx) [IN DEVELOPMENT]
+- get initial data from Plex API
+- receive events from Plex Webhook (Plex Pass only)
+- receive events from Tatulli (if used)
 
 
 ## License

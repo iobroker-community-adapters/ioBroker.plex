@@ -71,7 +71,7 @@ Finally, go to the _Triggers_ tab, select your desired (or simply all) options a
 | Plex Update Available | _to be defined_ |
 | Tautulli Update Available | _to be defined_ |
 
-__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities. __Please be aware__, that the notification types for ```Playback``` __require__ ```{"Player": {"title": "", "uuid": ""} ``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
+__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities. __Please be aware__, that the notification types for ```Playback``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"} ``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
 
 
 ## Channels & States

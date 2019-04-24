@@ -51,7 +51,7 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 		"originallyAvailableAt":"{release_date}",
 		"addedAt":"{added_date}",
 		"updatedAt":"{updated_date}",
-		"chapterSource":undefined,
+		"chapterSource":"undefined",
 		"primaryExtraKey":"undefined",
 		"ratingImage":"imdb://image.rating",
 		"Genre":"{genres}",

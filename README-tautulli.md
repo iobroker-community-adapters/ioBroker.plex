@@ -7,12 +7,12 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 ```
 {
 	"event":"media.play",
-	"user":undefined,
-	"owner":undefined,
+	"user":"undefined",
+	"owner":"undefined",
 	"Account":{
 		"userId":"{user_id}",
-		"id":undefined,
-		"thumb":undefined,
+		"id":"undefined",
+		"thumb":"undefined",
 		"title":"{username}"
 	},
 	"Server":{
@@ -22,12 +22,12 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 	"Player":{
 		"local":"{stream_local}",
 		"localAddress":"{ip_address}",
-		"publicAddress":undefined,
+		"publicAddress":"undefined",
 		"title":"{player}",
 		"uuid":"{machine_id}"
 	},
 	"Metadata":{
-		"librarySectionType":undefined,
+		"librarySectionType":"undefined",
 		"ratingKey":"{rating_key}",
 		"key":"/library/metadata/{rating_key}",
 		"guid":"com.plexapp.agents.imdb://{imdb_id}?lang=en",
@@ -37,7 +37,7 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 		"studio":"{studio}",
 		"type":"{media_type}",
 		"title":"{title}",
-		"titleSort":undefined,
+		"titleSort":"undefined",
 		"contentRating":"{content_rating}",
 		"summary":"{summary}",
 		"rating":"{rating}",
@@ -57,11 +57,11 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 		"Genre":"{genres}",
 		"Director":"{directors}",
 		"Writer":"{writers}",
-		"Country":undefined,
-		"Producer":undefined,
+		"Country":"undefined",
+		"Producer":"undefined",
 		"Collection":"{collections}",
 		"Role":"{actors}",
-		"Similar":undefined,
+		"Similar":"undefined",
 		"video": {
 			"container": "{container}",
 			"bitrate": "{bitrate}",

@@ -41,11 +41,12 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 		"contentRating":"{content_rating}",
 		"summary":"{summary}",
 		"rating":"{rating}",
+	  	"viewOffset":"undefined",
 		"lastViewedAt":"{last_viewed_date}",
 		"year":"{year}",
 		"tagline":"{tagline}",
 		"thumb":"{thumb}",
-		"art":"{poster_thumb}",
+		"art":"undefined",
 		"duration":"{duration}",
 		"originallyAvailableAt":"{release_date}",
 		"addedAt":"{added_date}",
@@ -58,8 +59,44 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 		"Writer":"{writers}",
 		"Country":undefined,
 		"Producer":undefined,
+		"Collection":"{collections}",
 		"Role":"{actors}",
-		"Similar":undefined
+		"Similar":undefined,
+		"video": {
+			"container": "{container}",
+			"bitrate": "{bitrate}",
+			"aspect_ratio": "{aspect_ratio}",
+			"video_codec": "{video_codec}",
+			"video_codec_level": "{video_codec_level}",
+			"video_bitrate": "{video_bitrate}",
+			"video_bit_depth": "{video_bit_depth}",
+			"video_framerate": "{video_framerate}",
+			"video_ref_frames": "{video_ref_frames}",
+			"video_resolution": "{video_resolution}",
+			"video_height": "{video_height}",
+			"video_width": "{video_width}",
+			"video_language": "{video_language}",
+			"video_language_code": "{video_language_code}"
+		},
+		"audio": {
+			"audio_bitrate": "{audio_bitrate}",
+			"audio_bitrate_mode": "{audio_bitrate_mode}",
+			"audio_codec": "{audio_codec}",
+			"audio_channels": "{audio_channels}",
+			"audio_channel_layout": "{audio_channel_layout}",
+			"audio_sample_rate": "{audio_sample_rate}",
+			"audio_language": "{audio_language}",
+			"audio_language_code": "{audio_language_code}"
+		},
+		"subtitles": {
+			"subtitle_codec": "{subtitle_codec}",
+			"subtitle_container": "{subtitle_container}",
+			"subtitle_format": "{subtitle_format}",
+			"subtitle_forced": "{subtitle_forced}",
+			"subtitle_location": "{subtitle_location}",
+			"subtitle_language": "{subtitle_language}",
+			"subtitle_language_code": "{subtitle_language_code}"
+		}
 	}
 }
 ```

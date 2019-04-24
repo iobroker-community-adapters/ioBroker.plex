@@ -3,10 +3,10 @@
 ## Notification configuration
 __Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities. __Please be aware__, that the notification types for ```Playback``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"} ``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
 
-### Playback Start
+### Playback Start / Stop / Pause / Resume
 ```
 {
-	"event":"media.play",
+	"event":"media.{action}",
 	"user":"undefined",
 	"owner":"undefined",
 	"Account":{
@@ -101,40 +101,89 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 }
 ```
 
-### Playback Stop
-```
-{
-  "event":"media.stop"
-}
-```
-
-### Playback Pause
-```
-{
-  "event":"media.pause"
-}
-```
-
-### Playback Resume
-```
-{
-  "event":"media.resume"
-}
-```
-
 ### Transcode Decision Change
-### Watched
-### Buffer Warning
-### User Concurrent Streams
-### User New Device
-### Recently Added
-### Plex Server Down
-### Plex Server Back Up
-### Plex Remote Access Down
-### Plex Remote Access Back Up
-### Plex Update Available
-### Tautulli Update Available
+```
+{
+	to be defined
+}
+```
 
+### Watched
+```
+{
+	to be defined
+}
+```
+
+### Buffer Warning
+```
+{
+	to be defined
+}
+```
+
+### User Concurrent Streams
+```
+{
+	to be defined
+}
+```
+
+### User New Device
+```
+{
+	to be defined
+}
+```
+
+### Recently Added
+```
+{
+	to be defined
+}
+```
+
+### Plex Server Down
+```
+{
+	to be defined
+}
+```
+
+### Plex Server Back Up
+```
+{
+	to be defined
+}
+```
+
+### Plex Remote Access Down
+```
+{
+	to be defined
+}
+```
+
+### Plex Remote Access Back Up
+```
+{
+	to be defined
+}
+```
+
+### Plex Update Available
+```
+{
+	to be defined
+}
+```
+
+### Tautulli Update Available
+```
+{
+	to be defined
+}
+```
 
 
 ## List of available parameters

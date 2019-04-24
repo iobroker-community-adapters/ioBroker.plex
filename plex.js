@@ -185,16 +185,17 @@ function setEvent(data, source)
 		// update only
 		if (data['Metadata'] && data['Metadata']['key'] && state && state.val == data['Metadata']['key'])
 		{
-			library._setValue('_playing.' + groupBy + '.event', data.event);
-			library._setValue('_playing.' + groupBy + '.datetime', data.timestamp);
-			library._setValue('_playing.' + groupBy + '.timestamp', data.datetime);
+			adapter.log.debug('Plex: Media is being updated.');
+			for (let key in data)
+				readData('_playing.' + groupBy + '.' + key, data[key])
 		}
 		
 		// add (only on new media)
 		else
 		{
-			library.del('_playing.' + groupBy + '.*', function() // delete any previous media states
+			library.del('_playing.' + groupBy, true, function() // delete any previous media states
 			{
+				adapter.log.debug('Plex: New media is being played.');
 				library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
 				library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
 				
@@ -214,8 +215,26 @@ function readData(key, data)
 	// loop nested data
 	if (typeof data == 'object')
 	{
+		// flatten nested data in one state
+ 		if (Array.isArray(data))
+		{
+			library.set(
+				{
+					node: key,
+					type:  'string',
+					role: 'text',
+					description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description
+				},
+				data.map(function(item) {return item.tag}).join(', ')
+			);
+			
+			key = key + 'Tree';
+		}
+		
+		//
 		library.set({node: key, role: 'channel', description: key.substr(key.lastIndexOf('.')+1)}, '');
 		
+		// read nested data
 		for (let nestedKey in data)
 		{
 			library.set({node: key + '.' + nestedKey, role: 'channel', description: nestedKey}, '');
@@ -230,6 +249,21 @@ function readData(key, data)
 	// read data
 	else
 	{
+		// data given?
+		if (data == undefined || data == 'undefined')
+			return;
+		
+		// convert data
+		switch(get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).convert)
+		{
+			case "date":
+				break;
+			
+			case "timestamp":
+				break;
+		}
+		
+		// set data
 		library.set(
 			{
 				node: key,

@@ -3,6 +3,13 @@
 	"playing.owner": {"description": "Indicator if webhook was set by Plex Owner", "role": "indicator", "type": "boolean"},
 	"playing.user": {"description": "Indicator if webhook was set by Plex User", "role": "indicator", "type": "boolean"},
 	
+	"playing.Metadata.lastViewedAt": {"description": "Timestamp of last watched time", "role": "value", "type": "number"},
+	"playing.Metadata.lastViewedAtDate": {"description": "Date of last watched time", "role": "date", "type": "string"},
+	
+	
+	
+	
+	
 	"library": {"description": "Plex Library %library%", "role": "channel"},
 	"libraries": {"description": "Plex Libraries", "role": "channel"},
 	"libraries.location": {"description": "Storage Locations", "role": "json", "type": "string"},

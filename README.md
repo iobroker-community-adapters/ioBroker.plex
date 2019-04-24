@@ -50,26 +50,7 @@ Enter your ioBroker IP adress with the custom port specified in the ioBroker.ple
 ![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
 
 Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
-Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the following table:
-
-| Type of Notification | Example of JSON data |
-| -------------------- | -------------------- |
-| Playback Start | ```{"title": "Playback of {media_type} started", "message": "{user} ({player}) started playing {title}."}``` |
-| Playback Stop | _to be defined_ |
-| Playback Pause | _to be defined_ |
-| Playback Resume | _to be defined_ |
-| Transcode Decision Change | _to be defined_ |
-| Watched | _to be defined_ |
-| Buffer Warning | _to be defined_ |
-| User Concurrent Streams | _to be defined_ |
-| User New Device | _to be defined_ |
-| Recently Added | _to be defined_ |
-| Plex Server Down | _to be defined_ |
-| Plex Server Back Up | _to be defined_ |
-| Plex Remote Access Down | _to be defined_ |
-| Plex Remote Access Back Up | _to be defined_ |
-| Plex Update Available | _to be defined_ |
-| Tautulli Update Available | _to be defined_ |
+Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here]().
 
 
 ## Channels & States
@@ -91,8 +72,15 @@ After sucessful advanced setup the following channels and states will _additiona
 
 ## Changelog
 
-### 0.1.0 (2019-04-18)
-* (zefau) initial release
+### 0.2.0 (2019-04-xx) [PLANNED RELEASE]
+- add playback control for players
+- add support for all Tautulli triggers
+- add state description for object tree ```_playing```
+
+### 0.1.0 (2019-04-xx) [IN DEVELOPMENT]
+- get initial data from Plex API
+- receive events from Plex Webhook (Plex Pass only)
+- receive events from Tatulli (if used)
 
 
 ## License

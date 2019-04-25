@@ -72,7 +72,7 @@ After sucessful advanced setup the following channels and states will _additiona
 
 ## Changelog
 
-### 0.2.0 (2019-04-xx) [PLANNED RELEASE]
+### 1.0.0 (2019-xx-xx) [PLANNED FEATURES FOR v1.0.0 RELEASE]
 - add playback control for players
 - add support for all Tautulli triggers
 - add state description for object tree ```_playing```

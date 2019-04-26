@@ -26,6 +26,7 @@ let adapter;
 let library;
 let plex, tautulli, data;
 let upload = _multer({ dest: '/tmp/' });
+let dutyCycle;
 
 
 /*
@@ -49,6 +50,15 @@ function startAdapter(options)
 	 */
 	adapter.on('ready', function()
 	{
+		// empty _playing on start
+		if (adapter.config.resetMedia)
+		{
+			library.del('_playing', true, function()
+			{
+				adapter.log.debug('Plex Media flushed!');
+			});
+		}
+		
 		// verify Plex settings
 		if (!adapter.config.plexIp)
 		{
@@ -153,6 +163,7 @@ function startAdapter(options)
 		try
 		{
 			adapter.log.info('Adapter stopped und unloaded.');
+			clearTimeout(dutyCycle);
 			callback();
 		}
 		catch(e)
@@ -174,36 +185,21 @@ function setEvent(data, source)
 	data['Player'] = data['Player'] !== undefined ? data['Player'] : {};
 	let groupBy = data['Player']['title'] && data['Player']['uuid'] ? data['Player']['title'].toLowerCase().replace(/ /g, '_') + '-' + data['Player']['uuid'] : 'unknown';
 	
+	// create player
+	library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
+	library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
+	
 	// add meta data
 	data.source = source;
 	data.timestamp = Math.floor(Date.now()/1000);
 	data.datetime = library.getDateTime(Date.now());
 	
-	// add or update
-	adapter.getState('_playing.' + groupBy + '.Metadata.key', function(err, state)
-	{
-		// update only
-		if (data['Metadata'] && data['Metadata']['key'] && state && state.val == data['Metadata']['key'])
-		{
-			adapter.log.debug('Plex: Media is being updated.');
-			for (let key in data)
-				readData('_playing.' + groupBy + '.' + key, data[key])
-		}
-		
-		// add (only on new media)
-		else
-		{
-			library.del('_playing.' + groupBy, true, function() // delete any previous media states
-			{
-				adapter.log.debug('Plex: New media is being played.');
-				library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
-				library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
-				
-				for (let key in data)
-					readData('_playing.' + groupBy + '.' + key, data[key])
-			});
-		}
-	});
+	for (let key in data)
+		readData('_playing.' + groupBy + '.' + key, data[key]);
+	
+	// delete old states (which were not updated in the current payload)
+	clearTimeout(dutyCycle);
+	dutyCycle = setTimeout(function() {library.runDutyCycle('_playing.' + groupBy, data.timestamp)}, 10000);
 }
 
 /**
@@ -218,31 +214,37 @@ function readData(key, data)
 		// flatten nested data in one state
  		if (Array.isArray(data))
 		{
-			library.set(
-				{
-					node: key,
-					type:  'string',
-					role: 'text',
-					description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description
-				},
-				data.map(function(item) {return item.tag}).join(', ')
-			);
+			if (data.length)
+			{
+				library.set(
+					{
+						node: key,
+						type:  'string',
+						role: 'text',
+						description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description
+					},
+					data.map(function(item) {return item.tag}).join(', ')
+				);
+			}
 			
 			key = key + 'Tree';
 		}
 		
-		//
-		library.set({node: key, role: 'channel', description: key.substr(key.lastIndexOf('.')+1)}, '');
-		
-		// read nested data
-		for (let nestedKey in data)
+		// create channel
+		if (Object.keys(data).length > 0)
 		{
-			library.set({node: key + '.' + nestedKey, role: 'channel', description: nestedKey}, '');
-			
-			if (typeof data[nestedKey] == 'object')
-				library.set({node: key + '.' + nestedKey + '._data', role: 'json', description: nestedKey + ' data'}, JSON.stringify(data[nestedKey]));
-			
-			readData(key + '.' + nestedKey, data[nestedKey])
+			library.set({node: key, role: 'channel', description: key.substr(key.lastIndexOf('.')+1)}, '');
+		
+			// read nested data
+			for (let nestedKey in data)
+			{
+				library.set({node: key + '.' + nestedKey, role: 'channel', description: nestedKey}, '');
+				
+				if (typeof data[nestedKey] == 'object')
+					library.set({node: key + '.' + (Array.isArray(data[nestedKey]) ? nestedKey + 'Tree' : nestedKey) + '._data', role: 'json', description: nestedKey + ' data'}, JSON.stringify(data[nestedKey]));
+				
+				readData(key + '.' + nestedKey, data[nestedKey])
+			}
 		}
 	}
 	
@@ -250,16 +252,44 @@ function readData(key, data)
 	else
 	{
 		// data given?
-		if (data == undefined || data == 'undefined')
+		if (data == undefined || data == 'undefined' || !data)
 			return;
 		
 		// convert data
 		switch(get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).convert)
 		{
-			case "date":
+			case "date-timestamp":
+				
+				// convert timestamp to date
+				let date;
+				if (data.indexOf('-') > -1)
+				{
+					date = data
+					data = Math.floor(new Date(data).getTime()/1000)
+				}
+				
+				// or keep date if that is given
+				else
+				{
+					let ts = new Date(data*1000);
+					date = ts.getFullYear() + '-' + ('0'+ts.getMonth()).substr(-2) + '-' + ('0'+ts.getDate()).substr(-2);
+				}
+				
+				// set date
+				library.set(
+					{
+						node: key + 'Date',
+						type: 'string',
+						role: 'text',
+						description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description.replace('Timestamp', 'Date')
+					},
+					date
+				);
 				break;
 			
-			case "timestamp":
+			case "ms-min":
+				let duration = data/1000/60;
+				data = duration < 1 ? data : Math.floor(duration);
 				break;
 		}
 		
@@ -379,6 +409,11 @@ function retrieveData()
 			{
 				library.set({node: 'libraries.' + libId + '.items', type: get('libraries.items').type, role: get('libraries.items').role, description: get('libraries.items').description}, JSON.stringify(res.MediaContainer.Metadata));
 				library.set({node: 'libraries.' + libId + '.itemsCount', type: get('libraries.itemscount').type, role: get('libraries.itemscount').role, description: get('libraries.itemscount').description}, JSON.stringify(res.MediaContainer.size));
+			})
+			.catch(function(e)
+			{
+				adapter.log.debug('Could not retrieve Items for Library ' + entry['title'] + ' from Plex!');
+				adapter.log.debug(e);
 			});
 			
 			// get statistics / watch time
@@ -504,6 +539,9 @@ function retrieveData()
 		
 		
 		
+	})
+	.catch(function(e)
+	{
 	});
 	
 	//

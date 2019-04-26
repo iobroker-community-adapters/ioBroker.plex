@@ -4,16 +4,32 @@
         "version": "0.1.0",
         "title": "Plex Media Server",
         "desc": {
-            "en": "Integration of your Plex Media Server and / or your Tautulli"
+            "en": "Integration of your Plex Media Server and / or your Tautulli",
+            "de": "Integration der Plex Media Server und / oder Ihre Tautulli",
+            "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
+            "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
+            "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
+            "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
+            "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
+            "es": "La integración de su Plex Media Server y / o su Tautulli",
+            "pl": "Integracja Plex media serwer i / lub Tautulli",
+            "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
             "0.1.0": {
                 "en": "initial checkin",
                 "de": "Erste version",
-                "ru": "первая версия"
+                "ru": "первая версия",
+                "pt": "inicial do check-in",
+                "nl": "eerste checkin",
+                "fr": "initiale de l'archivage",
+                "it": "iniziale checkin",
+                "es": "inicial checkin",
+                "pl": "początkowa Чекин",
+                "zh-cn": "最初的签"
             }
         },
-	"license": "MIT",
+        "license": "MIT",
         "platform": "Javascript/Node.js",
         "mode": "daemon",
         "icon": "plex.jpg",
@@ -21,7 +37,7 @@
         "keywords": [
             "tautulli",
             "plex",
-			"media"
+            "media"
         ],
         "readme": "https://github.com/Zefau/ioBroker.plex/blob/master/README.md",
         "loglevel": "info",
@@ -36,9 +52,7 @@
             }
         ]
     },
-    "native": {
-    },
+    "native": {},
     "objects": [],
-    "instanceObjects": [
-    ]
+    "instanceObjects": []
 }

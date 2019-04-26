@@ -3,11 +3,11 @@
 	"playing.owner": {"description": "Indicator if webhook was set by Plex Owner", "role": "indicator", "type": "boolean"},
 	"playing.user": {"description": "Indicator if webhook was set by Plex User", "role": "indicator", "type": "boolean"},
 	
-	"playing.Metadata.lastViewedAt": {"description": "Timestamp of last watched time", "role": "value", "type": "number"},
-	"playing.Metadata.lastViewedAtDate": {"description": "Date of last watched time", "role": "date", "type": "string"},
-	
-	
-	
+	"playing.Metadata.lastViewedAt": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},
+	"playing.Metadata.updatedAt": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},
+	"playing.Metadata.addedAt": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},
+	"playing.Metadata.originallyAvailableAt": {"description": "Timestamp of last watched time", "role": "text", "type": "string"},
+	"playing.Metadata.duration": {"description": "The duration (in minutes) for the item.", "role": "value", "type": "number", "convert": "ms-min"},
 	
 	
 	"library": {"description": "Plex Library %library%", "role": "channel"},

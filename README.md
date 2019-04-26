@@ -72,12 +72,12 @@ After sucessful advanced setup the following channels and states will _additiona
 
 ## Changelog
 
-### 1.0.0 (2019-xx-xx) [PLANNED FEATURES FOR v1.0.0 RELEASE]
+### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
 - add playback control for players
 - add support for all Tautulli triggers
 - add state description for object tree ```_playing```
 
-### 0.1.0 (2019-04-xx) [IN DEVELOPMENT]
+### 0.1.0 (2019-04-26) [CURRENT RELEASE]
 - get initial data from Plex API
 - receive events from Plex Webhook (Plex Pass only)
 - receive events from Tatulli (if used)

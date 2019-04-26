@@ -77,6 +77,9 @@ After sucessful advanced setup the following channels and states will _additiona
 - add support for all Tautulli triggers
 - add state description for object tree ```_playing```
 
+### 0.2.0 (2019-05-xx) [UPCOMING RELEASE]
+- fixed @iobroker/adapter-core dependency
+
 ### 0.1.0 (2019-04-26) [CURRENT RELEASE]
 - get initial data from Plex API
 - receive events from Plex Webhook (Plex Pass only)

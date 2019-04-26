@@ -9,6 +9,8 @@
     "plexSecure": "Segura (https)",
     "refresh": "Actualización (en segundos)",
     "refreshInfo": "Tiempo para la actualización de todos los ajustes / información (en segundos). Si se establece en 0, la configuración sólo se actualizarán en el adaptador de inicio.",
+    "resetMedia": "Reset '._playing' Estados",
+    "resetMediaInfo": "Restablecimiento de todos los estados dentro de un árbol\"._playing' en el inicio",
     "tab_alexa": "Alexa integración",
     "tab_config": "Configuración",
     "tab_info": "Información",

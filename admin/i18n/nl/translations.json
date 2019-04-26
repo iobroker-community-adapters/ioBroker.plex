@@ -9,6 +9,8 @@
     "plexSecure": "Secure (https)",
     "refresh": "Vernieuwen (in seconden)",
     "refreshInfo": "Tijd voor het vernieuwen van alle instellingen / informatie (in seconden). Indien ingesteld op 0, instellingen wordt alleen vernieuwd aan de adapter opstarten.",
+    "resetMedia": "Reset '._playing' Staten",
+    "resetMediaInfo": "Reset alle staten in de boom '._playing' bij opstarten",
     "tab_alexa": "Alexa integratie",
     "tab_config": "Configuratie",
     "tab_info": "Informatie",

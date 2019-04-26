@@ -9,6 +9,8 @@
     "plexSecure": "Sécurisé (https)",
     "refresh": "D'actualisation (en secondes)",
     "refreshInfo": "Temps à l'actualisation de tous les paramètres / l'information (en secondes). Si la valeur est 0, les paramètres ne seront actualisées sur la carte de démarrage.",
+    "resetMedia": "Reset\"._playing \" les États",
+    "resetMediaInfo": "Réinitialisation de tous les états à l'intérieur de l'arbre '._playing' au démarrage",
     "tab_alexa": "Alexa intégration",
     "tab_config": "Configuration",
     "tab_info": "Informations",

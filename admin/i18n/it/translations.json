@@ -9,6 +9,8 @@
     "plexSecure": "Secure (https)",
     "refresh": "Aggiornamento (in secondi)",
     "refreshInfo": "Tempo per l'aggiornamento di tutte le impostazioni / informazioni (in secondi). Se impostato a 0, impostazioni solo essere aggiornati sulla scheda avvio.",
+    "resetMedia": "Reset '._playing' Stati",
+    "resetMediaInfo": "Reset di tutti i membri all'interno dell'albero '._playing' on startup",
     "tab_alexa": "Alexa integrazione",
     "tab_config": "Configurazione",
     "tab_info": "Informazioni",

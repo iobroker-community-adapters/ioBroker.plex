@@ -9,6 +9,8 @@
     "plexSecure": "Bezpieczne (HTTPS)",
     "refresh": "Aktualizacje (w sekundach)",
     "refreshInfo": "Podczas aktualizacji wszystkie ustawienia / informacje (w sekundach). Jeżeli określono wartość 0, ustawienia zostaną zaktualizowane po uruchomieniu zasilacza.",
+    "resetMedia": "Reset '.Państwa _playing' ",
+    "resetMediaInfo": "Reset wszystkich państw w drzewo '._playing' przy starcie",
     "tab_alexa": "Alexa integracji",
     "tab_config": "Konfiguracji",
     "tab_info": "Informacje",

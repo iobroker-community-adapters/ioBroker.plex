@@ -9,6 +9,8 @@
     "plexSecure": "安全(https)",
     "refresh": "刷新(秒)",
     "refreshInfo": "时间用于清爽的所有设置/信息(秒)。 如果设定为0，设置仅将刷新关于适配器启动。",
+    "resetMedia": "重置的。_playing'国",
+    "resetMediaInfo": "重所有国家在树'._playing'在启动",
     "tab_alexa": "Alexa的一体化",
     "tab_config": "配置",
     "tab_info": "的信息",

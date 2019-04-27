@@ -70,6 +70,8 @@ function startAdapter(options)
 			hostname: adapter.config.plexIp,
 			port: adapter.config.plexPort || 32400,
 			https: adapter.config.plexSecure || false,
+			username: adapter.config.plexPassUser || '',
+			password: adapter.config.plexPassPassword || '',
 			options: {
 				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',

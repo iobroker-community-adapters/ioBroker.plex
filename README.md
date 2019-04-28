@@ -50,7 +50,7 @@ Enter your ioBroker IP adress with the custom port specified in the ioBroker.ple
 ![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
 
 Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
-Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here]().
+Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#notification-configuration).
 
 
 ## Channels & States

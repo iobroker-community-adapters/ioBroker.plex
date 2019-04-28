@@ -6,6 +6,9 @@ __Note:__ The JSON data is highly customizable and can be changed to any data yo
 ### Playback Start / Stop / Pause / Resume
 __Note:__ As stated above the JSON data is highly customizable and can be changed to any data you wish. __Please be aware__, that the notification types for ```Playback Start```, ```Stop```, ```Resume``` and ```Pause``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"}``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
 
+You may copy the following example into Tautulli to have a full detailed payload retrieved.
+![Tautulli Notification](/img/screenshot_tautulli-notification.png)
+
 ```
 {
 	"event":"media.{action}",

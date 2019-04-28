@@ -2,6 +2,7 @@
 
 ## Notification configuration
 __Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities.
+The JSON data specified in the notifications (see below) will be send to ioBroker and put into states.
 
 ### Playback Start / Stop / Pause / Resume
 __Note:__ As stated above the JSON data is highly customizable and can be changed to any data you wish. __Please be aware__, that the notification types for ```Playback Start```, ```Stop```, ```Resume``` and ```Pause``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"}``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.

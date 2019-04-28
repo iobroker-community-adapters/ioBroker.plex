@@ -11,35 +11,37 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 
 **Table of contents**
-1. [Setup instructions](https://github.com/Zefau/ioBroker.plex#setup-instructions)
-   1. [Basic setup](https://github.com/Zefau/ioBroker.plex#basic-setup)
-   2. [Advanced Setup](https://github.com/Zefau/ioBroker.plex#advanced-setup-plex-pass-or-tautulli)
-2. [Channels & States](https://github.com/Zefau/ioBroker.plex#channels--states)
-3. [Changelog](https://github.com/Zefau/ioBroker.plex#changelog)
-4. [Licence](https://github.com/Zefau/ioBroker.plex#license)
+1. [Setup instructions](#setup-instructions)
+   1. [Basic setup](#basic-setup)
+   2. [Advanced Setup](#advanced-setup-plex-pass-or-tautulli)
+2. [Channels & States](#channels--states)
+   1. [with Basic Setup](#with-basis-setup)
+   2. [with Advanced Setup](#with-advanced-setup)
+3. [Changelog](#changelog)
+4. [Licence](#license)
 
 
-## Setup instructions
-### Basic Setup
+## 1. Setup instructions
+### 1.1. Basic Setup
 For the basic setup it is only required to provide the IP address (and port) of your Plex installation. Once this is given, ioBroker.plex will retrieve all the basic data (incl. Servers, Libraries). See [Channels & States](https://github.com/Zefau/ioBroker.plex#with-basis-setup) for the full list of basic data.
 
-### Advanced Setup (Plex Pass or Tautulli)
-#### Plex Pass
+### 1.2. Advanced Setup (Plex Pass or Tautulli)
+#### 1.2.1. Plex Pass
 If you are a Plex Pass user, you may [setup a webhook](https://support.plex.tv/articles/115002267687-webhooks/#toc-0) in the Plex Settings to retrieve the current event / action from your Plex Media Server (play, pause, resume, stop, viewed and rated).
 
 Navigate to your Plex Media Server and go to ```Settings``` and ```Webhook```. Created a new webhook by clicking ```Add Webhook``` and enter your ioBroker IP adress with the custom port specified in the ioBroker.plex settings and trailing ```/plex``` path, e.g. ```http://192.168.178.29:41891/plex```:
 
 ![Plex Webhook](https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/img/screenshot_plex-webhook.png)
 
-#### Tautulli
+#### 1.2.2.Tautulli
 [Tautulli is a 3rd party application](https://tautulli.com/#about) that you can run alongside your Plex Media Server to monitor activity and track various statistics. Most importantly, these statistics include what has been watched, who watched it, when and where they watched it, and how it was watched. All statistics are presented in a nice and clean interface with many tables and graphs, which makes it easy to brag about your server to everyone else. Check out [Tautulli Preview](https://tautulli.com/#preview) and [install it on your preferred system](https://github.com/Tautulli/Tautulli-Wiki/wiki/Installation) if you are interested.
 
 This adapter connects to the [Tautulli API](https://github.com/Tautulli/Tautulli/blob/master/API.md) and also receives webhook events from Tautulli.
 
-##### API
+##### 1.2.2.1. API
 Once Tautulli is installed, open the _Settings_ page from Tautulli dashboard and navigate to _Web Interface_. Scroll down to the _API_ section and make sure ```Enable API``` is checked. Copy the ```API key``` and enter it in the ioBroker.plex settings. Furthermore, add the Tautulli IP address and port to allow API communication.
 
-##### Webhook
+##### 1.2.2.2. Webhook
 ###### Overview
 To setup a webook using Tautulli, following the instrucutions below and make sure you have completed all 4 steps:
 1. Add Notification Agent
@@ -54,25 +56,24 @@ Once installed open the settings page from Tautulli dashboard and navigate to No
 
 1. Click _Add a new notification agent_ and _Webhook_.
 2. Enter your ioBroker IP adress with the custom port specified in the ioBroker.plex settings and trailing ```/tautulli``` path, e.g. ```http://192.168.178.29:41891/tautulli```:
-
-![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
-
-Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
+   
+   ![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
+   Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
 3. Next, go to the _Triggers_ tab, select your desired (or simply all) options
 4. Finally, __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#notification-configuration). Copy the whole content into the first four notification agents (```Playback Start```, ```Playback Stop```, ```Playback Pause``` and ```Playback Resume```) as shown below for ```Playback Start```
+   
+   ![Tautulli Notification](/img/screenshot_tautulli-notification.png)
 
-![Tautulli Notification](/img/screenshot_tautulli-notification.png)
 
-
-## Channels & States
-###  With Basis Setup
+## 2. Channels & States
+### 2.1. With Basis Setup
 After sucessful basic setup the following channels and states will be created:
 
 | Channel | Folder | State | Description |
 | ------- | ------ | ----- | ----------- |
 | tbd | - | - | tbd |
 
-###  With Advanced Setup
+### 2.2. With Advanced Setup
 After sucessful advanced setup the following channels and states will _additionally_ be created:
 
 | Channel | Folder | State | Description | Remark |
@@ -81,7 +82,7 @@ After sucessful advanced setup the following channels and states will _additiona
 | tbd | - | - | tbd | only with Tautulli |
 
 
-## Changelog
+## 3. Changelog
 
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
 - add playback control for players
@@ -97,7 +98,7 @@ After sucessful advanced setup the following channels and states will _additiona
 - receive events from Tatulli (if used)
 
 
-## License
+## 4. License
 The MIT License (MIT)
 
 Copyright (c) 2019 Zefau <zefau@mailbox.org>

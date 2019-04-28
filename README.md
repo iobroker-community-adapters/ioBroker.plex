@@ -23,7 +23,7 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 ## 1. Setup instructions
 ### 1.1. Basic Setup
-For the basic setup it is only required to provide the IP address (and port) of your Plex installation. Once this is given, ioBroker.plex will retrieve all the basic data (incl. Servers, Libraries). See [Channels & States](https://github.com/Zefau/ioBroker.plex#with-basis-setup) for the full list of basic data.
+For the basic setup it is only required to provide the IP address (and port) of your Plex installation. Once this is given, ioBroker.plex will retrieve all the basic data (incl. Servers, Libraries). See [Channels & States](#21-with-basis-setup) for the full list of basic data.
 
 ### 1.2. Advanced Setup (Plex Pass or Tautulli)
 #### 1.2.1. Plex Pass

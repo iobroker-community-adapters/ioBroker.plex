@@ -11,14 +11,14 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 
 **Table of contents**
-1. [Setup instructions](#setup-instructions)
-   1. [Basic setup](#basic-setup)
-   2. [Advanced Setup](#advanced-setup-plex-pass-or-tautulli)
-2. [Channels & States](#channels--states)
-   1. [with Basic Setup](#with-basis-setup)
-   2. [with Advanced Setup](#with-advanced-setup)
-3. [Changelog](#changelog)
-4. [Licence](#license)
+1. [Setup instructions](#1-setup-instructions)
+   1. [Basic setup](#11-basic-setup)
+   2. [Advanced Setup](#12-advanced-setup-plex-pass-or-tautulli)
+2. [Channels & States](#2-channels--states)
+   1. [with Basic Setup](#21-with-basis-setup)
+   2. [with Advanced Setup](#22-with-advanced-setup)
+3. [Changelog](#3-changelog)
+4. [Licence](#4-license)
 
 
 ## 1. Setup instructions

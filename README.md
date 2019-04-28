@@ -60,7 +60,7 @@ Once installed open the settings page from Tautulli dashboard and navigate to No
    ![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
    Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
 3. Next, go to the _Triggers_ tab, select your desired (or simply all) options
-4. Finally, __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#notification-configuration). Copy the whole content into the first four notification agents (```Playback Start```, ```Playback Stop```, ```Playback Pause``` and ```Playback Resume```) as shown below for ```Playback Start```
+4. Finally, __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#notification-configuration). Copy the whole content into the first four notification agents (```Playback Start```, ```Playback Stop```, ```Playback Pause``` and ```Playback Resume```) as shown below for ```Playback Start```:
    
    ![Tautulli Notification](/img/screenshot_tautulli-notification.png)
 

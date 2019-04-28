@@ -40,17 +40,28 @@ This adapter connects to the [Tautulli API](https://github.com/Tautulli/Tautulli
 Once Tautulli is installed, open the _Settings_ page from Tautulli dashboard and navigate to _Web Interface_. Scroll down to the _API_ section and make sure ```Enable API``` is checked. Copy the ```API key``` and enter it in the ioBroker.plex settings. Furthermore, add the Tautulli IP address and port to allow API communication.
 
 ##### Webhook
+###### Overview
+To setup a webook using Tautulli, following the instrucutions below and make sure you have completed all 4 steps:
+1. Add Notification Agent
+2. Configure Webhook in Notification Agent
+3. Configurehh Triggers in Notification Agent
+4. Configure Data in Notification Agent
+
+###### Description
 Once installed open the settings page from Tautulli dashboard and navigate to Notification Agents as seen below:
 
 ![Tautulli Settings](/img/screenshot_tautulli-settings.png)
 
-Click _Add a new notification agent_ and _Webhook_.
-Enter your ioBroker IP adress with the custom port specified in the ioBroker.plex settings and trailing ```/tautulli``` path, e.g. ```http://192.168.178.29:41891/tautulli```:
+1. Click _Add a new notification agent_ and _Webhook_.
+2. Enter your ioBroker IP adress with the custom port specified in the ioBroker.plex settings and trailing ```/tautulli``` path, e.g. ```http://192.168.178.29:41891/tautulli```:
 
 ![Tautulli Webhook](/img/screenshot_tautulli-webhook.png)
 
 Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
-Finally, go to the _Triggers_ tab, select your desired (or simply all) options and __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#notification-configuration).
+3. Next, go to the _Triggers_ tab, select your desired (or simply all) options
+4. Finally, __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#notification-configuration). Copy the whole content into the first four notification agents (```Playback Start```, ```Playback Stop```, ```Playback Pause``` and ```Playback Resume```) as shown below for ```Playback Start```
+
+![Tautulli Notification](/img/screenshot_tautulli-notification.png)
 
 
 ## Channels & States

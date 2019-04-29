@@ -17,8 +17,8 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 2. [Channels & States](#2-channels--states)
    1. [with Basic Setup](#21-with-basis-setup)
    2. [with Advanced Setup](#22-with-advanced-setup)
-3. [Changelog](#3-changelog)
-4. [Licence](#4-license)
+3. [Changelog](#changelog)
+4. [Licence](#license)
 
 
 ## 1. Setup instructions
@@ -94,7 +94,7 @@ After sucessful advanced setup the following channels and states will _additiona
 | users._\<userName\>_ | - | Plex User _\<userName\>_ | only with Tautulli |
 
 
-## 3. Changelog
+## Changelog
 
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
 - add Plex Pass Authentication by PIN (and removing current authentication with user / password)
@@ -112,7 +112,7 @@ After sucessful advanced setup the following channels and states will _additiona
 - receive events from Tatulli (if used)
 
 
-## 4. License
+## License
 The MIT License (MIT)
 
 Copyright (c) 2019 Zefau <zefau@mailbox.org>

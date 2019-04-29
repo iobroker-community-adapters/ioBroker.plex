@@ -66,20 +66,32 @@ Once installed open the settings page from Tautulli dashboard and navigate to No
 
 
 ## 2. Channels & States
+Having both the basic and advanced setup configured, the following channels will appear (libraries, servers and users are only examples of course). See further below for [full list of channels & states](#21-with-basis-setup).
+
+![Channels & States Exeample](img/screenshot_plex-states.jpg)
+
 ### 2.1. With Basis Setup
 After sucessful basic setup the following channels and states will be created:
 
-| Channel | Folder | State | Description |
-| ------- | ------ | ----- | ----------- |
-| tbd | - | - | tbd |
+| Channel / Folder | State | Description |
+| ------- | ----- | ----------- |
+| __libraries__ | - | Plex Libraries |
+| __servers__ | - | Plex Servers |
+| __settings__ | - | Plex Settings |
 
 ### 2.2. With Advanced Setup
 After sucessful advanced setup the following channels and states will _additionally_ be created:
 
-| Channel | Folder | State | Description | Remark |
-| ------- | ------ | ----- | ----------- | ------ |
-| tbd | - | - | tbd | with Plex Pass or Tautulli |
-| tbd | - | - | tbd | only with Tautulli |
+| Channel / Folder | State | Description | Remark |
+| ------- | ----- | ----------- | ------ |
+| __\_playing__ | - | Plex Media being played | with Plex Pass or Tautulli |
+| __statistics__ | - | Plex Watch Statistics | only with Tautulli |
+| statistics.libraries | - | Plex Watch Statistics | only with Tautulli |
+| statistics.libraries._\<libraryName\>_ | - | Library Watch Statistics _\<libraryName\>_ | only with Tautulli |
+| statistics.users | - | User Watch Statistics | only with Tautulli |
+| statistics.users._\<userName\>_ | _(same states as in statistics.libraries)_ | User Watch Statistics _\<userName\>_ | only with Tautulli |
+| __users__ | - | Plex Users | only with Tautulli |
+| users._\<userName\>_ | - | Plex User _\<userName\>_ | only with Tautulli |
 
 
 ## 3. Changelog

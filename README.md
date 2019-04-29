@@ -85,6 +85,7 @@ After sucessful advanced setup the following channels and states will _additiona
 ## 3. Changelog
 
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
+- add Plex Pass Authentication by PIN (and removing current authentication with user / password)
 - add playback control for players
 - add support for all Tautulli triggers
 - add state description for object tree ```_playing```

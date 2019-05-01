@@ -2,7 +2,9 @@
 # ioBroker.plex
 Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Furthermore, Tautulli integration.
 
-![Number of Installations](http://iobroker.live/badges/plex-installed.svg) ![Stable version](http://iobroker.live/badges/plex-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.plex.svg)](https://www.npmjs.com/package/iobroker.plex)
+![Number of Installations](http://iobroker.live/badges/plex-installed.svg)
+![Stable version](http://iobroker.live/badges/plex-stable.svg)
+[![NPM version](http://img.shields.io/npm/v/iobroker.plex.svg)](https://www.npmjs.com/package/iobroker.plex)
 [![Travis CI](https://travis-ci.org/Zefau/ioBroker.plex.svg?branch=master)](https://travis-ci.org/Zefau/ioBroker.plex)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.plex.svg)](https://www.npmjs.com/package/iobroker.plex)
 [![Greenkeeper badge](https://badges.greenkeeper.io/Zefau/ioBroker.plex.svg)](https://greenkeeper.io/)

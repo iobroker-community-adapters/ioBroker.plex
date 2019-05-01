@@ -1,14 +1,14 @@
-![Logo](https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/admin/tautulli.jpg)
+![Logo](admin/tautulli.jpg)
 
 ## Notification configuration
-__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](https://github.com/Zefau/ioBroker.plex/blob/master/README-tautulli.md#list-of-available-parameters) for the full list of possibilities.
+__Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](#list-of-available-parameters) for the full list of possibilities.
 The JSON data specified in the notifications (see below) will be send to ioBroker and put into states.
 
 ### Playback Start / Stop / Pause / Resume
 __Note:__ As stated above the JSON data is highly customizable and can be changed to any data you wish. __Please be aware__, that the notification types for ```Playback Start```, ```Stop```, ```Resume``` and ```Pause``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"}``` as well as ```{"Metadata": {"key": ""}}``` in order to work correctly.
 
 You may copy the following example into Tautulli to have a full detailed payload retrieved.
-![Tautulli Notification](/img/screenshot_tautulli-notification.png)
+![Tautulli Notification](img/screenshot_tautulli-notification.png)
 
 ```
 {

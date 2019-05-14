@@ -104,6 +104,7 @@ After sucessful advanced setup the following channels and states will _additiona
 - add support for all Tautulli triggers
 - add state description for object tree ```_playing```
 - add support / discovery in [iobroker.discovery](https://github.com/ioBroker/ioBroker.discovery)
+- add playlists to states
 
 ### 0.2.0 (2019-05-xx) [UPCOMING RELEASE]
 - fixed @iobroker/adapter-core dependency

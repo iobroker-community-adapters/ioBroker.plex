@@ -2,7 +2,7 @@
   "_from": "https://github.com/Zefau/ioBroker.plex/tarball/master",
   "_id": "iobroker.plex@0.1.0",
   "_inBundle": false,
-  "_integrity": "sha512-EUraEowLT80IMNySbxpe0zyQGHT7fcWgIthHmznT/jY5ZgfprAmUAEj9/6WtxX07l+1NZovR+q/GtpcEjabHAQ==",
+  "_integrity": "sha512-9AkTvELAfcVF9hoIVaS0NC9ugnAjeEsW1oiwOBn6QJdnlTAvyBs+Wmdhg97uxZKawBI7oqRfgLKl39Dlqhsyng==",
   "_location": "/iobroker.plex",
   "_phantomChildren": {},
   "_requested": {
@@ -17,9 +17,9 @@
     "/"
   ],
   "_resolved": "https://github.com/Zefau/ioBroker.plex/tarball/master",
-  "_shasum": "03819ad831f5bd31270c700df85fea4629ead1e3",
+  "_shasum": "f44d2fbda1e5bf34777cf238590d5e2e0c2255cd",
   "_spec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
-  "_where": "/root",
+  "_where": "/opt/iobroker/node_modules",
   "author": {
     "name": "zefau",
     "email": "zefau@mailbox.org"
@@ -40,16 +40,16 @@
     "express": "^4.16.4",
     "multer": "^1.4.1",
     "plex-api": "^5.2.2",
-    "plex-control": "^3.0.0",
+    "plex-control": "^3.0.1",
     "tautulli-api": "^1.0.0"
   },
   "deprecated": false,
   "description": "Integration of your Plex Media Server and / or your Tautulli",
   "devDependencies": {
-    "@iobroker/testing": "^1.2.0",
+    "@iobroker/testing": "^1.2.1",
     "axios": "^0.18.0",
     "chai": "^4.2.0",
-    "gulp": "^4.0.1",
+    "gulp": "^4.0.2",
     "mocha": "^6.1.4"
   },
   "homepage": "https://github.com/Zefau/ioBroker.plex",
@@ -72,5 +72,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

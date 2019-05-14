@@ -12,10 +12,11 @@ const _multer = require('multer');
  */
 const Library = require(__dirname + '/lib/library.js');
 const Plex = require('plex-api');
-//const PlexControl = require('plex-control').PlexControl;
+const PlexControl = require('plex-control').PlexControl;
 const Tautulli = require('tautulli-api');
 //const params = require(__dirname + '/tautulli-parameters.json');
 const _NODES = require(__dirname + '/NODES.json');
+const _ACTIONS = require(__dirname + '/ACTIONS.json');
 
 
 /*
@@ -24,6 +25,7 @@ const _NODES = require(__dirname + '/NODES.json');
 let adapter;
 let library;
 let plex, tautulli, data;
+let players = {};
 let upload = _multer({ dest: '/tmp/' });
 let dutyCycle;
 
@@ -72,6 +74,7 @@ function startAdapter(options)
 			https: adapter.config.plexSecure || false,
 			username: adapter.config.plexPassUser || '',
 			password: adapter.config.plexPassPassword || '',
+			token: 'FNjTPMQmRxmmra8pXJb3',
 			options: {
 				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',
@@ -100,10 +103,20 @@ function startAdapter(options)
 			);
 		}
 		
-		// retrieve data
+		// retrieve data once
 		retrieveData();
 		
-		if (adapter.config.refresh !== undefined && adapter.config.refresh > 10)
+		// regulary retrieve data
+		if (adapter.config.refresh === undefined || adapter.config.refresh === null)
+			adapter.config.refresh = 0;
+		
+		else if (adapter.config.refresh > 0 && adapter.config.refresh < 10)
+		{
+			adapter.log.info('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
+			adapter.config.refresh = 10;
+		}
+		
+		if (adapter.config.refresh > 0)
 		{
 			setTimeout(function updater()
 			{
@@ -153,6 +166,46 @@ function startAdapter(options)
 	{
 		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
 		
+		let action = id.substr(id.lastIndexOf('.')+1);
+		
+		// Playback
+		if (_ACTIONS.playback.indexOf(action) && state && state.ack !== true)
+		{
+			let playerId = '';
+			//let player = new PlexControl(adapter.config.plexIp, playerId);
+			
+			// add player instance
+			//players[] = ;
+			
+			// log
+			//adapter.log.info('Triggered action -' + action + '- on Player ' + playerId + '.');
+			adapter.log.info('Not yet implemented!');
+			
+			/*
+			// apply playback action
+			player.playback[action]().then(function()
+			{
+				// moveUp was successfully communicated to Plex
+				adapter.log.info('Successfully triggered action.');
+				
+				
+			},
+			function(err)
+			{
+				adapter.log.warn('Error triggering action -' + action + '- on Player ' + playerId + '. See debug log for details.');
+			});
+			*/
+			
+			
+		}
+		
+		// Navigation
+		else if (_ACTIONS.navigation.indexOf(action) && state && state.ack !== true)
+		{
+			adapter.log.info('Not yet implemented!');
+			
+			
+		}
 	});
 	
 	/*
@@ -186,9 +239,30 @@ function setEvent(data, source)
 	data['Player'] = data['Player'] !== undefined ? data['Player'] : {};
 	let groupBy = data['Player']['title'] && data['Player']['uuid'] ? data['Player']['title'].toLowerCase().replace(/ /g, '_') + '-' + data['Player']['uuid'] : 'unknown';
 	
+	/*
 	// create player
 	library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
 	library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
+	
+	// add player controls
+	let controls = '_playing.' + groupBy + '._Controls';
+	library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
+	library.set({node: controls + '.playback', role: 'channel', description: 'Playback Controls'}, '');
+	library.set({node: controls + '.navigation', role: 'channel', description: 'Navigation Controls'}, '');
+	adapter.subscribeStates(controls + '.*');
+	
+	// Playback controls
+	_ACTIONS.playback.forEach(function(button)
+	{
+		library.set({node: controls + '.playback.' + button, role: 'button', description: 'Playback ' + library.ucFirst(button), common: {playerId: ''}}, '');
+	});
+	
+	// Navigation controls
+	_ACTIONS.navigation.forEach(function(button)
+	{
+		library.set({node: controls + '.navigation.' + button, role: 'button', description: 'Navigation ' + library.ucFirst(button)}, '');
+	});
+	*/
 	
 	// add meta data
 	data.source = source;
@@ -345,7 +419,6 @@ function get(node)
 function retrieveData()
 {
 	let watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
-	adapter.log.debug('Retrieving data from Plex..');
 	
 	//
 	// GET SERVERS
@@ -534,7 +607,8 @@ function retrieveData()
 	//
 	// GET CLIENTS
 	//
-	plex.query('https://plex.tv/devices.xml').then(function(res)
+	/*
+	plex.query('/clients').then(function(res)
 	{
 		adapter.log.debug(JSON.stringify(res));
 		
@@ -543,12 +617,12 @@ function retrieveData()
 	})
 	.catch(function(e)
 	{
+		adapter.log.debug(JSON.stringify(e));
 	});
 	
 	//
 	// GET HISTORY
 	//
-	/*
 	plex.query('/status/sessions/history/all').then(function(res)
 	{
 		adapter.log.debug('/status/sessions/history/all')

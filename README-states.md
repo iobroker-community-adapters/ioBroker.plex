@@ -39,6 +39,42 @@ The following tables list all channels and states which will be created by the a
 | Channel / Folder | State | Description |
 | ---------------- | ----- | ----------- |
 | __settings__ | - | Plex Settings |
+| settings.butler | - | Settings Butler |
+| settings.butler | ButlerStartHour | Time at which tasks start to run |
+| settings.butler | ButlerEndHour | Time at which tasks stop running |
+| settings.butler | ButlerTaskBackupDatabase | Backup database every three days |
+| settings.butler | ButlerDatabaseBackupPath | Backup directory |
+| settings.butler | ButlerTaskOptimizeDatabase | Optimize database every week |
+| settings.butler | ButlerTaskCleanOldBundles | Remove old bundles every week |
+| settings.butler | ButlerTaskCleanOldCacheFiles | Remove old cache files every week |
+| settings.butler | ButlerTaskRefreshLocalMedia | Refresh local metadata every three days |
+| settings.butler | ButlerTaskRefreshLibraries | Update all libraries during maintenance |
+| settings.butler | ButlerTaskUpgradeMediaAnalysis | Upgrade media analysis during maintenance |
+| settings.butler | ButlerTaskRefreshPeriodicMetadata | Refresh metadata periodically |
+| settings.butler | ButlerTaskDeepMediaAnalysis | Perform extensive media analysis during maintenance |
+| settings.butler | ButlerTaskRefreshEpgGuides | Perform refresh of program guide data. |
+| settings.butler | ButlerTaskReverseGeocode | Fetch missing location names for items in photo sections |
+| settings.butler | ButlerTaskGenerateAutoTags | Analyze and tag photos |
+| settings.channels | - | Settings Channels |
+| settings.channels | iTunesSharingEnabled | Enable iTunes plugin |
+| settings.channels | iTunesLibraryXmlPath | iTunes library XML path |
+| settings.channels | disableCapabilityChecking | Disable capability checking |
+| settings.channels | PluginsLaunchTimeout | Number of seconds to wait before a plugin times out |
+| settings.dlna | - | Settings Dlna |
+| settings.dlna | DlnaEnabled | Enable the DLNA server |
+| settings.dlna | DlnaPlatinumLoggingLevel | DLNA server logging level |
+| settings.dlna | DlnaClientPreferences | DLNA client preferences |
+| settings.dlna | DlnaReportTimeline | DLNA server timeline reporting |
+| settings.dlna | DlnaDefaultProtocolInfo | DLNA default protocol info |
+| settings.dlna | DlnaDeviceDiscoveryInterval | DLNA media renderer discovery interval |
+| settings.dlna | DlnaAnnouncementLeaseTime | DLNA server announcement lease time |
+| settings.dlna | DlnaDescriptionIcons | DLNA server description icons |
+| settings.extras | - | Settings Extras |
+| settings.extras | CinemaTrailersType | Choose Cinema Trailers from |
+| settings.extras | CinemaTrailersFromLibrary | Include Cinema Trailers from movies in my library |
+| settings.extras | CinemaTrailersFromTheater | Include Cinema Trailers from new and upcoming movies in theaters |
+| settings.extras | CinemaTrailersFromBluRay | Include Cinema Trailers from new and upcoming movies on Blu-ray |
+| settings.extras | CinemaTrailersPrerollID | Movie pre-roll video |
 | settings.general | - | Settings General |
 | settings.general | FriendlyName | Friendly name |
 | settings.general | sendCrashReports | Send crash reports to Plex |
@@ -62,17 +98,24 @@ The following tables list all channels and states which will be created by the a
 | settings.library | GenerateChapterThumbBehavior | Generate chapter thumbnails |
 | settings.library | LoudnessAnalysisBehavior | Analyze audio tracks for loudness |
 | settings.library | LocationVisibility | Location visibility |
-| settings.extras | - | Settings Extras |
-| settings.extras | CinemaTrailersType | Choose Cinema Trailers from |
-| settings.extras | CinemaTrailersFromLibrary | Include Cinema Trailers from movies in my library |
-| settings.extras | CinemaTrailersFromTheater | Include Cinema Trailers from new and upcoming movies in theaters |
-| settings.extras | CinemaTrailersFromBluRay | Include Cinema Trailers from new and upcoming movies on Blu-ray |
-| settings.extras | CinemaTrailersPrerollID | Movie pre-roll video |
-| settings.channels | - | Settings Channels |
-| settings.channels | iTunesSharingEnabled | Enable iTunes plugin |
-| settings.channels | iTunesLibraryXmlPath | iTunes library XML path |
-| settings.channels | disableCapabilityChecking | Disable capability checking |
-| settings.channels | PluginsLaunchTimeout | Number of seconds to wait before a plugin times out |
+| settings.network | - | Settings Network |
+| settings.network | ConfigurationUrl | Web Manager URL |
+| settings.network | EnableIPv6 | Enable server support for IPv6 |
+| settings.network | secureConnections | Secure connections |
+| settings.network | customCertificatePath | Custom certificate location |
+| settings.network | customCertificateKey | Custom certificate encryption key |
+| settings.network | customCertificateDomain | Custom certificate domain |
+| settings.network | PreferredNetworkInterface | Preferred network interface |
+| settings.network | GdmEnabled | Enable local network discovery (GDM) |
+| settings.network | WanPerUserStreamCount | Remote streams allowed per user |
+| settings.network | LanNetworksBandwidth | LAN Networks |
+| settings.network | MinutesAllowedPaused | Terminate Sessions Paused for Longer Than |
+| settings.network | TreatWanIpAsLocal | Treat WAN IP As LAN Bandwidth |
+| settings.network | customConnections | Custom server access URLs |
+| settings.network | allowedNetworks | List of IP addresses and networks that are allowed without auth |
+| settings.network | enableAirplay | |
+| settings.network | enableHttpPipelining | Enable HTTP Pipelining |
+| settings.network | WebHooksEnabled | Webhooks |
 | settings.other | - | Settings Other |
 | settings.other | MachineIdentifier | A unique identifier for the machine |
 | settings.other | AllowHighOutputBitrates | |
@@ -114,15 +157,6 @@ The following tables list all channels and states which will be created by the a
 | settings.other | SubtitlesPersistIfAdmin | |
 | settings.other | DvrIncrementalEpgLoader | |
 | settings.other | DvrAllowUnsupportedCountry | |
-| settings.network | - | Settings Network |
-| settings.network | ConfigurationUrl | Web Manager URL |
-| settings.network | EnableIPv6 | Enable server support for IPv6 |
-| settings.network | secureConnections | Secure connections |
-| settings.network | customCertificatePath | Custom certificate location |
-| settings.network | customCertificateKey | Custom certificate encryption key |
-| settings.network | customCertificateDomain | Custom certificate domain |
-| settings.network | PreferredNetworkInterface | Preferred network interface |
-| settings.network | GdmEnabled | Enable local network discovery (GDM) |
 | settings.transcoder | - | Settings Transcoder |
 | settings.transcoder | TranscoderQuality | Transcoder quality |
 | settings.transcoder | SegmentedTranscoderTimeout | Segmented transcoder timeout |
@@ -141,40 +175,6 @@ The following tables list all channels and states which will be created by the a
 | settings.transcoder | SystemAudioCodecs | |
 | settings.transcoder | HardwareDevicePath | |
 | settings.transcoder | TranscodeCountLimit | Maximum simultaneous video transcode |
-| settings.dlna | - | Settings Dlna |
-| settings.dlna | DlnaEnabled | Enable the DLNA server |
-| settings.dlna | DlnaPlatinumLoggingLevel | DLNA server logging level |
-| settings.dlna | DlnaClientPreferences | DLNA client preferences |
-| settings.dlna | DlnaReportTimeline | DLNA server timeline reporting |
-| settings.dlna | DlnaDefaultProtocolInfo | DLNA default protocol info |
-| settings.dlna | DlnaDeviceDiscoveryInterval | DLNA media renderer discovery interval |
-| settings.dlna | DlnaAnnouncementLeaseTime | DLNA server announcement lease time |
-| settings.dlna | DlnaDescriptionIcons | DLNA server description icons |
-| settings.network | WanPerUserStreamCount | Remote streams allowed per user |
-| settings.network | LanNetworksBandwidth | LAN Networks |
-| settings.network | MinutesAllowedPaused | Terminate Sessions Paused for Longer Than |
-| settings.network | TreatWanIpAsLocal | Treat WAN IP As LAN Bandwidth |
-| settings.network | customConnections | Custom server access URLs |
-| settings.network | allowedNetworks | List of IP addresses and networks that are allowed without auth |
-| settings.network | enableAirplay | |
-| settings.network | enableHttpPipelining | Enable HTTP Pipelining |
-| settings.network | WebHooksEnabled | Webhooks |
-| settings.butler | - | Settings Butler |
-| settings.butler | ButlerStartHour | Time at which tasks start to run |
-| settings.butler | ButlerEndHour | Time at which tasks stop running |
-| settings.butler | ButlerTaskBackupDatabase | Backup database every three days |
-| settings.butler | ButlerDatabaseBackupPath | Backup directory |
-| settings.butler | ButlerTaskOptimizeDatabase | Optimize database every week |
-| settings.butler | ButlerTaskCleanOldBundles | Remove old bundles every week |
-| settings.butler | ButlerTaskCleanOldCacheFiles | Remove old cache files every week |
-| settings.butler | ButlerTaskRefreshLocalMedia | Refresh local metadata every three days |
-| settings.butler | ButlerTaskRefreshLibraries | Update all libraries during maintenance |
-| settings.butler | ButlerTaskUpgradeMediaAnalysis | Upgrade media analysis during maintenance |
-| settings.butler | ButlerTaskRefreshPeriodicMetadata | Refresh metadata periodically |
-| settings.butler | ButlerTaskDeepMediaAnalysis | Perform extensive media analysis during maintenance |
-| settings.butler | ButlerTaskRefreshEpgGuides | Perform refresh of program guide data. |
-| settings.butler | ButlerTaskReverseGeocode | Fetch missing location names for items in photo sections |
-| settings.butler | ButlerTaskGenerateAutoTags | Analyze and tag photos |
 
 
 ## With Advanced Setup

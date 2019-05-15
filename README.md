@@ -113,7 +113,7 @@ After sucessful advanced setup the following channels and states will _additiona
 - added authentication method (using Plex user and Plex password)
 - fixed @iobroker/adapter-core dependency
 
-### 0.1.0 (2019-04-26) [CURRENT RELEASE]
+### 0.1.0 (2019-04-26)
 - get initial data from Plex API
 - receive events from Plex Webhook (Plex Pass only)
 - receive events from Tatulli (if used)

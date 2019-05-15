@@ -79,27 +79,22 @@ Having both the basic and advanced setup configured, the following channels will
 ![Channels & States Exeample](img/screenshot_plex-states.jpg)
 
 ### 2.1. With Basis Setup
-After sucessful basic setup the following channels and states will be created:
+After sucessful basic setup the channels according to the following table will be created. For a list of all states which will be created, please [see dedicated list of states](README-states.md).
 
-| Channel / Folder | State | Description |
-| ------- | ----- | ----------- |
-| __libraries__ | - | Plex Libraries |
-| __servers__ | - | Plex Servers |
-| __settings__ | - | Plex Settings |
+| Channel / Folder | Description |
+| ------- | ----------- |
+| __libraries__ | Plex Libraries |
+| __servers__ | Plex Servers |
+| __settings__ | Plex Settings |
 
 ### 2.2. With Advanced Setup
-After sucessful advanced setup the following channels and states will _additionally_ be created:
+After sucessful advanced setup the following channels will _additionally_ be created. For a list of all states which will be created, please [see dedicated list of states](README-states.md).
 
-| Channel / Folder | State | Description | Remark |
-| ------- | ----- | ----------- | ------ |
-| __\_playing__ | - | Plex Media being played | with Plex Pass or Tautulli |
-| __statistics__ | - | Plex Watch Statistics | only with Tautulli |
-| statistics.libraries | - | Plex Watch Statistics | only with Tautulli |
-| statistics.libraries._\<libraryName\>_ | - | Library Watch Statistics _\<libraryName\>_ | only with Tautulli |
-| statistics.users | - | User Watch Statistics | only with Tautulli |
-| statistics.users._\<userName\>_ | _(same states as in statistics.libraries)_ | User Watch Statistics _\<userName\>_ | only with Tautulli |
-| __users__ | - | Plex Users | only with Tautulli |
-| users._\<userName\>_ | - | Plex User _\<userName\>_ | only with Tautulli |
+| Channel / Folder | Description | Remark |
+| ---------------- | ----------- | ------ |
+| __\_playing__ | Plex Media being played | with Plex Pass or Tautulli |
+| __statistics__ | Plex Watch Statistics | only with Tautulli |
+| __users__ | Plex Users | only with Tautulli |
 
 
 ## Changelog

@@ -6,7 +6,7 @@ The following tables list all channels and states which will be created by the a
 | Channel / Folder | State | Description |
 | ---------------- | ----- | ----------- |
 | __libraries__ | - | Plex Libraries |
-| libraries | _\<libraryName\>_ | Plex Library Movies |
+| libraries | _\<libraryName\>_ | Plex Library _\<libraryName\>_ |
 | libraries._\<libraryName\>_ | allowsync | Allow Sync |
 | libraries._\<libraryName\>_ | art | Picture path |
 | libraries._\<libraryName\>_ | composite | Composite |
@@ -24,7 +24,6 @@ The following tables list all channels and states which will be created by the a
 | libraries._\<libraryName\>_ | createdat | Timestamp of library creation |
 | libraries._\<libraryName\>_ | scannedat | Timestamp of last scan |
 | libraries._\<libraryName\>_ | location | Storage Locations |
-| libraries | _\<libraryName\>_ | Plex Library Series |
 | __servers__ | - | Plex Servers |
 | servers | _\<serverName\>_ | Plex Server _\<serverName\>_ |
 | servers._\<serverName\>_ | name | Server Name |

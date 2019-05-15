@@ -25,7 +25,13 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 ## 1. Setup instructions
 ### 1.1. Basic Setup
-For the basic setup it is only required to provide the IP address (and port) of your Plex installation. Once this is given, ioBroker.plex will retrieve all the basic data (incl. Servers, Libraries). See [Channels & States](#21-with-basis-setup) for the full list of basic data.
+For the basic setup it is only required to provide the IP address (and port) of your Plex installation. Furthermore, you have to provide user and password for the adapter to retrieve data from Plex.
+
+If you __do not__ want to store user and password within the adapter, you may whitelist the ioBroker IP within your Plex settings. For this, go to the `Settings` of your Plex Media Server and to `Network`. Type in the ioBroker IP address in both the fields `LAN Networks` and `List of IP addresses and networks that are allowed without auth`:
+
+![Plex Network settings](img/screenshot_plex-networksettings.jpg)
+
+Once this is given, ioBroker.plex will retrieve all the basic data (incl. Servers, Libraries). See [Channels & States](#21-with-basis-setup) for the full list of basic data.
 
 ### 1.2. Advanced Setup (Plex Pass or Tautulli)
 #### 1.2.1. Plex Pass

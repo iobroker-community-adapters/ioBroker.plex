@@ -79,7 +79,7 @@ Having both the basic and advanced setup configured, the following channels will
 ![Channels & States Exeample](img/screenshot_plex-states.jpg)
 
 ### 2.1. With Basis Setup
-After sucessful basic setup the channels according to the following table will be created. For a list of all states which will be created, please [see dedicated list of states](README-states.md).
+After sucessful basic setup the channels according to the following table will be created. For a list of all states which will be created, please [see dedicated list of states](README-states.md#with-basis-setup).
 
 | Channel / Folder | Description |
 | ------- | ----------- |
@@ -88,7 +88,7 @@ After sucessful basic setup the channels according to the following table will b
 | __settings__ | Plex Settings |
 
 ### 2.2. With Advanced Setup
-After sucessful advanced setup the following channels will _additionally_ be created. For a list of all states which will be created, please [see dedicated list of states](README-states.md).
+After sucessful advanced setup the following channels will _additionally_ be created. For a list of all states which will be created, please [see dedicated list of states](README-states.md#with-advanced-setup).
 
 | Channel / Folder | Description | Remark |
 | ---------------- | ----------- | ------ |

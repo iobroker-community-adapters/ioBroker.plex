@@ -106,6 +106,9 @@ After sucessful advanced setup the following channels and states will _additiona
 - add support / discovery in [iobroker.discovery](https://github.com/ioBroker/ioBroker.discovery)
 - add playlists to states
 
+### 0.3.0 (2019-05-XX)
+- ([@Apollon77](https://github.com/Apollon77)) updated testing for Node.js v12 ([#6](https://github.com/Zefau/ioBroker.plex/pull/6))
+
 ### 0.2.0 (2019-05-14)
 - added authentication method (using Plex user and Plex password)
 - fixed @iobroker/adapter-core dependency

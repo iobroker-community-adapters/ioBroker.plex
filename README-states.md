@@ -24,6 +24,9 @@ The following tables list all channels and states which will be created by the a
 | libraries._\<libraryName\>_ | createdat | Timestamp of library creation |
 | libraries._\<libraryName\>_ | scannedat | Timestamp of last scan |
 | libraries._\<libraryName\>_ | location | Storage Locations |
+
+| Channel / Folder | State | Description |
+| ---------------- | ----- | ----------- |
 | __servers__ | - | Plex Servers |
 | servers._\<serverName\>_ | - | Plex Server _\<serverName\>_ |
 | servers._\<serverName\>_ | name | Server Name |
@@ -32,6 +35,9 @@ The following tables list all channels and states which will be created by the a
 | servers._\<serverName\>_ | port | Server Port |
 | servers._\<serverName\>_ | machineIdentifier | Server Identifier |
 | servers._\<serverName\>_ | version | Server Software Version |
+
+| Channel / Folder | State | Description |
+| ---------------- | ----- | ----------- |
 | __settings__ | - | Plex Settings |
 | settings.general | - | Settings General |
 | settings.general | FriendlyName | Friendly name |
@@ -40,7 +46,7 @@ The following tables list all channels and states which will be created by the a
 | settings.general | LogVerbose | Enable Plex Media Server verbose logging |
 | settings.general | MinimumProgressTime | |
 | settings.general | ButlerUpdateChannel | Server update Channel |
-| settings | library | Settings Library |
+| settings.library | - | Settings Library |
 | settings.library | FSEventLibraryUpdatesEnabled | Scan my library automatically |
 | settings.library | FSEventLibraryPartialScanEnabled | Run a partial scan when changes are detected |
 | settings.library | watchMusicSections | Include music libraries in automatic updates |
@@ -56,18 +62,18 @@ The following tables list all channels and states which will be created by the a
 | settings.library | GenerateChapterThumbBehavior | Generate chapter thumbnails |
 | settings.library | LoudnessAnalysisBehavior | Analyze audio tracks for loudness |
 | settings.library | LocationVisibility | Location visibility |
-| settings | extras | Settings Extras |
+| settings.extras | - | Settings Extras |
 | settings.extras | CinemaTrailersType | Choose Cinema Trailers from |
 | settings.extras | CinemaTrailersFromLibrary | Include Cinema Trailers from movies in my library |
 | settings.extras | CinemaTrailersFromTheater | Include Cinema Trailers from new and upcoming movies in theaters |
 | settings.extras | CinemaTrailersFromBluRay | Include Cinema Trailers from new and upcoming movies on Blu-ray |
 | settings.extras | CinemaTrailersPrerollID | Movie pre-roll video |
-| settings | channels | Settings Channels |
+| settings.channels | - | Settings Channels |
 | settings.channels | iTunesSharingEnabled | Enable iTunes plugin |
 | settings.channels | iTunesLibraryXmlPath | iTunes library XML path |
 | settings.channels | disableCapabilityChecking | Disable capability checking |
 | settings.channels | PluginsLaunchTimeout | Number of seconds to wait before a plugin times out |
-| settings | other | Settings Other |
+| settings.other | - | Settings Other |
 | settings.other | MachineIdentifier | A unique identifier for the machine |
 | settings.other | AllowHighOutputBitrates | |
 | settings.other | AcceptedEULA | Has the user accepted the EULA |
@@ -108,7 +114,7 @@ The following tables list all channels and states which will be created by the a
 | settings.other | SubtitlesPersistIfAdmin | |
 | settings.other | DvrIncrementalEpgLoader | |
 | settings.other | DvrAllowUnsupportedCountry | |
-| settings | network | Settings Network |
+| settings.network | - | Settings Network |
 | settings.network | ConfigurationUrl | Web Manager URL |
 | settings.network | EnableIPv6 | Enable server support for IPv6 |
 | settings.network | secureConnections | Secure connections |
@@ -117,7 +123,7 @@ The following tables list all channels and states which will be created by the a
 | settings.network | customCertificateDomain | Custom certificate domain |
 | settings.network | PreferredNetworkInterface | Preferred network interface |
 | settings.network | GdmEnabled | Enable local network discovery (GDM) |
-| settings | transcoder | Settings Transcoder |
+| settings.transcoder | - | Settings Transcoder |
 | settings.transcoder | TranscoderQuality | Transcoder quality |
 | settings.transcoder | SegmentedTranscoderTimeout | Segmented transcoder timeout |
 | settings.transcoder | TranscoderTempDirectory | Transcoder temporary directory |
@@ -135,7 +141,7 @@ The following tables list all channels and states which will be created by the a
 | settings.transcoder | SystemAudioCodecs | |
 | settings.transcoder | HardwareDevicePath | |
 | settings.transcoder | TranscodeCountLimit | Maximum simultaneous video transcode |
-| settings | dlna | Settings Dlna |
+| settings.dlna | - | Settings Dlna |
 | settings.dlna | DlnaEnabled | Enable the DLNA server |
 | settings.dlna | DlnaPlatinumLoggingLevel | DLNA server logging level |
 | settings.dlna | DlnaClientPreferences | DLNA client preferences |
@@ -153,7 +159,7 @@ The following tables list all channels and states which will be created by the a
 | settings.network | enableAirplay | |
 | settings.network | enableHttpPipelining | Enable HTTP Pipelining |
 | settings.network | WebHooksEnabled | Webhooks |
-| settings | butler | Settings Butler |
+| settings.butler | - | Settings Butler |
 | settings.butler | ButlerStartHour | Time at which tasks start to run |
 | settings.butler | ButlerEndHour | Time at which tasks stop running |
 | settings.butler | ButlerTaskBackupDatabase | Backup database every three days |
@@ -217,6 +223,9 @@ tbd
 | statistics.users._\<userName\>_.00-all_time | query_days | Days querying |
 | statistics.users._\<userName\>_.00-all_time | total_time | Total Time |
 | statistics.users._\<userName\>_.00-all_time | total_plays | Total plays |
+
+| Channel / Folder | State | Description |
+| ---------------- | ----- | ----------- |
 | __users__ | - | Plex Users |
 | users._\<userName\>_ | - | Plex User _\<userName\>_ |
 | users._\<userName\>_ | username | Name of User |

@@ -112,7 +112,7 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 - add support for all Tautulli triggers
 - add playback control for players
 
-### 0.3.0 (2019-05-XX) [IN DEVELOPMENT]
+### 0.3.0 (2019-05-16)
 - ([@Apollon77](https://github.com/Apollon77)) updated testing for Node.js v12 ([#6](https://github.com/Zefau/ioBroker.plex/pull/6))
 - added support / discovery in [iobroker.discovery](https://github.com/ioBroker/ioBroker.discovery) ([#62](https://github.com/ioBroker/ioBroker.discovery/pull/62))
 - added playlists to states

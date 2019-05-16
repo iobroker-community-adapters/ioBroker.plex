@@ -60,6 +60,7 @@ To setup a webook using Tautulli, following the instrucutions below and make sur
 2. Configure Webhook in Notification Agent
 3. Configurehh Triggers in Notification Agent
 4. Configure Data in Notification Agent
+5. Configure Notification options
 
 ###### Description
 Once installed open the settings page from Tautulli dashboard and navigate to Notification Agents as seen below:
@@ -72,9 +73,13 @@ Once installed open the settings page from Tautulli dashboard and navigate to No
    ![Tautulli Webhook](img/screenshot_tautulli-webhook.png)
    Furthermore, choose ```POST``` for the _Webhook Method_ and enter any description you like in _Description_.
 3. Next, go to the _Triggers_ tab, select your desired (or simply all) options
-4. Finally, __most important__ fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](README-tautulli.md#notification-configuration). Copy the whole content into the first four notification agents (```Playback Start```, ```Playback Stop```, ```Playback Pause``` and ```Playback Resume```) as shown below for ```Playback Start```:
+4. Now, __most importantly__, fill in the respective data payload in the _Data_ tab according to the [Notification configuration found here](README-tautulli.md#notification-configuration). Copy the whole content into the first four notification agents (```Playback Start```, ```Playback Stop```, ```Playback Pause``` and ```Playback Resume```) as shown below for ```Playback Start```:
    
    ![Tautulli Notification](img/screenshot_tautulli-notification.png)
+
+5. Finally, check the option `Allow Consecutive Notifications` to enable to allow sending of consecutive notifications (e.g. both watched & stopped notifications):
+
+   ![Tautulli Notification Settings](img/screenshot_tautulli-notification_settings.png)
 
 
 ## 3. Channels & States
@@ -104,15 +109,15 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 ## Changelog
 
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
-- add Plex Pass Authentication by PIN (and removing current authentication with user / password)
-- add playback control for players
 - add support for all Tautulli triggers
+- add playback control for players
 
 ### 0.3.0 (2019-05-XX) [IN DEVELOPMENT]
 - ([@Apollon77](https://github.com/Apollon77)) updated testing for Node.js v12 ([#6](https://github.com/Zefau/ioBroker.plex/pull/6))
 - added support / discovery in [iobroker.discovery](https://github.com/ioBroker/ioBroker.discovery) ([#62](https://github.com/ioBroker/ioBroker.discovery/pull/62))
 - added playlists to states
 - added state description for object tree ```_playing```
+- updated German translation (instead of generating it from English)
 
 ### 0.2.0 (2019-05-14)
 - added authentication method (using Plex user and Plex password)

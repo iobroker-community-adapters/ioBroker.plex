@@ -64,7 +64,6 @@ function startAdapter(options)
 			});
 			
 			adapter.log.debug('Generated new encryption key for password encryption.');
-			adapter.log.debug(key);
 		}
 		else
 			key = adapter.config.encryptionKey;
@@ -91,7 +90,7 @@ function startAdapter(options)
 			port: adapter.config.plexPort || 32400,
 			https: adapter.config.plexSecure || false,
 			username: adapter.config.plexUser || '',
-			password: adapter.config.plexPassword || '',
+			password: adapter.config.plexPassword ? library.decode(key, adapter.config.plexPassword) : '',
 			options: {
 				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',
@@ -116,7 +115,7 @@ function startAdapter(options)
 			tautulli = new Tautulli(
 				adapter.config.tautulliIp,
 				adapter.config.tautulliPort || 8181,
-				adapter.config.tautulliToken
+				library.decode(key, adapter.config.tautulliToken)
 			);
 		}
 		

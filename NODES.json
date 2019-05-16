@@ -13,7 +13,7 @@
 	
 	"playing.player.local": {"description": "Indication whether Player is local", "role": "indicator", "type": "boolean"},
 	"playing.player.localaddress": {"description": "Local IP address", "role": "info.ip", "type": "string"},
-	"playing.player.publicaddress|  |": {"description": "Public IP address", "role": "info.ip", "type": "string"},
+	"playing.player.publicaddress": {"description": "Public IP address", "role": "info.ip", "type": "string"},
 	"playing.player.title": {"description": "Name of Plex Player", "role": "text", "type": "string"},
 	"playing.player.uuid": {"description": "ID of Plex Player", "role": "text", "type": "string"},
 	

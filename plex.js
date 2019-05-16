@@ -59,6 +59,8 @@ function startAdapter(options)
 			key = library.getKey(20);
 			adapter.getForeignObject('system.adapter.plex.' + adapter.instance, function(err, obj)
 			{
+				if (err || obj === undefined) return;
+				
 				obj.native.encryptionKey = key;
 				adapter.setForeignObject(obj._id, obj);
 			});

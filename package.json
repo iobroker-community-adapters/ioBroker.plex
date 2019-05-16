@@ -1,10 +1,13 @@
 {
   "_from": "https://github.com/Zefau/ioBroker.plex/tarball/master",
-  "_id": "iobroker.plex@0.1.0",
+  "_id": "iobroker.plex@0.3.0",
   "_inBundle": false,
-  "_integrity": "sha512-9AkTvELAfcVF9hoIVaS0NC9ugnAjeEsW1oiwOBn6QJdnlTAvyBs+Wmdhg97uxZKawBI7oqRfgLKl39Dlqhsyng==",
+  "_integrity": "sha512-XALsJfS+vQEdm4uknqCiXClkuk6ggFUoiKJpog75dHTkT4oLYmv4E08M9fRPmYwYmZ6eDTnO1NLTJh/5CbJxFA==",
   "_location": "/iobroker.plex",
-  "_phantomChildren": {},
+  "_phantomChildren": {
+    "plex-api": "5.2.2",
+    "when": "3.7.8"
+  },
   "_requested": {
     "type": "remote",
     "raw": "https://github.com/Zefau/ioBroker.plex/tarball/master",
@@ -17,9 +20,9 @@
     "/"
   ],
   "_resolved": "https://github.com/Zefau/ioBroker.plex/tarball/master",
-  "_shasum": "f44d2fbda1e5bf34777cf238590d5e2e0c2255cd",
+  "_shasum": "bfcade76aa367cdccc486d2c207c0ba750ab031e",
   "_spec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
-  "_where": "/opt/iobroker/node_modules",
+  "_where": "/opt/iobroker",
   "author": {
     "name": "zefau",
     "email": "zefau@mailbox.org"
@@ -41,7 +44,7 @@
     "multer": "^1.4.1",
     "plex-api": "^5.2.2",
     "plex-control": "^3.0.1",
-    "tautulli-api": "^1.0.1"
+    "tautulli-api": "^1.0.2"
   },
   "deprecated": false,
   "description": "Integration of your Plex Media Server and / or your Tautulli",

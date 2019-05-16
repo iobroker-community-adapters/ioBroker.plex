@@ -103,12 +103,12 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 - add Plex Pass Authentication by PIN (and removing current authentication with user / password)
 - add playback control for players
 - add support for all Tautulli triggers
-- add state description for object tree ```_playing```
-- add support / discovery in [iobroker.discovery](https://github.com/ioBroker/ioBroker.discovery)
-- add playlists to states
 
-### 0.3.0 (2019-05-XX)
+### 0.3.0 (2019-05-XX) [IN DEVELOPMENT]
 - ([@Apollon77](https://github.com/Apollon77)) updated testing for Node.js v12 ([#6](https://github.com/Zefau/ioBroker.plex/pull/6))
+- added support / discovery in [iobroker.discovery](https://github.com/ioBroker/ioBroker.discovery) ([#62](https://github.com/ioBroker/ioBroker.discovery/pull/62))
+- added playlists to states
+- added state description for object tree ```_playing```
 
 ### 0.2.0 (2019-05-14)
 - added authentication method (using Plex user and Plex password)

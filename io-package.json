@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and / or your Tautulli",
@@ -16,17 +16,41 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
+            "0.3.0": {
+                "en": "- updated testing for Node.js v12 (#6)\n- added support / discovery in iobroker.discovery (#62)\n- added playlists to states\n- added state description for object tree _playing\n- updated German translation (instead of generating it from English)",
+                "de": "- aktualisiert-Tests für Node.js v12 (#6)\n- Unterstützung / Entdeckung in iobroker.discovery (#62)\n- Hinzugefügt Wiedergabelisten Staaten\n- Hinzugefügt Staat Beschreibung für Objekt Baum _playing\n- Deutsche übersetzung überarbeitet (anstatt der Erzeugung aus dem englischen)",
+                "ru": "- обновленное тестирование Node.js В12 (#6)\n- добавлена поддержка / открытие в iobroker.открытие (#62)\n- добавлены плейлисты для государства\n- добавлена описание дерева объектов _playing\n- обновлен немецкий перевод (вместо того чтобы создавать его с английского)",
+                "pt": "- atualizado para testar Node.js v12 (#6)\n- adicionado suporte / descoberta em iobroker.descoberta (#62)\n- adicionado listas de reprodução para os estados\n- adicionado estado de descrição para o objeto árvore _playing\n- atualizado em tradução para o alemão (em vez de gerá-lo a partir do inglês)",
+                "nl": "- bijgewerkt testen voor Node.js v12 (#6)\n- toegevoegde ondersteuning / ontdekking in iobroker.discovery (#62)\n- toegevoegd afspeellijsten naar staten\n- toegevoegd staat de beschrijving voor het object boom _playing\n- bijgewerkt duitse vertaling (in plaats van het genereren uit het engels)",
+                "fr": "- mise à jour de test pour Node.js v12 (#6)\n- ajout du support / découverte à iobroker.de la découverte (n ° 62)\n- ajout de listes de lecture pour les états\n- ajout de description de l'état de l'objet de l'arbre _playing\n- mise à jour de la traduction en allemand (au lieu de générer de l'anglais)",
+                "it": "- aggiornati i test per Node.js v12 (#6)\n- aggiunto il supporto / scoperta in iobroker.scoperta (#62)\n- aggiunto playlist stati\n- aggiunta la descrizione dello stato per l'albero di oggetti _playing\n- aggiornata la traduzione in tedesco (invece di generare dall'inglese)",
+                "es": "- actualizados de las pruebas para Node.js v12 (#6)\n- añadido soporte / descubrimiento en iobroker.descubrimiento (#62)\n- añadido listas de reproducción a los estados\n- añadida la descripción de estado para el árbol de objetos _playing\n- actualizada la traducción al alemán (en lugar de la generación de inglés)",
+                "pl": "- aktualizacja testy Node.js B12 (#6)\n- dodano wsparcie / otwieranie w iobroker.otwieranie (#62)\n- dodane do listy odtwarzania dla państwa\n- dodano opis drzewa obiektów _playing\n- zaktualizowany tłumaczenie na niemiecki (zamiast tworzyć z języka angielskiego)",
+                "zh-cn": "-更新测试Node.js v12(第6条)\n-增加支助/发现在iobroker的。发现(#62)\n-增加国家的播放列表\n-加入状态描述为对象树_playing\n-更新的德语翻译(而不是产生从文)"
+            },
+            "0.2.0": {
+                "en": "- added authentication method (using Plex user and Plex password)\n- fixed @iobroker/adapter-core dependency",
+                "de": "- Hinzugefügt Authentifizierung-Methode (mit Plex-user und Plex Passwort)\n- fixed @iobroker/adapter-core-Abhängigkeit",
+                "ru": "- добавлен новый метод проверки подлинности (с помощью пользователя и пароля Плекс Плекс)\n- исправлена @iobroker/адаптер-основных зависимостей",
+                "pt": "- adicionado o método de autenticação (usando o Plex usuário e Plex senha)\n- fixo @iobroker/adaptador-núcleo de dependência",
+                "nl": "- toegevoegd authenticatie methode (het gebruik van Plex gebruiker en Plex wachtwoord)\n- vaste @iobroker/adapter-core afhankelijkheid",
+                "fr": "- ajout de la méthode d'authentification (à l'aide de Plex utilisateur et Plex mot de passe)\n- correction d' @iobroker/adaptateur-core dépendance",
+                "it": " aggiunto metodo di autenticazione (tramite Plex utente e Plex password)\n- fisso @iobroker/adattatore-core di dipendenza",
+                "es": " añadido método de autenticación (usando Plex usuario y Plex contraseña)\n- corregido @iobroker/adaptador de núcleo de dependencia",
+                "pl": "- dodano nową metodę uwierzytelniania za pomocą użytkownika i hasła plex dnia plex dnia)\n- naprawiono @iobroker/adapter-podstawowe zależności",
+                "zh-cn": "-加入认证方法(使用复杂的用户和复杂的密码)\n-固定@iobroker/器核的依赖"
+            },
             "0.1.0": {
-                "en": "initial checkin",
-                "de": "Erste version",
-                "ru": "первая версия",
-                "pt": "inicial do check-in",
-                "nl": "eerste checkin",
-                "fr": "initiale de l'archivage",
-                "it": "iniziale checkin",
-                "es": "inicial checkin",
-                "pl": "początkowa Чекин",
-                "zh-cn": "最初的签"
+                "en": "- get initial data from Plex API\n- receive events from Plex Webhook (Plex Pass only)\n- receive events from Tatulli (if used)",
+                "de": "- erste Daten aus Plex-API\n- Ereignisse empfangen, die von Plex Webhook (Plex Pass nur)\n- empfangen von Ereignissen vom Tatulli (falls verwendet)",
+                "ru": "- получить исходные данные от плекса по API\n- получать события от веб-перехватчик Плекс (Plex пасс только)\n- получать события от Tatulli (если используется)",
+                "pt": "- obter dados iniciais do Plex API\n- receber eventos do Plex Webhook (Plex Passar apenas)\n- receber eventos de Tatulli (se usado)",
+                "nl": "- de eerste gegevens van Plex API\n- ontvangen van gebeurtenissen uit Plex Webhook (Plex Pass)\n- ontvangen van gebeurtenissen uit Tatulli (indien gebruikt)",
+                "fr": "- obtenir des données initiales de Plex API\n- recevoir des événements de Plex Webhook (Plex Pass uniquement)\n- recevoir des événements de Tatulli (si utilisé)",
+                "it": "- ottenere i dati iniziali da Plex API\n- la ricezione di eventi da Plex Webhook (Plex Pass)\n- la ricezione di eventi da Tatulli (se usato)",
+                "es": "- obtener datos iniciales de Plex API\n- recibir eventos de Plex Webhook (Plex Pass solo)\n- recibir eventos de Tatulli (si se utiliza)",
+                "pl": "- zobacz dane źródłowe od plexus API\n- odbierać zdarzenia od strony pościgowa plex dnia (Plex pass tylko)\n- odbierać zdarzenia z Tatulli (jeśli jest używany)",
+                "zh-cn": "-得到最初的数据丛API\n-接收活动从丛两者(丛只通过)\n-接收活动从Tatulli(如果使用)"
             }
         },
         "license": "MIT",
@@ -44,6 +68,7 @@
         "materialize": true,
         "compact": true,
         "enabled": true,
+        "localLink": "%plexProtocol%://%plexIp%:%plexPort%/web/index.html",
         "type": "multimedia",
         "authors": [
             {

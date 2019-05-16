@@ -51,6 +51,24 @@ function startAdapter(options)
 	 */
 	adapter.on('ready', function()
 	{
+		// set encryption key
+		let key;
+		if (adapter.config.encryptionKey === undefined || adapter.config.encryptionKey === '')
+		{
+			//let key = encryptor.getEncryptionKey();
+			key = library.getKey(20);
+			adapter.getForeignObject('system.adapter.plex.' + adapter.instance, function(err, obj)
+			{
+				obj.native.encryptionKey = key;
+				adapter.setForeignObject(obj._id, obj);
+			});
+			
+			adapter.log.debug('Generated new encryption key for password encryption.');
+			adapter.log.debug(key);
+		}
+		else
+			key = adapter.config.encryptionKey;
+		
 		// empty _playing on start
 		if (adapter.config.resetMedia)
 		{
@@ -72,9 +90,8 @@ function startAdapter(options)
 			hostname: adapter.config.plexIp,
 			port: adapter.config.plexPort || 32400,
 			https: adapter.config.plexSecure || false,
-			username: adapter.config.plexPassUser || '',
-			password: adapter.config.plexPassPassword || '',
-			token: 'FNjTPMQmRxmmra8pXJb3',
+			username: adapter.config.plexUser || '',
+			password: adapter.config.plexPassword || '',
 			options: {
 				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',
@@ -237,7 +254,8 @@ function setEvent(data, source)
 {
 	// group by player
 	data['Player'] = data['Player'] !== undefined ? data['Player'] : {};
-	let groupBy = data['Player']['title'] && data['Player']['uuid'] ? data['Player']['title'].toLowerCase().replace(/ /g, '_') + '-' + data['Player']['uuid'] : 'unknown';
+	let groupBy = data['Player']['title'] && data['Player']['uuid'] ? library.clean(data['Player']['title'], true) + '-' + data['Player']['uuid'] : 'unknown';
+	library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Plex Player ' + data['Player']['title']});
 	
 	/*
 	// create player
@@ -274,7 +292,7 @@ function setEvent(data, source)
 	
 	// delete old states (which were not updated in the current payload)
 	clearTimeout(dutyCycle);
-	dutyCycle = setTimeout(function() {library.runDutyCycle('_playing.' + groupBy, data.timestamp)}, 10000);
+	dutyCycle = setTimeout(function() {library.runDutyCycle('_playing.' + groupBy, data.timestamp)}, 60000);
 }
 
 /**
@@ -283,6 +301,13 @@ function setEvent(data, source)
  */
 function readData(key, data)
 {
+	// only proceed if data is given
+	if (data === undefined || data === 'undefined' || data == '')
+		return false;
+	
+	// get node details
+	let node = get('playing.' + key.replace('_playing.', '').substr(key.replace('_playing.', '').indexOf('.')+1).replace(RegExp('\.[0-9][0-9][0-9]\.', ''), '.'));
+	
 	// loop nested data
 	if (typeof data == 'object')
 	{
@@ -294,11 +319,11 @@ function readData(key, data)
 				library.set(
 					{
 						node: key,
-						type:  'string',
-						role: 'text',
-						description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description
+						type:  node.type,
+						role: node.role,
+						description: node.description
 					},
-					data.map(function(item) {return item.tag}).join(', ')
+					data.map(function(item) {return item.tag ? item.tag : item.name}).join(', ')
 				);
 			}
 			
@@ -308,73 +333,39 @@ function readData(key, data)
 		// create channel
 		if (Object.keys(data).length > 0)
 		{
-			library.set({node: key, role: 'channel', description: key.substr(key.lastIndexOf('.')+1)}, '');
+			library.set({node: key, role: 'channel', description: RegExp('\.[0-9]{3}$').test(key.substr(-4)) ? 'Index ' + key.substr(key.lastIndexOf('.')+1) : library.ucFirst(key.substr(key.lastIndexOf('.')+1).replace('Tree', '')) + ' Information'}, '');
 		
 			// read nested data
+			let indexKey;
 			for (let nestedKey in data)
 			{
-				library.set({node: key + '.' + nestedKey, role: 'channel', description: nestedKey}, '');
+				indexKey = nestedKey >= 0 && nestedKey < 100 ? (nestedKey >= 0 && nestedKey < 10 ? '00' + nestedKey : '0' + nestedKey) : nestedKey;
 				
-				if (typeof data[nestedKey] == 'object')
-					library.set({node: key + '.' + (Array.isArray(data[nestedKey]) ? nestedKey + 'Tree' : nestedKey) + '._data', role: 'json', description: nestedKey + ' data'}, JSON.stringify(data[nestedKey]));
+				if (data[nestedKey] !== undefined && data[nestedKey] !== 'undefined' && typeof data[nestedKey] == 'object')
+				{
+					//library.set({node: key + '.' + indexKey, role: 'channel', description: nestedKey}, '');
+					library.set({node: key + '.' + (Array.isArray(data[nestedKey]) ? nestedKey + 'Tree' : indexKey) + '._data', role: 'json', description: 'Data of this folder in JSON format'}, JSON.stringify(data[nestedKey]));
+				}
 				
-				readData(key + '.' + nestedKey, data[nestedKey])
+				readData(key + '.' + indexKey, data[nestedKey]);
 			}
 		}
 	}
 	
-	// read data
+	// write to states
 	else
 	{
-		// data given?
-		if (data == undefined || data == 'undefined' || !data)
-			return;
-		
 		// convert data
-		switch(get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).convert)
-		{
-			case "date-timestamp":
-				
-				// convert timestamp to date
-				let date;
-				if (data.indexOf('-') > -1)
-				{
-					date = data
-					data = Math.floor(new Date(data).getTime()/1000)
-				}
-				
-				// or keep date if that is given
-				else
-				{
-					let ts = new Date(data*1000);
-					date = ts.getFullYear() + '-' + ('0'+ts.getMonth()).substr(-2) + '-' + ('0'+ts.getDate()).substr(-2);
-				}
-				
-				// set date
-				library.set(
-					{
-						node: key + 'Date',
-						type: 'string',
-						role: 'text',
-						description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description.replace('Timestamp', 'Date')
-					},
-					date
-				);
-				break;
-			
-			case "ms-min":
-				let duration = data/1000/60;
-				data = duration < 1 ? data : Math.floor(duration);
-				break;
-		}
+		node.key = key;
+		data = convertNode(node, data);
 		
 		// set data
 		library.set(
 			{
 				node: key,
-				type: typeof data,
-				role: typeof data == 'boolean' ? 'indicator' : (typeof data == 'number' ? 'value' : 'text'),
-				description: get('playing.' + key.replace('_playing.', '').substr(key.indexOf('.')+1)).description
+				type: node.type,
+				role: node.role,
+				description: node.description
 			},
 			data
 		);
@@ -404,12 +395,79 @@ function is(res)
 }
 
 /**
+ *
+ *
+ */
+function convertNode(node, data)
+{
+	switch(node.convert)
+	{
+		case "date-timestamp":
+			
+			// convert timestamp to date
+			let date;
+			if (data.toString().indexOf('-') > -1)
+			{
+				date = data
+				data = Math.floor(new Date(data).getTime()/1000)
+			}
+			
+			// or keep date if that is given
+			else
+			{
+				let ts = new Date(data*1000);
+				date = ts.getFullYear() + '-' + ('0'+ts.getMonth()).substr(-2) + '-' + ('0'+ts.getDate()).substr(-2);
+			}
+			
+			// set date
+			library.set(
+				{
+					node: node.key + 'Date',
+					type: 'string',
+					role: 'text',
+					description: node.description.replace('Timestamp', 'Date')
+				},
+				date
+			);
+			break;
+		
+		case "ms-min":
+			let duration = data/1000/60;
+			return duration < 1 ? data : Math.floor(duration);
+			break;
+	}
+	
+	return data;
+}
+
+/**
  * Get Node Description
  *
  */
 function get(node)
 {
-	return _NODES[node.toLowerCase().replace(/ /, '_')] || {description: '', role: 'text'};
+	return _NODES[library.clean(node, true)] || {description: '', role: 'text', type: 'string', convert: null};
+}
+
+/**
+ * Get Items from Plex
+ *
+ */
+function getItems(path, key, node)
+{
+	if (!adapter.config.allItems)
+		return;
+	
+	plex.query(path).then(function(res)
+	{
+		library.set({node: node + '.items', type: get(key + '.items').type, role: get(key + '.items').role, description: get(key + '.items').description}, JSON.stringify(res.MediaContainer.Metadata));
+		library.set({node: node + '.itemsCount', type: get(key + '.itemscount').type, role: get(key + '.itemscount').role, description: get(key + '.itemscount').description}, res.MediaContainer.size);
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve items for ' + key + ' from Plex!');
+		adapter.log.debug(e);
+	});
 }
 
 /**
@@ -434,7 +492,9 @@ function retrieveData()
 			let serverId = entry['name'].toLowerCase();
 			library.set({node: 'servers.' + serverId, role: get('server').role, description: get('server').description.replace(/%server%/gi, entry['name'])}, '');
 			
+			// index all keys as states
 			for (let key in entry)
+			{
 				library.set(
 					{
 						node: 'servers.' + serverId + '.' + key,
@@ -443,6 +503,7 @@ function retrieveData()
 					},
 					entry[key]
 				);
+			}
 		});
 	})
 	.catch(function(e)
@@ -465,6 +526,7 @@ function retrieveData()
 			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
 			library.set({node: 'libraries.' + libId, role: get('library').role, description: get('library').description.replace(/%library%/gi, entry['title'])}, '');
 			
+			// index all keys as states
 			for (let key in entry)
 			{
 				library.set(
@@ -479,16 +541,7 @@ function retrieveData()
 			}
 			
 			// get library content
-			plex.query('/library/sections/' + entry['key'] + '/all').then(function(res)
-			{
-				library.set({node: 'libraries.' + libId + '.items', type: get('libraries.items').type, role: get('libraries.items').role, description: get('libraries.items').description}, JSON.stringify(res.MediaContainer.Metadata));
-				library.set({node: 'libraries.' + libId + '.itemsCount', type: get('libraries.itemscount').type, role: get('libraries.itemscount').role, description: get('libraries.itemscount').description}, JSON.stringify(res.MediaContainer.size));
-			})
-			.catch(function(e)
-			{
-				adapter.log.debug('Could not retrieve Items for Library ' + entry['title'] + ' from Plex!');
-				adapter.log.debug(e);
-			});
+			getItems('/library/sections/' + entry['key'] + '/all', 'libraries', 'libraries.' + libId);
 			
 			// get statistics / watch time
 			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
@@ -532,12 +585,12 @@ function retrieveData()
 		
 		data.forEach(function(entry)
 		{
-			let userId = entry['friendly_name'].toLowerCase().replace(/ /gi, '_');
+			let userId = library.clean(entry['friendly_name'], true);
 			if (userId === 'local') return;
 			
 			library.set({node: 'users.' + userId, role: get('user').role, description: get('user').description.replace(/%user%/gi, entry['friendly_name'])}, '');
 			
-			// fill user information
+			// index all keys as states
 			for (let key in entry)
 			{
 				if (key === 'server_token') continue;
@@ -605,15 +658,55 @@ function retrieveData()
 	});
 	
 	//
+	// GET PLAYLISTS
+	//
+	plex.query('/playlists').then(function(res)
+	{
+		let data = res.MediaContainer.Metadata;
+		adapter.log.debug('Retrieved Playlists from Plex.');
+		library.set({node: 'playlists', role: get('playlists').role, description: get('playlists').description}, '');
+		
+		data.forEach(function(entry)
+		{
+			let playlistId = library.clean(entry['title'], true);
+			library.set({node: 'playlists.' + playlistId, role: 'channel', description: 'Playlist ' + entry['title']}, '');
+			
+			// index all keys as states
+			for (let key in entry)
+			{
+				let node = get('playlists.' + key);
+				node.key = 'playlists.' + playlistId + '.' + key;
+				entry[key] = convertNode(node, entry[key]);
+				
+				library.set(
+					{
+						node: 'playlists.' + playlistId + '.' + key,
+						type: node.type,
+						role: node.role,
+						description: node.description
+					},
+					entry[key]
+				);
+			}
+			
+			// get playlist content
+			getItems(entry['key'], 'playlists', 'playlists.' + playlistId);
+		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Playlists from Plex!');
+		adapter.log.debug(e);
+	});
+	
+	
+	//
 	// GET CLIENTS
 	//
 	/*
 	plex.query('/clients').then(function(res)
 	{
 		adapter.log.debug(JSON.stringify(res));
-		
-		
-		
 	})
 	.catch(function(e)
 	{
@@ -625,38 +718,28 @@ function retrieveData()
 	//
 	plex.query('/status/sessions/history/all').then(function(res)
 	{
-		adapter.log.debug('/status/sessions/history/all')
+		adapter.log.debug('history')
 		adapter.log.debug(JSON.stringify(res))
 	});
 	
-	// PLAYLISTS
-	plex.query('/playlists').then(function(res)
-	{
-		adapter.log.debug('/playlists')
-		adapter.log.debug(JSON.stringify(res))
-	});
-	
-	// RECENTLY ADDED
+	//
+	// GET RECENTLY ADDED
+	//
 	plex.query('/library/recentlyAdded').then(function(res)
 	{
-		adapter.log.debug('/playlists')
+		adapter.log.debug('recentlyAdded')
 		adapter.log.debug(JSON.stringify(res))
 	});
 	
-	// ON_DECK
+	//
+	// GET ON_DECK
+	//
 	plex.query('/library/onDeck').then(function(res)
 	{
-		adapter.log.debug('/library/onDeck')
+		adapter.log.debug('onDeck')
 		adapter.log.debug(JSON.stringify(res))
 	});
 	*/
-	
-	// PLAYING
-	
-	
-	// COMMANDS
-	
-	
 }
 
 /*

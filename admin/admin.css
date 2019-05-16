@@ -2,7 +2,7 @@
  * Admin styles.
  *
  * @author Zefau <zefau@mailbox.org>
- * @version 0.3.0
+ * @version 0.3.1
  *
  */
 .m select {display: block !important}
@@ -32,3 +32,7 @@ p.errorMessage {
 }
 
 .table-button-add {margin: 15px 5px 10px 5px}
+
+.modalMessage {
+	line-height: 20px;
+}

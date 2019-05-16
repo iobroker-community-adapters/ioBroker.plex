@@ -1,7 +1,9 @@
 /**
  * Admin functions.
- * @version 0.3.0
  *
+ * @author Zefau <zefau@mailbox.org>
+ * @version 0.3.1
+ * @date 2019-05-16
  *
  */
 
@@ -16,6 +18,36 @@ function _log(message, severity, id)
 	var log = $(id || '#log').html();
 	$(id || '#log').append('<li class="log ' + (severity || 'info') + ' translate">' + message + '</li>');
 	console.log((severity !== undefined ? severity.toUpperCase() : 'INFO') + ': ' + message);
+}
+	
+/**
+ * Encode a string.
+ *
+ * @param	{string}	key			Key used for encoding
+ * @param	{string}	string		String to encode
+ * @return	{string}				Encoded String
+ *
+ */
+function encode(key, string)
+{
+	let result = '';
+	for (let i = 0; i < string.length; i++)
+		result += String.fromCharCode(key[i % key.length].charCodeAt(0) ^ string.charCodeAt(i));
+	
+	return result;
+}
+
+/**
+ * Decode a string.
+ *
+ * @param	{string}	key			Key used for decoding
+ * @param	{string}	string		String to decode
+ * @return	{string}				Decoded String
+ *
+ */
+function decode(key, string)
+{
+	return encode(key, string);
 }
 
 /**
@@ -80,7 +112,7 @@ function _save(callback, obj)
 		
 		// save settings
 		else
-			obj[key] = $this.val();
+			obj[key] = obj[key] ? obj[key] : $this.val();
 	});
 	
 	callback(obj);

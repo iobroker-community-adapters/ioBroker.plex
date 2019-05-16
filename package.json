@@ -41,12 +41,12 @@
     "multer": "^1.4.1",
     "plex-api": "^5.2.2",
     "plex-control": "^3.0.1",
-    "tautulli-api": "^1.0.0"
+    "tautulli-api": "^1.0.1"
   },
   "deprecated": false,
   "description": "Integration of your Plex Media Server and / or your Tautulli",
   "devDependencies": {
-    "@iobroker/testing": "^1.2.1",
+    "@iobroker/testing": "^1.2.2",
     "axios": "^0.18.0",
     "chai": "^4.2.0",
     "gulp": "^4.0.2",
@@ -72,5 +72,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

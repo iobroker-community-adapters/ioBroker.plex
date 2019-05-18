@@ -49,7 +49,7 @@
   "deprecated": false,
   "description": "Integration of your Plex Media Server and / or your Tautulli",
   "devDependencies": {
-    "@iobroker/testing": "^1.2.2",
+    "@iobroker/testing": "^1.2.5",
     "axios": "^0.18.0",
     "chai": "^4.2.0",
     "gulp": "^4.0.2",

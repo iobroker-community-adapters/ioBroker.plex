@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.3.0",
+        "version": "0.3.1",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and / or your Tautulli",
@@ -16,6 +16,9 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
+            "0.3.1": {
+				"en": "- updated dependencies to fix security vulnerabilities in depending packages"
+			},
             "0.3.0": {
                 "en": "- updated testing for Node.js v12 (#6)\n- added support / discovery in iobroker.discovery (#62)\n- added playlists to states\n- added state description for object tree _playing\n- updated German translation (instead of generating it from English)",
                 "de": "- aktualisiert-Tests für Node.js v12 (#6)\n- Unterstützung / Entdeckung in iobroker.discovery (#62)\n- Hinzugefügt Wiedergabelisten Staaten\n- Hinzugefügt Staat Beschreibung für Objekt Baum _playing\n- Deutsche übersetzung überarbeitet (anstatt der Erzeugung aus dem englischen)",

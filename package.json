@@ -40,8 +40,8 @@
   "dependencies": {
     "@iobroker/adapter-core": "^1.0.3",
     "body-parser": "^1.19.0",
-    "express": "^4.16.4",
-    "multer": "^1.4.1",
+    "express": "^4.17.1",
+    "multer": "^1.4.2",
     "plex-api": "^5.2.2",
     "plex-control": "^3.0.1",
     "tautulli-api": "^1.0.2"
@@ -53,7 +53,7 @@
     "axios": "^0.19.0",
     "chai": "^4.2.0",
     "gulp": "^4.0.2",
-    "mocha": "^6.1.4"
+    "mocha": "^6.2.0"
   },
   "homepage": "https://github.com/Zefau/ioBroker.plex",
   "keywords": [
@@ -75,5 +75,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.3.0"
+  "version": "0.3.1"
 }

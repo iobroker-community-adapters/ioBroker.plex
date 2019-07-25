@@ -70,8 +70,8 @@ You may copy the following example into Tautulli to have a full detailed payload
 		"Similar":"undefined",
 		"file": {
 			"path": "{file}",
-			"name": {filename}",
-			"size": {file_size}"
+			"name": "{filename}",
+			"size": "{file_size}"
 		},
 		"transcoding": {
 			"transcode_decision": "{transcode_decision}",

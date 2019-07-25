@@ -1,11 +1,11 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.3.1",
+        "version": "0.3.2",
         "title": "Plex Media Server",
         "desc": {
-            "en": "Integration of your Plex Media Server and / or your Tautulli",
-            "de": "Integration der Plex Media Server und / oder Ihre Tautulli",
+            "en": "Integration of your Plex Media Server and your Tautulli",
+            "de": "Integration des Plex Media Servers und Tautulli",
             "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
             "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
             "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
@@ -16,9 +16,30 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
+            "0.3.2": {
+                "en": "- added file, streaming and transcoding information to Tautulli event\n- fixed bug when no playlists exist",
+                "de": "- Hinzugefügt file -, streaming-und transcoding-Informationen zu Tautulli Veranstaltung\n- behoben: Fehler, wenn keine Playlisten vorhanden sind",
+                "ru": "- добавлен файл, потоковая передача и перекодирование информации Tautulli событие\n- Исправлена ошибка, когда не существует плейлисты",
+                "pt": "- arquivo adicionado, a transmissão e a transcodificação de informações para Tautulli evento\n- corrigido o erro quando não existem listas de reprodução",
+                "nl": "- toegevoegde bestand, streaming en het transcoderen van informatie te Tautulli evenement\n- bug opgelost als er geen afspeellijsten bestaan",
+                "fr": "- ajout de fichiers, le streaming et le transcodage de l'information à Tautulli événement\n- correction d'un bug lorsque aucune liste de lecture existent",
+                "it": "- aggiunto il file, lo streaming e la transcodifica di informazioni per Tautulli evento\n- corretto il bug quando non esiste playlist",
+                "es": "- añadido archivo, de transmisión y de transcodificación de información para Tautulli evento\n- corregido un fallo cuando no existen listas de reproducción",
+                "pl": "- dodano plik, przesyłanie i transkodowanie informacji Tautulli wydarzenie\n- Naprawiono błąd, gdy nie istnieje playlisty",
+                "zh-cn": "-加入文件，流和代码转换信息Tautulli事件\n-固定错误时，没有存在的播放列表"
+            },
             "0.3.1": {
-				"en": "- updated dependencies to fix security vulnerabilities in depending packages"
-			},
+                "en": "- updated dependencies to fix security vulnerabilities in depending packages",
+                "de": "- Abhängigkeiten aktualisiert, um Sicherheitslücken in je-Pakete",
+                "ru": "- обновлены зависимости, чтобы исправить найденные уязвимости в зависимости от пакетов",
+                "pt": "- atualizado dependências para corrigir vulnerabilidades de segurança em pacotes de acordo",
+                "nl": "- bijgewerkt afhankelijkheden op te lossen beveiligingsproblemen in afhankelijk van pakketten",
+                "fr": "- mise à jour des dépendances à réparer les failles de sécurité en fonction des paquets",
+                "it": "- aggiornato dipendenze per risolvere vulnerabilità di sicurezza in base pacchetti",
+                "es": "- actualizado a las dependencias para corregir las vulnerabilidades de seguridad en función de los paquetes",
+                "pl": "- zaktualizowane zależności, aby naprawić znalezione luki w zależności od pakietów",
+                "zh-cn": "-更新的依赖关系，以解决安全漏洞，根据包"
+            },
             "0.3.0": {
                 "en": "- updated testing for Node.js v12 (#6)\n- added support / discovery in iobroker.discovery (#62)\n- added playlists to states\n- added state description for object tree _playing\n- updated German translation (instead of generating it from English)",
                 "de": "- aktualisiert-Tests für Node.js v12 (#6)\n- Unterstützung / Entdeckung in iobroker.discovery (#62)\n- Hinzugefügt Wiedergabelisten Staaten\n- Hinzugefügt Staat Beschreibung für Objekt Baum _playing\n- Deutsche übersetzung überarbeitet (anstatt der Erzeugung aus dem englischen)",

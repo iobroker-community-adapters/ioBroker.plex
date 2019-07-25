@@ -14,8 +14,9 @@ const Library = require(__dirname + '/lib/library.js');
 const Plex = require('plex-api');
 const PlexControl = require('plex-control').PlexControl;
 const Tautulli = require('tautulli-api');
-//const params = require(__dirname + '/tautulli-parameters.json');
+
 const _NODES = require(__dirname + '/NODES.json');
+const _EVENTS = require(__dirname + '/EVENTS.json');
 const _ACTIONS = require(__dirname + '/ACTIONS.json');
 
 
@@ -154,8 +155,15 @@ function startAdapter(options)
 			try
 			{
 				payload = JSON.parse(req.body.payload);
-				adapter.log.debug('Received payload from Plex: ' + JSON.stringify(payload));
-				setEvent(payload, 'plex');
+				adapter.log.info('Received payload from Plex: ' + JSON.stringify(payload));
+				
+				// index event of payload
+				// events.history
+				// events.last
+				
+				// write payload to states
+				if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
+					setEvent(payload, 'plex');
 			}
 			catch(e) {adapter.log.warn(e.message)}
 		});
@@ -487,7 +495,7 @@ function retrieveData()
 		adapter.log.debug('Retrieved Servers from Plex.');
 		library.set({node: 'servers', role: get('servers').role, description: get('servers').description}, '');
 		
-		let data = res.MediaContainer.Server;
+		let data = res.MediaContainer.Server || [];
 		data.forEach(function(entry)
 		{
 			let serverId = entry['name'].toLowerCase();
@@ -521,7 +529,7 @@ function retrieveData()
 		adapter.log.debug('Retrieved Libraries from Plex.');
 		library.set({node: 'libraries', role: get('libraries').role, description: get('libraries').description}, '');
 		
-		let data = res.MediaContainer.Directory;
+		let data = res.MediaContainer.Directory || [];
 		data.forEach(function(entry)
 		{
 			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
@@ -548,7 +556,7 @@ function retrieveData()
 			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
 			tautulli.get('get_library_watch_time_stats', {'section_id': entry['key']}).then(function(res)
 			{
-				if (!is(res)) return; else data = res.response.data;
+				if (!is(res)) return; else data = res.response.data || [];
 				adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
 				
 				library.set({node: 'statistics', role: get('statistics').role, description: get('statistics').description}, '');
@@ -580,7 +588,7 @@ function retrieveData()
 	//
 	tautulli.get('get_users').then(function(res)
 	{
-		if (!is(res)) return; else data = res.response.data;
+		if (!is(res)) return; else data = res.response.data || [];
 		adapter.log.debug('Retrieved Users from Tautulli.');
 		library.set({node: 'users', role: get('users').role, description: get('users').description}, '');
 		
@@ -603,7 +611,7 @@ function retrieveData()
 			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_user_watch_time_stats
 			tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(function(res)
 			{
-				if (!is(res)) return; else data = res.response.data;
+				if (!is(res)) return; else data = res.response.data || [];
 				adapter.log.debug('Retrieved Watch Statistics for User ' + entry['friendly_name'] + ' from Tautulli.');
 				
 				library.set({node: 'statistics.users', role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, '')}, '');
@@ -633,7 +641,7 @@ function retrieveData()
 	//
 	plex.query('/:/prefs').then(function(res)
 	{
-		let data = res.MediaContainer.Setting;
+		let data = res.MediaContainer.Setting || [];
 		adapter.log.debug('Retrieved Settings from Plex.');
 		library.set({node: 'settings', role: get('settings').role, description: get('settings').description}, '');
 		
@@ -663,7 +671,7 @@ function retrieveData()
 	//
 	plex.query('/playlists').then(function(res)
 	{
-		let data = res.MediaContainer.Metadata;
+		let data = res.MediaContainer.Metadata || [];
 		adapter.log.debug('Retrieved Playlists from Plex.');
 		library.set({node: 'playlists', role: get('playlists').role, description: get('playlists').description}, '');
 		

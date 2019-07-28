@@ -108,6 +108,20 @@ You may copy the following example into Tautulli to have a full detailed payload
 			"transcode_hw_encode_title": "{transcode_hw_encode_title}"
 		},
 		"stream": {
+			"user": {
+				"streams": "{streams}",
+				"user_streams": "{user_streams}",
+				"name": "{user}",
+				"user": "{username}",
+				"email": "{user_email}"
+			},
+			"player": {
+				"device": "{device}",
+				"platform": "{platform}",
+				"product": "{product}",
+				"player": "{player}",
+				"ip_address": "{ip_address}"
+			},
 			"quality_profile": "{quality_profile}",
 			"optimized_version": "{optimized_version}",
 			"optimized_version_profile": "{optimized_version_profile}",

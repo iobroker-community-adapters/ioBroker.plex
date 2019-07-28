@@ -4,6 +4,21 @@
 __Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](#list-of-available-parameters) for the full list of possibilities.
 The JSON data specified in the notifications (see below) will be send to ioBroker and put into states.
 
+__Notification agents__
+- [Playback Start / Stop / Pause / Resume](#notification-agent-playback-start--stop--pause--resume) 
+- [Transcode Decision Change](#notification-agent-transcode-decision-change)
+- [Watched](#notification-agent-watched)
+- [Buffer Warning](#notification-agent-buffer-warning)
+- [User Concurrent Streams](#notification-agent-user-concurrent-streams)
+- [User New Device](#notification-agent-user-new-device)
+- [Recently Added](#notification-agent-recently-added)
+- [Plex Server Down](#notification-agent-plex-server-down)
+- [Plex Server Back Up](#notification-agent-plex-server-back-up)
+- [Plex Remote Access Down](#notification-agent-plex-remote-access-down)
+- [Plex Remote Access Back Up](#notification-agent-plex-remote-access-back-up)
+- [Plex Update Available](#notification-agent-plex-update-available)
+- [Tautulli Update Available](#notification-agent-tautulli-update-available)
+
 ### Notification agent: Playback Start / Stop / Pause / Resume
 __Note:__ As stated above the JSON data is highly customizable and can be changed to any data you wish. __Please be aware__, that the notification types for ```Playback Start```, ```Stop```, ```Resume``` and ```Pause``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"}``` (to identify the Player) in order to work correctly.
 

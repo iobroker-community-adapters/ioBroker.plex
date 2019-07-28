@@ -4,7 +4,7 @@
 __Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](#list-of-available-parameters) for the full list of possibilities.
 The JSON data specified in the notifications (see below) will be send to ioBroker and put into states.
 
-### Playback Start / Stop / Pause / Resume
+### Notification agent: Playback Start / Stop / Pause / Resume
 __Note:__ As stated above the JSON data is highly customizable and can be changed to any data you wish. __Please be aware__, that the notification types for ```Playback Start```, ```Stop```, ```Resume``` and ```Pause``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"}``` (to identify the Player) in order to work correctly.
 
 You may copy the following example into Tautulli to have a full detailed payload retrieved.
@@ -170,84 +170,84 @@ You may copy the following example into Tautulli to have a full detailed payload
 }
 ```
 
-### Transcode Decision Change
+### Notification agent: Transcode Decision Change
 ```
 {
 	to be defined
 }
 ```
 
-### Watched
+### Notification agent: Watched
 ```
 {
 	to be defined
 }
 ```
 
-### Buffer Warning
+### Notification agent: Buffer Warning
 ```
 {
 	to be defined
 }
 ```
 
-### User Concurrent Streams
+### Notification agent: User Concurrent Streams
 ```
 {
 	to be defined
 }
 ```
 
-### User New Device
+### Notification agent: User New Device
 ```
 {
 	to be defined
 }
 ```
 
-### Recently Added
+### Notification agent: Recently Added
 ```
 {
 	to be defined
 }
 ```
 
-### Plex Server Down
+### Notification agent: Plex Server Down
 ```
 {
 	to be defined
 }
 ```
 
-### Plex Server Back Up
+### Notification agent: Plex Server Back Up
 ```
 {
 	to be defined
 }
 ```
 
-### Plex Remote Access Down
+### Notification agent: Plex Remote Access Down
 ```
 {
 	to be defined
 }
 ```
 
-### Plex Remote Access Back Up
+### Notification agent: Plex Remote Access Back Up
 ```
 {
 	to be defined
 }
 ```
 
-### Plex Update Available
+### Notification agent: Plex Update Available
 ```
 {
 	to be defined
 }
 ```
 
-### Tautulli Update Available
+### Notification agent: Tautulli Update Available
 ```
 {
 	to be defined

@@ -155,6 +155,8 @@ function startAdapter(options)
 			try
 			{
 				payload = JSON.parse(req.body.payload);
+				res.send(200);
+				
 				adapter.log.info('Received payload from Plex: ' + JSON.stringify(payload));
 				
 				// index event of payload
@@ -165,7 +167,10 @@ function startAdapter(options)
 				if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
 					setEvent(payload, 'plex');
 			}
-			catch(e) {adapter.log.warn(e.message)}
+			catch(e) {
+				adapter.log.warn(e.message);
+				res.send(500);
+			}
 		});
 		
 		// listen to events from Tautulli
@@ -175,10 +180,22 @@ function startAdapter(options)
 			try
 			{
 				payload = req.body;
-				adapter.log.debug('Received payload from Tautulli: ' + JSON.stringify(payload));
-				setEvent(payload, 'tautulli');
+				res.send(200);
+				
+				adapter.log.info('Received payload from Tautulli: ' + JSON.stringify(payload));
+				
+				// index event of payload
+				// events.history
+				// events.last
+				
+				// write payload to states
+				if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
+					setEvent(payload, 'tautulli');
 			}
-			catch(e) {adapter.log.warn(e.message)}
+			catch(e) {
+				adapter.log.warn(e.message);
+				res.send(500);
+			}
 		});
 		
 		_http.listen(adapter.config.port || 41891);

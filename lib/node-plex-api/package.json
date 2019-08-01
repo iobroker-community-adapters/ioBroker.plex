@@ -9,17 +9,11 @@
   "dependencies": {
     "plex-api-credentials": "^3.0.0",
     "plex-api-headers": "1.1.0",
-    "request": "^2.87.0",
-    "uuid": "2.0.2",
-    "xml2js": "0.4.16"
+    "request": "^2.88.0",
+    "uuid": "^3.3.2",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "expect.js": "^0.3.1",
-    "mocha": "^4.0.1",
-    "nock": "^9.0.0",
-    "prettier": "1.1.0",
-    "proxyquire": "^1.7.3",
-    "sinon": "^1.17.2"
   },
   "scripts": {
     "format": "npm run format:exec -- --write",

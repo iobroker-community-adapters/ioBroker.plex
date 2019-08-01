@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.3.3",
+        "version": "0.4.0",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and your Tautulli",
@@ -16,6 +16,18 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
+            "0.4.0": {
+                "en": "- added playback control for players\n- added configuration options to only retrieve specific objects from Plex",
+                "de": "- Steuerung der Wiedergabe der Player\n- Optionen nur bestimmte Konfiguration von Plex abzurufen",
+                "ru": "- добавлено управление воспроизведением для игроков\n- добавлены параметры конфигурации для извлечения только определенных объектов из плекса",
+                "pt": "- adicionado controle de reprodução para os jogadores\n- adicionado opções de configuração para obter apenas os objetos específicos do Plex",
+                "nl": "- toegevoegd playback control voor spelers\nde toegevoegde configuratie opties om alleen het ophalen van specifieke objecten van Plex",
+                "fr": "- ajout de la lecture de contrôle pour les joueurs\n- ajout d'options de configuration pour récupérer uniquement les objets spécifiques de Plex",
+                "it": "- aggiunto controllo della riproduzione per i giocatori\n- aggiunte opzioni di configurazione per recuperare oggetti specifici da Plex",
+                "es": "- añadido control de reproducción para los jugadores\n- añadido opciones de configuración para recuperar sólo los objetos específicos de Plex",
+                "pl": "- dodano sterowanie odtwarzaniem dla graczy\n- dodano opcje konfiguracji w celu wyodrębnienia pewnych obiektów z plexus",
+                "zh-cn": "-增加播放控制的球员\n-增加配置选项只有检索的具体对象的复杂"
+            },
             "0.3.2": {
                 "en": "- added file, streaming and transcoding information to Tautulli event\n- fixed bug when no playlists exist",
                 "de": "- Hinzugefügt file -, streaming-und transcoding-Informationen zu Tautulli Veranstaltung\n- behoben: Fehler, wenn keine Playlisten vorhanden sind",
@@ -101,7 +113,13 @@
             }
         ]
     },
-    "native": {},
+    "native": {
+        "getAllItems": true,
+        "getLibraries": true,
+        "getPlaylists": true,
+        "getServers": true,
+        "getSettings": true
+    },
     "objects": [],
     "instanceObjects": []
 }

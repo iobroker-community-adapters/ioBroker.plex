@@ -1,16 +1,9 @@
 {
 	"playback": [
 		"play",
+		"resume",
 		"pause",
-		"stop",
-		"rewind",
-		"fastForward",
-		"stepForward",
-		"bigStepForward",
-		"stepBack",
-		"bigStepBack",
-		"skipNext",
-		"skipPrevious"
+		"stop"
 	],
 	
 	"navigation": [
@@ -18,13 +11,7 @@
 		"moveDown",
 		"moveLeft",
 		"moveRight",
-		"pageUp",
-		"pageDown",
-		"nextLetter",
-		"previousLetter",
 		"select",
-		"back",
-		"contextMenu",
-		"toggleOSD"
+		"back"
 	]
 }

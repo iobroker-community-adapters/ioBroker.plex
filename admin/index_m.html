@@ -175,11 +175,18 @@
 						</div>
 					</div>
 					<div class="row box">
-						<p class="subtitle translate">eventsInfo</p>
-						
-						<div class="input-field col s4 m4">
+						<div class="input-field col s3 m3">
+							<p class="subtitle translate">eventsInfo</p>
+							
 							<input class="value" id="port" type="number" placeholder="41891" />
 							<label for="port" class="translate">webhookPort</label>
+						</div>
+						<div class="input-field col s1 m1"></div>
+						<div class="input-field col s4 m4">
+							<p class="subtitle translate">resetMediaInfo</p>
+							
+							<input class="value" id="resetMedia" type="checkbox" />
+							<label for="resetMedia" class="translate">resetMedia</label>
 						</div>
 						
 					</div>
@@ -195,23 +202,49 @@
 						</div>
 					</div>
 					<div class="row box">
-						<div class="input-field col s4 m4">
-							<p class="subtitle translate">allItemsInfo</p>
-							
-							<input class="value" id="allItems" type="checkbox" />
-							<label for="allItems" class="translate">allItems</label>
-						</div>
-						<div class="input-field col s4 m4">
+						<div class="input-field col s3 m3">
 							<p class="subtitle translate">refreshInfo</p>
 							
 							<input class="value" id="refresh" type="number" placeholder="0" />
 							<label for="refresh" class="translate" style="display: none">refresh</label>
 						</div>
+						<div class="input-field col s1 m1"></div>
 						<div class="input-field col s4 m4">
-							<p class="subtitle translate">resetMediaInfo</p>
 							
-							<input class="value" id="resetMedia" type="checkbox" />
-							<label for="resetMedia" class="translate">resetMedia</label>
+							<div style="display: block">
+								<input class="value" id="getServers" type="checkbox" />
+								<label for="getServers" class="translate">getServers</label>
+							</div>
+							<div style="display: block">
+								<input class="value" id="getLibraries" type="checkbox" />
+								<label for="getLibraries" class="translate">getLibraries</label>
+							</div>
+							
+							<div style="display: block">
+								<input class="value" id="getAllItems" type="checkbox" />
+								<label for="getAllItems" class="translate">getAllItems</label>
+							</div>
+							
+							<div style="display: block">
+								<input class="value" id="getUsers" type="checkbox" />
+								<label for="getUsers" class="translate">getUsers</label>
+							</div>
+							
+							<div style="display: block">
+								<input class="value" id="getStatistics" type="checkbox" />
+								<label for="getStatistics" class="translate">getStatistics</label>
+							</div>
+							
+							<div style="display: block">
+								<input class="value" id="getPlaylists" type="checkbox" />
+								<label for="getPlaylists" class="translate">getPlaylists</label>
+							</div>
+							
+							<div style="display: block">
+								<input class="value" id="getSettings" type="checkbox" />
+								<label for="getSettings" class="translate">getSettings</label>
+							</div>
+							
 						</div>
 						
 					</div>

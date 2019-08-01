@@ -25,7 +25,15 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 
 ## 1. Features
-tbd
+- Receive events from Plex (via Plex Pass or Tautulli)
+- Playback control for players
+- Retrieve servers
+- Retrieve libraries
+- Retrieve all items within a library
+- Retrieve users (only with Tautulli)
+- Retrieve statistics (only with Tautulli)
+- Retrieve playlists
+- Retrieve settings 
 
 ## 2. Setup instructions
 ### 2.1. Basic Setup

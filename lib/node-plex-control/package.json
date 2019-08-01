@@ -8,13 +8,10 @@
   ],
   "dependencies": {
     "plex-api": "^5.2.2",
-    "validator": "10.11.0",
-    "when": "^3.7.7"
+    "validator": "^11.1.0",
+    "when": "^3.7.8"
   },
   "devDependencies": {
-    "expect.js": "^0.3.1",
-    "mocha": "^4.1.0",
-    "sinon": "^1.17.3"
   },
   "scripts": {
     "test": "mocha test/bootstrapTests.js test/**/*-test.js",

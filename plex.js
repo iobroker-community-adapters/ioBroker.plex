@@ -5,6 +5,7 @@ const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');
+const _request = require('request-promise');
 
 
 /*
@@ -12,7 +13,6 @@ const _multer = require('multer');
  */
 const Library = require(__dirname + '/lib/library.js');
 const Plex = require('plex-api');
-const PlexControl = require(__dirname + '/lib/node-plex-control/lib/control.js').PlexControl;
 const Tautulli = require('tautulli-api');
 
 const _NODES = require(__dirname + '/NODES.json');
@@ -26,7 +26,7 @@ const _ACTIONS = require(__dirname + '/ACTIONS.json');
 let adapter;
 let library;
 let plex, tautulli, data;
-let players = {};
+let players = [];
 let upload = _multer({ dest: '/tmp/' });
 let dutyCycle;
 
@@ -98,7 +98,8 @@ function startAdapter(options)
 				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',
 				version: '1.0',
-				deviceName: 'ioBroker'
+				deviceName: 'ioBroker',
+				platform: 'ioBroker'
 			}
 		});
 		
@@ -155,7 +156,7 @@ function startAdapter(options)
 			try
 			{
 				payload = JSON.parse(req.body.payload);
-				res.send(200);
+				res.sendStatus(200);
 				
 				adapter.log.info('Received payload from Plex: ' + JSON.stringify(payload));
 				
@@ -169,7 +170,7 @@ function startAdapter(options)
 			}
 			catch(e) {
 				adapter.log.warn(e.message);
-				res.send(500);
+				//res.sendStatus(500);
 			}
 		});
 		
@@ -180,7 +181,7 @@ function startAdapter(options)
 			try
 			{
 				payload = req.body;
-				res.send(200);
+				res.sendStatus(200);
 				
 				adapter.log.info('Received payload from Tautulli: ' + JSON.stringify(payload));
 				
@@ -194,7 +195,7 @@ function startAdapter(options)
 			}
 			catch(e) {
 				adapter.log.warn(e.message);
-				res.send(500);
+				//res.sendStatus(500);
 			}
 		});
 		
@@ -207,51 +208,44 @@ function startAdapter(options)
 	 */
 	adapter.on('stateChange', function(id, state)
 	{
-		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
+		if (!state || state.ack === true) return;
 		
+		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
 		let action = id.substr(id.lastIndexOf('.')+1);
 		
-		// Playback / Navigation
-		if ((_ACTIONS.playback.indexOf(action) || _ACTIONS.navigation.indexOf(action)) && state && state.ack !== true)
+		// Player Controls
+		adapter.getObject(id, function(err, obj)
 		{
-			adapter.getObject(id, function(err, obj)
+			if (err !== null || !obj || !obj.common) return;
+			
+			let mode = obj.common.mode;
+			let playerIp = obj.common.playerIp;
+			let playerPort = obj.common.playerPort;
+			let playerIdentifier = obj.common.playerIdentifier;
+			
+			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
 			{
-				adapter.log.info(JSON.stringify(obj));
-				if (err !== null || !obj || !obj.common) return;
+				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
 				
-				let playerIp = obj.common.playerIp;
-				let player = new PlexControl(adapter.config.plexIp, playerIp);
-				adapter.log.info('Triggered action -' + action + '- on Player ' + playerIp + '.');
+				let key = obj.common.key || action;
+				let attribute = obj.common.attribute;
 				
-				// apply playback action
-				if (player.playback[action])
+				let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + state.val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier;
+				adapter.log.debug(url);
+				
+				_request(url).then(function(res)
 				{
-					player.playback[action]().then(function()
-					{
-						adapter.log.info('Successfully triggered playback action -' + action + '- on player ' + playerIp + '.');
-					},
-					function(err)
-					{
-						adapter.log.warn('Error triggering playback action -' + action + '- on player ' + playerIp + '! See debug log for details.');
-						adapter.log.debug(err);
-					});
-				}
-				
-				// apply navigation action
-				if (player.navigation[action])
+					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+				})
+				.catch(function(err)
 				{
-					player.navigation[action]().then(function()
-					{
-						adapter.log.info('Successfully triggered navigation action -' + action + '- on player ' + playerIp + '.');
-					},
-					function(err)
-					{
-						adapter.log.warn('Error triggering navigation action -' + action + '- on player ' + playerIp + '! See debug log for details.');
-						adapter.log.debug(err);
-					});
-				}
-			});
-		}
+					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
+					adapter.log.debug(err);
+				});
+			}
+			else
+				adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
+		});
 	});
 	
 	/*
@@ -290,24 +284,9 @@ function setEvent(data, source)
 	library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
 	
 	// add player controls
-	let controls = '_playing.' + groupBy + '._Controls';
-	library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
-	library.set({node: controls + '.playback', role: 'channel', description: 'Playback Controls'}, '');
-	library.set({node: controls + '.navigation', role: 'channel', description: 'Navigation Controls'}, '');
-	adapter.subscribeStates(controls + '.*');
+	if (data['Player'] && data['Player']['uuid'] && players.indexOf(data['Player']['uuid']) == -1)
+		getPlayers();
 	
-	// Playback controls
-	_ACTIONS.playback.forEach(function(button)
-	{
-		library.set({node: controls + '.playback.' + button, role: 'button', description: 'Playback ' + library.ucFirst(button), common: { playerIp: data['Player']['localAddress'] || data['Player']['title'] }}, '');
-	});
-	
-	// Navigation controls
-	_ACTIONS.navigation.forEach(function(button)
-	{
-		library.set({node: controls + '.navigation.' + button, role: 'button', description: 'Navigation ' + library.ucFirst(button), common: { playerIp: data['Player']['localAddress'] || data['Player']['title'] }}, '');
-	});
-
 	// add meta data
 	data.source = source;
 	data.timestamp = Math.floor(Date.now()/1000);
@@ -504,278 +483,340 @@ function retrieveData()
 {
 	let watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
 	
-	//
 	// GET SERVERS
-	//
 	if (adapter.config.getServers)
-	{
-		plex.query('/servers').then(function(res)
-		{
-			adapter.log.debug('Retrieved Servers from Plex.');
-			library.set({node: 'servers', role: get('servers').role, description: get('servers').description}, '');
-			
-			let data = res.MediaContainer.Server || [];
-			data.forEach(function(entry)
-			{
-				let serverId = entry['name'].toLowerCase();
-				library.set({node: 'servers.' + serverId, role: get('server').role, description: get('server').description.replace(/%server%/gi, entry['name'])}, '');
-				
-				// index all keys as states
-				for (let key in entry)
-				{
-					library.set(
-						{
-							node: 'servers.' + serverId + '.' + key,
-							role: get('servers.' + key).role,
-							description: get('servers.' + key).description
-						},
-						entry[key]
-					);
-				}
-			});
-		})
-		.catch(function(e)
-		{
-			adapter.log.debug('Could not retrieve Servers from Plex!');
-			adapter.log.debug(e);
-		});
-	}
+		getServers();
 	
-	//
 	// GET LIBRARIES
-	//
 	if (adapter.config.getLibraries)
-	{
-		plex.query('/library/sections').then(function(res)
-		{
-			adapter.log.debug('Retrieved Libraries from Plex.');
-			library.set({node: 'libraries', role: get('libraries').role, description: get('libraries').description}, '');
-			
-			let data = res.MediaContainer.Directory || [];
-			data.forEach(function(entry)
-			{
-				let libId = entry['key'] + '-' + entry['title'].toLowerCase();
-				library.set({node: 'libraries.' + libId, role: get('library').role, description: get('library').description.replace(/%library%/gi, entry['title'])}, '');
-				
-				// index all keys as states
-				for (let key in entry)
-				{
-					library.set(
-						{
-							node: 'libraries.' + libId + '.' + key.toLowerCase(),
-							type: get('libraries.' + key).type, 
-							role: get('libraries.' + key).role,
-							description: get('libraries.' + key).description
-						},
-						typeof entry[key] == 'object' ? JSON.stringify(entry[key]) : entry[key]
-					);
-				}
-				
-				// get library content
-				getItems('/library/sections/' + entry['key'] + '/all', 'libraries', 'libraries.' + libId);
-				
-				// get statistics / watch time
-				// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
-				if (adapter.config.getStatistics)
-				{
-					tautulli.get('get_library_watch_time_stats', {'section_id': entry['key']}).then(function(res)
-					{
-						if (!is(res)) return; else data = res.response.data || [];
-						adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
-						
-						library.set({node: 'statistics', role: get('statistics').role, description: get('statistics').description}, '');
-						library.set({node: 'statistics.libraries', role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, '')}, '');
-						library.set({node: 'statistics.libraries.' + libId, role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, entry['title'])}, '');
-						
-						data.forEach(function(entry, i)
-						{
-							let id = watched[i];
-							library.set({node: 'statistics.libraries.' + libId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
-								
-							for (let key in entry)
-								library.set({node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
-						});
-					})
-					.catch(function(e) {});
-				}
-				
-			});
-		})
-		.catch(function(e)
-		{
-			adapter.log.debug('Could not retrieve Libraries from Plex!');
-			adapter.log.debug(e);
-		});
-	}
+		getLibraries();
 	
-	//
-	// GET USERS
-	// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_users
-	//
+	// GET USERS (https://github.com/Tautulli/Tautulli/blob/master/API.md#get_users)
 	if (adapter.config.getUsers)
-	{
-		tautulli.get('get_users').then(function(res)
-		{
-			if (!is(res)) return; else data = res.response.data || [];
-			adapter.log.debug('Retrieved Users from Tautulli.');
-			library.set({node: 'users', role: get('users').role, description: get('users').description}, '');
-			
-			data.forEach(function(entry)
-			{
-				let userId = library.clean(entry['friendly_name'], true);
-				if (userId === 'local') return;
-				
-				library.set({node: 'users.' + userId, role: get('user').role, description: get('user').description.replace(/%user%/gi, entry['friendly_name'])}, '');
-				
-				// index all keys as states
-				for (let key in entry)
-				{
-					if (key === 'server_token') continue;
-					library.set({node: 'users.' + userId + '.' + key, role: get('users.' + key).role, description: get('users.' + key).description}, entry[key]);
-				}
-				
-				// get statistics / watch time
-				//
-				// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_user_watch_time_stats
-				if (adapter.config.getStatistics)
-				{
-					tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(function(res)
-					{
-						if (!is(res)) return; else data = res.response.data || [];
-						adapter.log.debug('Retrieved Watch Statistics for User ' + entry['friendly_name'] + ' from Tautulli.');
-						
-						library.set({node: 'statistics.users', role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, '')}, '');
-						library.set({node: 'statistics.users.' + userId, role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, entry['friendly_name'])}, '');
-						
-						data.forEach(function(entry, i)
-						{
-							let id = watched[i];
-							library.set({node: 'statistics.users.' + userId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
-							
-							for (let key in entry)
-								library.set({node: 'statistics.users.' + userId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
-						});
-					})
-					.catch(function(e) {});
-				}
-				
-			});
-		})
-		.catch(function(e)
-		{
-			adapter.log.debug('Could not retrieve Users from Tautulli!');
-			adapter.log.debug(e);
-		});
-	}
+		getUsers();
 	
-	//
 	// GET SETTINGS
-	//
 	if (adapter.config.getSettings)
+		getSettings();
+	
+	// GET PLAYLISTS
+	if (adapter.config.getPlaylists)
+		getPlaylists();
+	
+	// GET CLIENTS / PLAYERS
+	getPlayers();
+}
+
+/**
+ * Retrieve Server from Plex
+ *
+ */
+function getServers()
+{
+	plex.query('/servers').then(function(res)
 	{
-		plex.query('/:/prefs').then(function(res)
+		adapter.log.debug('Retrieved Servers from Plex.');
+		library.set({node: 'servers', role: get('servers').role, description: get('servers').description}, '');
+		
+		let data = res.MediaContainer.Server || [];
+		data.forEach(function(entry)
 		{
-			let data = res.MediaContainer.Setting || [];
-			adapter.log.debug('Retrieved Settings from Plex.');
-			library.set({node: 'settings', role: get('settings').role, description: get('settings').description}, '');
+			let serverId = entry['name'].toLowerCase();
+			library.set({node: 'servers.' + serverId, role: get('server').role, description: get('server').description.replace(/%server%/gi, entry['name'])}, '');
 			
-			data.forEach(function(entry)
+			// index all keys as states
+			for (let key in entry)
 			{
-				entry['group'] = !entry['group'] ? 'other' : entry['group'];
-				library.set({node: 'settings.' + entry['group'], role: 'channel', description: 'Settings ' + library.ucFirst(entry['group'])}, '');
 				library.set(
 					{
-						node: 'settings.' + entry['group'] + '.' + entry['id'],
-						type: entry['type'] == 'bool' ? 'boolean' : (entry['type'] == 'int' ? 'number' : entry['type']),
-						role: entry['type'] == 'bool' ? 'indicator' : (entry['type'] == 'int' ? 'value' : 'text'),
-						description: entry['label']
+						node: 'servers.' + serverId + '.' + key,
+						role: get('servers.' + key).role,
+						description: get('servers.' + key).description
 					},
-					entry['value']
+					entry[key]
 				);
-			});
-		})
-		.catch(function(e)
-		{
-			adapter.log.debug('Could not retrieve Settings from Plex!');
-			adapter.log.debug(e);
+			}
 		});
-	}
-	
-	//
-	// GET PLAYLISTS
-	//
-	if (adapter.config.getPlaylists)
+	})
+	.catch(function(e)
 	{
-		plex.query('/playlists').then(function(res)
+		adapter.log.debug('Could not retrieve Servers from Plex!');
+		adapter.log.debug(e);
+	});
+}
+
+/**
+ * Retrieve Libraries from Plex
+ *
+ */
+function getLibraries()
+{
+	plex.query('/library/sections').then(function(res)
+	{
+		adapter.log.debug('Retrieved Libraries from Plex.');
+		library.set({node: 'libraries', role: get('libraries').role, description: get('libraries').description}, '');
+		
+		let data = res.MediaContainer.Directory || [];
+		data.forEach(function(entry)
 		{
-			let data = res.MediaContainer.Metadata || [];
-			adapter.log.debug('Retrieved Playlists from Plex.');
-			library.set({node: 'playlists', role: get('playlists').role, description: get('playlists').description}, '');
+			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
+			library.set({node: 'libraries.' + libId, role: get('library').role, description: get('library').description.replace(/%library%/gi, entry['title'])}, '');
 			
-			data.forEach(function(entry)
+			// index all keys as states
+			for (let key in entry)
 			{
-				let playlistId = library.clean(entry['title'], true);
-				library.set({node: 'playlists.' + playlistId, role: 'channel', description: 'Playlist ' + entry['title']}, '');
-				
-				// index all keys as states
-				for (let key in entry)
+				library.set(
+					{
+						node: 'libraries.' + libId + '.' + key.toLowerCase(),
+						type: get('libraries.' + key).type, 
+						role: get('libraries.' + key).role,
+						description: get('libraries.' + key).description
+					},
+					typeof entry[key] == 'object' ? JSON.stringify(entry[key]) : entry[key]
+				);
+			}
+			
+			// get library content
+			getItems('/library/sections/' + entry['key'] + '/all', 'libraries', 'libraries.' + libId);
+			
+			// get statistics / watch time
+			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
+			if (adapter.config.getStatistics)
+			{
+				tautulli.get('get_library_watch_time_stats', {'section_id': entry['key']}).then(function(res)
 				{
-					let node = get('playlists.' + key);
-					node.key = 'playlists.' + playlistId + '.' + key;
-					entry[key] = convertNode(node, entry[key]);
+					if (!is(res)) return; else data = res.response.data || [];
+					adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
 					
-					library.set(
-						{
-							node: 'playlists.' + playlistId + '.' + key,
-							type: node.type,
-							role: node.role,
-							description: node.description
-						},
-						entry[key]
-					);
+					library.set({node: 'statistics', role: get('statistics').role, description: get('statistics').description}, '');
+					library.set({node: 'statistics.libraries', role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, '')}, '');
+					library.set({node: 'statistics.libraries.' + libId, role: get('statistics.libraries').role, description: get('statistics.libraries').description.replace(/%library%/gi, entry['title'])}, '');
+					
+					data.forEach(function(entry, i)
+					{
+						let id = watched[i];
+						library.set({node: 'statistics.libraries.' + libId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
+							
+						for (let key in entry)
+							library.set({node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
+					});
+				})
+				.catch(function(e) {});
+			}
+			
+		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Libraries from Plex!');
+		adapter.log.debug(e);
+	});
+}
+
+/**
+ * Retrieve Users from Plex
+ *
+ */
+function getUsers()
+{
+	tautulli.get('get_users').then(function(res)
+	{
+		if (!is(res)) return; else data = res.response.data || [];
+		adapter.log.debug('Retrieved Users from Tautulli.');
+		library.set({node: 'users', role: get('users').role, description: get('users').description}, '');
+		
+		data.forEach(function(entry)
+		{
+			let userId = library.clean(entry['friendly_name'], true);
+			if (userId === 'local') return;
+			
+			library.set({node: 'users.' + userId, role: get('user').role, description: get('user').description.replace(/%user%/gi, entry['friendly_name'])}, '');
+			
+			// index all keys as states
+			for (let key in entry)
+			{
+				if (key === 'server_token') continue;
+				library.set({node: 'users.' + userId + '.' + key, role: get('users.' + key).role, description: get('users.' + key).description}, entry[key]);
+			}
+			
+			// get statistics / watch time
+			//
+			// https://github.com/Tautulli/Tautulli/blob/master/API.md#get_user_watch_time_stats
+			if (adapter.config.getStatistics)
+			{
+				tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(function(res)
+				{
+					if (!is(res)) return; else data = res.response.data || [];
+					adapter.log.debug('Retrieved Watch Statistics for User ' + entry['friendly_name'] + ' from Tautulli.');
+					
+					library.set({node: 'statistics.users', role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, '')}, '');
+					library.set({node: 'statistics.users.' + userId, role: get('statistics.users').role, description: get('statistics.users').description.replace(/%user%/gi, entry['friendly_name'])}, '');
+					
+					data.forEach(function(entry, i)
+					{
+						let id = watched[i];
+						library.set({node: 'statistics.users.' + userId + '.' + id, type: get('statistics.' + id).type, role: get('statistics.' + id).role, description: get('statistics.' + id).description}, '');
+						
+						for (let key in entry)
+							library.set({node: 'statistics.users.' + userId + '.' + id + '.' + key, type: get('statistics.' + key).type, role: get('statistics.' + key).role, description: get('statistics.' + key).description}, entry[key]);
+					});
+				})
+				.catch(function(e) {});
+			}
+			
+		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Users from Tautulli!');
+		adapter.log.debug(e);
+	});
+}
+
+/**
+ * Retrieve Settings from Plex
+ *
+ */
+function getSettings()
+{
+	plex.query('/:/prefs').then(function(res)
+	{
+		let data = res.MediaContainer.Setting || [];
+		adapter.log.debug('Retrieved Settings from Plex.');
+		library.set({node: 'settings', role: get('settings').role, description: get('settings').description}, '');
+		
+		data.forEach(function(entry)
+		{
+			entry['group'] = !entry['group'] ? 'other' : entry['group'];
+			library.set({node: 'settings.' + entry['group'], role: 'channel', description: 'Settings ' + library.ucFirst(entry['group'])}, '');
+			library.set(
+				{
+					node: 'settings.' + entry['group'] + '.' + entry['id'],
+					type: entry['type'] == 'bool' ? 'boolean' : (entry['type'] == 'int' ? 'number' : entry['type']),
+					role: entry['type'] == 'bool' ? 'indicator' : (entry['type'] == 'int' ? 'value' : 'text'),
+					description: entry['label']
+				},
+				entry['value']
+			);
+		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Settings from Plex!');
+		adapter.log.debug(e);
+	});
+}
+
+/**
+ * Retrieve Playlists from Plex
+ *
+ */
+function getPlaylists()
+{
+	plex.query('/playlists').then(function(res)
+	{
+		let data = res.MediaContainer.Metadata || [];
+		adapter.log.debug('Retrieved Playlists from Plex.');
+		library.set({node: 'playlists', role: get('playlists').role, description: get('playlists').description}, '');
+		
+		data.forEach(function(entry)
+		{
+			let playlistId = library.clean(entry['title'], true);
+			library.set({node: 'playlists.' + playlistId, role: 'channel', description: 'Playlist ' + entry['title']}, '');
+			
+			// index all keys as states
+			for (let key in entry)
+			{
+				let node = get('playlists.' + key);
+				node.key = 'playlists.' + playlistId + '.' + key;
+				entry[key] = convertNode(node, entry[key]);
+				
+				library.set(
+					{
+						node: 'playlists.' + playlistId + '.' + key,
+						type: node.type,
+						role: node.role,
+						description: node.description
+					},
+					entry[key]
+				);
+			}
+			
+			// get playlist content
+			getItems(entry['key'], 'playlists', 'playlists.' + playlistId);
+		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Playlists from Plex!');
+		adapter.log.debug(e);
+	});
+}
+
+/**
+ * Retrieve Players from Plex
+ *
+ */
+function getPlayers()
+{
+	plex.query('/clients').then(function(res)
+	{
+		let data = res.MediaContainer.Server || [];
+		adapter.log.debug('Retrieved Players from Plex.');
+		
+		data.forEach(function(player)
+		{
+			// group by player
+			players.push(player.machineIdentifier);
+			let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
+			
+			// create player
+			library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
+			library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + player.name}, '');
+			
+			// add player controls
+			let controls = '_playing.' + groupBy + '._Controls';
+			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
+			
+			player.protocolCapabilities.split(',').forEach(function(mode) // e.g. "timeline,playback,navigation,mirror,playqueues"
+			{
+				if (_ACTIONS[mode] === undefined) return;
+				
+				library.set({node: controls + '.' + mode, role: 'channel', description: library.ucFirst(mode) + ' Controls'}, '');
+				
+				let button;
+				for (let key in _ACTIONS[mode])
+				{
+					button = typeof _ACTIONS[mode][key] == 'string' ? { "key": key, "description": _ACTIONS[mode][key] } : _ACTIONS[mode][key];
+					
+					library.set({
+						node: controls + '.' + mode + '.' + key,
+						description: 'Playback ' + library.ucFirst(button.description),
+						
+						role: _ACTIONS[mode][key].attribute !== undefined ? (_ACTIONS[mode][key].values ? 'value' : 'text') : 'button',
+						type: _ACTIONS[mode][key].attribute !== undefined ? (_ACTIONS[mode][key].values ? 'number' : 'string') : 'boolean',
+						
+						common: {
+							write: true,
+							states: _ACTIONS[mode][key].values,
+							
+							mode: mode,
+							key: _ACTIONS[mode][key].key,
+							attribute: _ACTIONS[mode][key].attribute,
+							
+							playerIp: player.address,
+							playerPort: player.port,
+							playerIdentifier: player.machineIdentifier
+						}
+					}, _ACTIONS[mode][key].default !== undefined ? _ACTIONS[mode][key].default : false);
 				}
 				
-				// get playlist content
-				getItems(entry['key'], 'playlists', 'playlists.' + playlistId);
+				adapter.subscribeStates(controls + '.' + mode + '.*');
 			});
-		})
-		.catch(function(e)
-		{
-			adapter.log.debug('Could not retrieve Playlists from Plex!');
-			adapter.log.debug(e);
 		});
-	}
-	
-	
-	/*
-	//
-	// GET HISTORY
-	//
-	plex.query('/status/sessions/history/all').then(function(res)
-	{
-		adapter.log.debug('history')
-		adapter.log.debug(JSON.stringify(res))
 	});
-	
-	//
-	// GET RECENTLY ADDED
-	//
-	plex.query('/library/recentlyAdded').then(function(res)
-	{
-		adapter.log.debug('recentlyAdded')
-		adapter.log.debug(JSON.stringify(res))
-	});
-	
-	//
-	// GET ON_DECK
-	//
-	plex.query('/library/onDeck').then(function(res)
-	{
-		adapter.log.debug('onDeck')
-		adapter.log.debug(JSON.stringify(res))
-	});
-	*/
 }
+
 
 /*
  * COMPACT MODE

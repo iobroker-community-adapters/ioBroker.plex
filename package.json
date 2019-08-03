@@ -44,6 +44,7 @@
     "multer": "^1.4.2",
     "plex-api": "^5.2.2",
     "plex-control": "^3.0.1",
+    "request-promise": "^4.2.4",
     "tautulli-api": "^1.0.2"
   },
   "deprecated": false,
@@ -75,5 +76,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.4.0"
+  "version": "0.4.2"
 }

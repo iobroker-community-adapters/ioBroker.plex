@@ -7,17 +7,17 @@ const _parser = require('body-parser');
 const _multer = require('multer');
 const _request = require('request-promise');
 
+const Plex = require('plex-api');
+const Tautulli = require('tautulli-api');
+
 
 /*
  * internal libraries
  */
 const Library = require(__dirname + '/lib/library.js');
-const Plex = require('plex-api');
-const Tautulli = require('tautulli-api');
-
-const _NODES = require(__dirname + '/NODES.json');
-const _EVENTS = require(__dirname + '/EVENTS.json');
-const _ACTIONS = require(__dirname + '/ACTIONS.json');
+const _NODES = require(__dirname + '/_NODES.js');
+const _EVENTS = require(__dirname + '/_EVENTS.js');
+const _ACTIONS = require(__dirname + '/_ACTIONS.js');
 
 
 /*
@@ -25,10 +25,12 @@ const _ACTIONS = require(__dirname + '/ACTIONS.json');
  */
 let adapter;
 let library;
+let unloaded;
+let dutyCycle, refreshCycle;
+
 let plex, tautulli, data;
 let players = [];
 let upload = _multer({ dest: '/tmp/' });
-let dutyCycle;
 
 
 /*
@@ -45,6 +47,7 @@ function startAdapter(options)
 	
 	adapter = new utils.Adapter(options);
 	library = new Library(adapter);
+	unloaded = false;
 
 	/*
 	 * ADAPTER READY
@@ -82,10 +85,7 @@ function startAdapter(options)
 		
 		// verify Plex settings
 		if (!adapter.config.plexIp)
-		{
-			adapter.log.warn('Plex IP not configured! Please go to settings and fill in Plex IP.');
-			return;
-		}
+			library.terminate('Plex IP not configured! Please go to settings and fill in Plex IP.');
 		
 		// initialize Plex API
 		plex = new Plex({
@@ -104,7 +104,24 @@ function startAdapter(options)
 		});
 		
 		// test connection
-		plex.query('/status/sessions').catch(function(e) {adapter.log.warn(e)})
+		plex.query('/status/sessions').catch(function(e)
+		{
+			library.terminate(e.message);
+		});
+		
+		// start duty cycle (deletion of old states, which have not been updated recently)
+		clearTimeout(dutyCycle);
+		dutyCycle = setTimeout(function dutyCycleRun()
+		{
+			if (!unloaded)
+			{
+				adapter.log.debug('Running Duty Cycle...');
+				library.runDutyCycle('_playing', Math.floor(Date.now()/1000));
+				adapter.log.debug('Duty Cycle finished.');
+				dutyCycle = setTimeout(dutyCycleRun, 60*60*1000); // run every 1h
+			}
+			
+		}, 60*1000);
 		
 		// verify Tautulli settings
 		if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
@@ -132,16 +149,17 @@ function startAdapter(options)
 		
 		else if (adapter.config.refresh > 0 && adapter.config.refresh < 10)
 		{
-			adapter.log.info('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
+			adapter.log.warn('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
 			adapter.config.refresh = 10;
 		}
 		
-		if (adapter.config.refresh > 0)
+		if (adapter.config.refresh > 0 && !unloaded)
 		{
-			setTimeout(function updater()
+			refreshCycle = setTimeout(function updater()
 			{
 				retrieveData();
-				setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+				if (!unloaded)
+					refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
 				
 			}, Math.round(parseInt(adapter.config.refresh)*1000));
 		}
@@ -213,39 +231,62 @@ function startAdapter(options)
 		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
 		let action = id.substr(id.lastIndexOf('.')+1);
 		
-		// Player Controls
-		adapter.getObject(id, function(err, obj)
+		// Refresh Library
+		if (action == '_refresh')
 		{
-			if (err !== null || !obj || !obj.common) return;
+			let libId = id.substring(id.indexOf('libraries.')+10, id.indexOf('-'));
+			let url = 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1';
+			adapter.log.debug(url);
 			
-			let mode = obj.common.mode;
-			let playerIp = obj.common.playerIp;
-			let playerPort = obj.common.playerPort;
-			let playerIdentifier = obj.common.playerIdentifier;
-			
-			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
+			_request(url).then(function(res)
 			{
-				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
+				adapter.log.info('Successfully triggered refresh on library with ID ' + libId + '.');
+				adapter.log.debug(JSON.stringify(res));
+			})
+			.catch(function(err)
+			{
+				adapter.log.warn('Error triggering refresh on library with ID ' + libId + '! See debug log for details.');
+				adapter.log.debug(err);
+			});
+		}
+		
+		// Player Controls
+		else
+		{
+			adapter.getObject(id, function(err, obj)
+			{
+				if (err !== null || !obj || !obj.common) return;
 				
-				let key = obj.common.key || action;
-				let attribute = obj.common.attribute;
+				let mode = obj.common.mode;
+				let playerIp = obj.common.playerIp;
+				let playerPort = obj.common.playerPort;
+				let playerIdentifier = obj.common.playerIdentifier;
 				
-				let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + state.val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier;
-				adapter.log.debug(url);
-				
-				_request(url).then(function(res)
+				if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
 				{
-					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
-				})
-				.catch(function(err)
-				{
-					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
-					adapter.log.debug(err);
-				});
-			}
-			else
-				adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
-		});
+					adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
+					
+					let key = obj.common.key || action;
+					let attribute = obj.common.attribute;
+					
+					let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + state.val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier;
+					adapter.log.debug(url);
+					
+					_request(url).then(function(res)
+					{
+						adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+						adapter.log.debug(JSON.stringify(res));
+					})
+					.catch(function(err)
+					{
+						adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
+						adapter.log.debug(err);
+					});
+				}
+				else
+					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
+			});
+		}
 	});
 	
 	/*
@@ -257,7 +298,11 @@ function startAdapter(options)
 		try
 		{
 			adapter.log.info('Adapter stopped und unloaded.');
+			
+			unloaded = true;
+			clearTimeout(refreshCycle);
 			clearTimeout(dutyCycle);
+			
 			callback();
 		}
 		catch(e)
@@ -294,10 +339,6 @@ function setEvent(data, source)
 	
 	for (let key in data)
 		readData('_playing.' + groupBy + '.' + key, data[key]);
-	
-	// delete old states (which were not updated in the current payload)
-	clearTimeout(dutyCycle);
-	dutyCycle = setTimeout(function() {library.runDutyCycle('_playing.' + groupBy, data.timestamp)}, 60000);
 }
 
 /**
@@ -465,7 +506,7 @@ function getItems(path, key, node)
 	
 	plex.query(path).then(function(res)
 	{
-		library.set({node: node + '.items', type: get(key + '.items').type, role: get(key + '.items').role, description: get(key + '.items').description}, JSON.stringify(res.MediaContainer.Metadata));
+		//library.set({node: node + '.items', type: get(key + '.items').type, role: get(key + '.items').role, description: get(key + '.items').description}, JSON.stringify(res.MediaContainer.Metadata));
 		library.set({node: node + '.itemsCount', type: get(key + '.itemscount').type, role: get(key + '.itemscount').role, description: get(key + '.itemscount').description}, res.MediaContainer.size);
 	})
 	.catch(function(e)
@@ -561,6 +602,18 @@ function getLibraries()
 		{
 			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
 			library.set({node: 'libraries.' + libId, role: get('library').role, description: get('library').description.replace(/%library%/gi, entry['title'])}, '');
+			
+			// refresh button
+			library.set(
+				{
+					node: 'libraries.' + libId + '._refresh',
+					type: 'boolean', 
+					role: 'button',
+					description: 'Scan Library Files'
+				},
+				false
+			);
+			adapter.subscribeStates('libraries.' + libId + '._refresh');
 			
 			// index all keys as states
 			for (let key in entry)

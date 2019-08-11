@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.4.2",
+        "version": "0.4.3",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and your Tautulli",
@@ -16,6 +16,9 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
+            "0.4.3": {
+				"en": "- Performance improvements\n- added refresh button (to scan library files) to libraries"
+			},
             "0.4.0": {
                 "en": "- added playback control for players\n- added configuration options to only retrieve specific objects from Plex",
                 "de": "- Steuerung der Wiedergabe der Player\n- Optionen nur bestimmte Konfiguration von Plex abzurufen",

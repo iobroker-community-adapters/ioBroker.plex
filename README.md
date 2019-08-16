@@ -121,6 +121,7 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
 - add support for Plex Notifications ([#9](https://github.com/Zefau/ioBroker.plex/issues/9))
 - add support for all Tautulli triggers
+- Remote Player Control
 
 ### 0.4.3 (2019-08-11)
 - (Zefau) Performance improvements (dutyCycleRun and state comparison)

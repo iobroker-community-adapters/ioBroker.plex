@@ -1,4 +1,7 @@
 {
+	/*
+	 * GLOBAL
+	 */
 	"tautulli_version": {"description": "The current version of Tautulli."},
 	"tautulli_remote": {"description": "The current git remote of Tautulli."},
 	"tautulli_branch": {"description": "The current git branch of Tautulli."},
@@ -23,6 +26,10 @@
 	"timestamp": {"description": "The time (in time format) when the notification is triggered."},
 	"unixtime": {"description": "The unix timestamp when the notification is triggered."},
 	"utctime": {"description": "The UTC timestamp in ISO format when the notification is triggered."},
+	
+	/*
+	 * Stream Details
+	 */
 	"streams": {"description": "The number of concurrent streams."},
 	"user_streams": {"description": "The number of concurrent streams by the person streaming."},
 	"user": {"description": "The friendly name of the person streaming."},
@@ -99,6 +106,10 @@
 	"session_id": {"description": "The unique identifier for the stream."},
 	"user_id": {"description": "The unique identifier for the user."},
 	"machine_id": {"description": "The unique identifier for the player."},
+	
+	/*
+	 * Source Metadata Details
+	 */
 	"media_type": {"description": "The type of media. (movie, show, season, episode, artist, album, track, clip)"},
 	"title": {"description": "The full title of the item."},
 	"library_name": {"description": "The library name of the item."},
@@ -192,6 +203,10 @@
 	"poster_thumb": {"description": "The Plex thumbnail for the poster image."},
 	"poster_title": {"description": "The title for the poster image."},
 	"indexes": {"description": "If the media has video preview thumbnails. (0 or 1)"},
+	
+	/*
+	 * Plex Update Available
+	 */
 	"update_version": {"description": "The available update version for your Plex Server."},
 	"update_url": {"description": "The download URL for the available update."},
 	"update_release_date": {"description": "The release date of the available update."},
@@ -203,6 +218,10 @@
 	"update_extra_info": {"description": "Any extra info for the available update."},
 	"update_changelog_added": {"description": "The added changelog for the available update."},
 	"update_changelog_fixed": {"description": "The fixed changelog for the available update."},
+	
+	/*
+	 * Tautulli Update Available
+	 */
 	"tautulli_update_version": {"description": "The available update version for Tautulli."},
 	"tautulli_update_release_url": {"description": "The release page URL on GitHub."},
 	"tautulli_update_tar": {"description": "The tar download URL for the available update."},

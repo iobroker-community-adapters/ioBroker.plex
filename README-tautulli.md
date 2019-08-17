@@ -4,22 +4,7 @@
 __Note:__ The JSON data is highly customizable and can be changed to any data you wish, see [the list of available parameters](#list-of-available-parameters) for the full list of possibilities.
 The JSON data specified in the notifications (see below) will be send to ioBroker and put into states.
 
-__Notification agents__
-- [Playback Start / Stop / Pause / Resume](#notification-agent-playback-start--stop--pause--resume) 
-- [Transcode Decision Change](#notification-agent-transcode-decision-change)
-- [Watched](#notification-agent-watched)
-- [Buffer Warning](#notification-agent-buffer-warning)
-- [User Concurrent Streams](#notification-agent-user-concurrent-streams)
-- [User New Device](#notification-agent-user-new-device)
-- [Recently Added](#notification-agent-recently-added)
-- [Plex Server Down](#notification-agent-plex-server-down)
-- [Plex Server Back Up](#notification-agent-plex-server-back-up)
-- [Plex Remote Access Down](#notification-agent-plex-remote-access-down)
-- [Plex Remote Access Back Up](#notification-agent-plex-remote-access-back-up)
-- [Plex Update Available](#notification-agent-plex-update-available)
-- [Tautulli Update Available](#notification-agent-tautulli-update-available)
-
-### Notification agent: Playback Start / Stop / Pause / Resume
+### Playback Start / Stop / Pause / Resume
 __Note:__ As stated above the JSON data is highly customizable and can be changed to any data you wish. __Please be aware__, that the notification types for ```Playback Start```, ```Stop```, ```Resume``` and ```Pause``` __require at least__ ```{"Player": {"title": "{player}", "uuid": "{machine_id}"}``` (to identify the Player) in order to work correctly.
 
 You may copy the following example into Tautulli to have a full detailed payload retrieved.
@@ -83,83 +68,6 @@ You may copy the following example into Tautulli to have a full detailed payload
 		"Collection":"{collections}",
 		"Role":"{actors}",
 		"Similar":"undefined",
-		"file": {
-			"path": "{file}",
-			"name": "{filename}",
-			"size": "{file_size}"
-		},
-		"transcoding": {
-			"transcode_decision": "{transcode_decision}",
-			"video_decision": "{video_decision}",
-			"audio_decision": "{audio_decision}",
-			"subtitle_decision": "{subtitle_decision}",
-			"transcode_container": "{transcode_container}",
-			"transcode_video_codec": "{transcode_video_codec}",
-			"transcode_video_width": "{transcode_video_width}",
-			"transcode_video_height": "{transcode_video_height}",
-			"transcode_audio_codec": "{transcode_audio_codec}",
-			"transcode_audio_channels": "{transcode_audio_channels}",
-			"transcode_hw_requested": "{transcode_hw_requested}",
-			"transcode_hw_decoding": "{transcode_hw_decoding}",
-			"transcode_hw_decode": "{transcode_hw_decode}",
-			"transcode_hw_decode_title": "{transcode_hw_decode_title}",
-			"transcode_hw_encoding": "{transcode_hw_encoding}",
-			"transcode_hw_encode": "{transcode_hw_encode}",
-			"transcode_hw_encode_title": "{transcode_hw_encode_title}"
-		},
-		"stream": {
-			"user": {
-				"streams": "{streams}",
-				"user_streams": "{user_streams}",
-				"name": "{user}",
-				"user": "{username}",
-				"email": "{user_email}"
-			},
-			"player": {
-				"device": "{device}",
-				"platform": "{platform}",
-				"product": "{product}",
-				"player": "{player}",
-				"ip_address": "{ip_address}"
-			},
-			"quality_profile": "{quality_profile}",
-			"optimized_version": "{optimized_version}",
-			"optimized_version_profile": "{optimized_version_profile}",
-			"synced_version": "{synced_version}",
-			"live": "{live}",
-			"stream_local": "{stream_local}",
-			"stream_location": "{stream_location}",
-			"stream_bandwidth": "{stream_bandwidth}",
-			"stream_container": "{stream_container}",
-			"stream_bitrate": "{stream_bitrate}",
-			"stream_aspect_ratio": "{stream_aspect_ratio}",
-			"stream_video_codec": "{stream_video_codec}",
-			"stream_video_codec_level": "{stream_video_codec_level}",
-			"stream_video_bitrate": "{stream_video_bitrate}",
-			"stream_video_bit_depth": "{stream_video_bit_depth}",
-			"stream_video_framerate": "{stream_video_framerate}",
-			"stream_video_ref_frames": "{stream_video_ref_frames}",
-			"stream_video_resolution": "{stream_video_resolution}",
-			"stream_video_height": "{stream_video_height}",
-			"stream_video_width": "{stream_video_width}",
-			"stream_video_language": "{stream_video_language}",
-			"stream_video_language_code": "{stream_video_language_code}",
-			"stream_audio_bitrate": "{stream_audio_bitrate}",
-			"stream_audio_bitrate_mode": "{stream_audio_bitrate_mode}",
-			"stream_audio_codec": "{stream_audio_codec}",
-			"stream_audio_channels": "{stream_audio_channels}",
-			"stream_audio_channel_layout": "{stream_audio_channel_layout}",
-			"stream_audio_sample_rate": "{stream_audio_sample_rate}",
-			"stream_audio_language": "{stream_audio_language}",
-			"stream_audio_language_code": "{stream_audio_language_code}",
-			"stream_subtitle_codec": "{stream_subtitle_codec}",
-			"stream_subtitle_container": "{stream_subtitle_container}",
-			"stream_subtitle_format": "{stream_subtitle_format}",
-			"stream_subtitle_forced": "{stream_subtitle_forced}",
-			"stream_subtitle_language": "{stream_subtitle_language}",
-			"stream_subtitle_language_code": "{stream_subtitle_language_code}",
-			"stream_subtitle_location": "{stream_subtitle_location}"
-		},
 		"video": {
 			"container": "{container}",
 			"bitrate": "{bitrate}",
@@ -199,87 +107,103 @@ You may copy the following example into Tautulli to have a full detailed payload
 }
 ```
 
-### Notification agent: Transcode Decision Change
+### Transcode Decision Change
+This notification is __not__ recommended to use.
 ```
 {
-	to be defined
+	"event":"{action}"
 }
 ```
 
-### Notification agent: Watched
+### Watched
 ```
 {
-	to be defined
+	"event":"media.scrobble"
 }
 ```
 
-### Notification agent: Buffer Warning
+### Buffer Warning
+This notification is __not__ recommended to use.
 ```
 {
-	to be defined
+	"event":"{action}"
 }
 ```
 
-### Notification agent: User Concurrent Streams
+### User Concurrent Streams
 ```
 {
-	to be defined
+	"event":"{action}"
 }
 ```
 
-### Notification agent: User New Device
+### User New Device
 ```
 {
-	to be defined
+	"event":"device.new"
 }
 ```
 
-### Notification agent: Recently Added
+### Recently Added
 ```
 {
-	to be defined
+	"event":"library.new"
 }
 ```
 
-### Notification agent: Plex Server Down
+### Plex Server Down
 ```
 {
-	to be defined
+	"event":"{action}"
 }
 ```
 
-### Notification agent: Plex Server Back Up
+### Plex Server Back Up
 ```
 {
-	to be defined
+	"event":"admin.database.backup"
 }
 ```
 
-### Notification agent: Plex Remote Access Down
+### Plex Remote Access Down
 ```
 {
-	to be defined
+	"event":"{action}"
 }
 ```
 
-### Notification agent: Plex Remote Access Back Up
+### Plex Remote Access Back Up
 ```
 {
-	to be defined
+	"event":"{action}"
 }
 ```
 
-### Notification agent: Plex Update Available
+### Plex Update Available
 ```
 {
-	to be defined
+	"event":"{action}",
+	"update_version":"{update_version}",
+	"update_url":"{update_url}",
+	"update_release_date":"{update_release_date}",
+	"update_channel":"{update_channel}",
+	"update_platform":"{update_platform}",
+	"update_distro":"{update_distro}",
+	"update_distro_build":"{update_distro_build}",
+	"update_requirements":"{update_requirements}",
+	"update_extra_info":"{update_extra_info}",
+	"update_changelog_added":"{update_changelog_added}",
+	"update_changelog_fixed":"{update_changelog_fixed}"
 }
 ```
 
-### Notification agent: Tautulli Update Available
+### Tautulli Update Available
 ```
 {
-	to be defined
+	"event":"{action}",
+	"tautulli_update_version":"{tautulli_update_version}",
+	"tautulli_update_release_url":"{tautulli_update_release_url}",
+	"tautulli_update_changelog":"{tautulli_update_changelog}"
 }
 ```
 

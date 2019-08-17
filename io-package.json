@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.4.3",
+        "version": "0.5.0",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and your Tautulli",
@@ -16,9 +16,21 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
-            "0.4.3": {
-				"en": "- Performance improvements\n- added refresh button (to scan library files) to libraries"
+            "0.5.0": {
+				"en": "-added support for Plex Notifications\n- added support for all Tautulli triggers\n- added Adapter Web Interface that shows the recent events"
 			},
+            "0.4.3": {
+                "en": "- Performance improvements\n- added refresh button (to scan library files) to libraries",
+                "de": "- Performance-Verbesserungen\n- Hinzugefügt refresh-button (scan-Bibliothek-Dateien) an Bibliotheken",
+                "ru": "- Улучшения производительности \n- добавлена кнопка Обновить (для сканирования файлы библиотек) для библиотеки",
+                "pt": "- Melhorias de desempenho\n- adicionado botão de atualização (para digitalização de arquivos de biblioteca) para bibliotecas",
+                "nl": "- Performance verbeteringen\nde toegevoegde knop vernieuwen (om te scannen bibliotheek-bestanden) bibliotheken",
+                "fr": "- Améliorations des performances\n- ajout de bouton actualiser (scan des fichiers de la bibliothèque) pour les bibliothèques",
+                "it": "- Miglioramenti delle prestazioni\n- aggiunto il pulsante di aggiornamento (per la scansione di file di libreria) per le biblioteche",
+                "es": "- Mejoras de rendimiento\n- añadido botón de actualización (para escanear los archivos de la biblioteca) a las bibliotecas",
+                "pl": "- Poprawa wydajności \n- dodano przycisk Odśwież (do skanowania pliki bibliotek) dla biblioteki",
+                "zh-cn": "-性能的改进\n-补充刷新键(扫描文件)图书馆"
+            },
             "0.4.0": {
                 "en": "- added playback control for players\n- added configuration options to only retrieve specific objects from Plex",
                 "de": "- Steuerung der Wiedergabe der Player\n- Optionen nur bestimmte Konfiguration von Plex abzurufen",
@@ -107,7 +119,7 @@
         "materialize": true,
         "compact": true,
         "enabled": true,
-        "localLink": "%plexProtocol%://%plexIp%:%plexPort%/web/index.html",
+        "localLink": "%web_protocol%://%ip%:%web_port%/plex/index.html",
         "type": "multimedia",
         "authors": [
             {

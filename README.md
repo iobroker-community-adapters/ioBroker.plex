@@ -27,7 +27,7 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 
 ## 1. Features
-- Receive `events` from Plex (via Plex Pass or Tautulli, [__see setup!__](#22-advanced-setup-plex-pass-or-tautulli))
+- Receive `events` from Plex (via [Plex Webhook](https://support.plex.tv/articles/115002267687-webhooks/#toc-0) and [Plex Notifications](https://support.plex.tv/articles/push-notifications/#toc-0) using Plex Pass or via Tautulli, [__see setup!__](#22-advanced-setup-plex-pass-or-tautulli))
 - Playback control for players
 - Retrieve `servers`
 - Retrieve `libraries`
@@ -35,7 +35,10 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 - Retrieve `users` (only with Tautulli)
 - Retrieve `statistics` (only with Tautulli)
 - Retrieve `playlists`
-- Retrieve `settings` 
+- Retrieve `settings`
+- Web Interface that shows the recent events from Plex:
+  ![Plex Web Interface](img/screenshot_adapter-interface.png)
+
 
 ## 2. Setup instructions
 ### 2.1. Basic Setup
@@ -128,9 +131,12 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 ## Changelog
 
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
-- add support for Plex Notifications ([#9](https://github.com/Zefau/ioBroker.plex/issues/9))
-- add support for all Tautulli triggers
 - Remote Player Control
+
+### 0.5.0 (2019-08-18)
+- (Zefau) added support for Plex Notifications ([#9](https://github.com/Zefau/ioBroker.plex/issues/9))
+- (Zefau) added support for all Tautulli triggers
+- (Zefau) added Adapter Web Interface that shows the recent events
 
 ### 0.4.3 (2019-08-11)
 - (Zefau) Performance improvements (dutyCycleRun and state comparison)

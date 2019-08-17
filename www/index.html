@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ioBroker.plex</title>
+	
+	<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+	<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
+	
+	<script src="../../lib/js/jquery-3.2.1.min.js"></script>
+	<script src="../../socket.io/socket.io.js"></script>
+	<script src="conn.js"></script>
+	<script src="modernizr-custom.js"></script>
+	<script src="vertical-timeline.js"></script>
+	<script src="ICONS.js"></script>
+
+	<script src="../../lib/js/materialize.js"></script>
+	<script>
+	<!--
+	var socketConnected;
+	var tl;
+	
+	// add entries
+	function timeline(entries)
+	{
+		console.log(entries.length + ' entries found in feed.');
+		entries.forEach(function(entry) {add(entry)});
+		
+		tl.hideBlocks();
+		$(window).trigger('scroll');
+	}
+	
+	// add entry
+	function add(entry)
+	{
+		var lang = getLang();
+		var date = new Date(entry.timestamp*1000);
+		entry.date = date.toLocaleDateString(lang, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+		entry.time = date.toLocaleTimeString(lang, {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+		
+		var icon = !ICONS[entry.event] ? 'unknown' : entry.event;
+		var tpl = $('.template').clone().removeClass('template hidden');
+		tpl.find('.cd-name').html(entry.title ? entry.title : '<em>Unknown event</em>');
+		tpl.find('.cd-subtitle').html(entry.source + ' | ' + (entry.subtitle ? entry.subtitle : ''));
+		tpl.find('.cd-icon').addClass('action-'+entry.event).css({'background-color': ICONS[icon].color, 'background-image': 'url(' + ICONS[icon].img + ')', 'background-color': ICONS[icon].color});
+		tpl.find('.cd-date').html(entry.date + ', ' + entry.time);
+		
+		$('#cd-timeline .cd-timeline-block').first().before(tpl);
+	}
+	
+	// get lang
+	function getLang()
+	{
+		return navigator.languages != undefined ? navigator.languages[0] : navigator.language;
+	}
+	
+	// page loaded
+	$(window).on('load', function()
+	{
+		// config
+		servConn.namespace = 'plex.0';
+		var states = ['events.history'];
+		
+		//
+		// Vertical Timeline
+		tl = new Timeline();
+		tl.bindScroll();
+		
+		//
+		// Connect Socket
+		servConn.init({
+			connLink: window.location.href.substr(0, window.location.href.indexOf('/', 8))
+		}, {
+			onConnChange: function(socketConnected)
+			{
+				console.log('Socket ' + (socketConnected ? 'connected' : 'disconnected') + '!');
+				
+				// retrieve states
+				if (socketConnected)
+				{
+					servConn.getStates(states.map(function(state) {return servConn.namespace + '.' + state}), function(err, _states)
+					{
+						if (_states !== null && _states !== undefined)
+						{
+							for (var key in _states)
+							{
+								var content = _states[key] && _states[key].val;
+								var node = key.replace(servConn.namespace + '.', '');
+								if (!content) return;
+								
+								if (node == 'events.history')
+									timeline(JSON.parse(content));
+								
+								else
+									$('[data-state="' + node + '"]').html(content);
+								
+							}
+						}
+					});
+				}
+			}
+		});
+	});
+	// -->
+	</script>
+	<link rel="stylesheet" type="text/css" href="vertical-timeline.css"/>
+	<link rel="stylesheet" type="text/css" href="index.css"/>
+	<link rel="stylesheet" type="text/css" href="plex.css"/>
+	
+</head>
+<body>
+
+
+<section id="cd-timeline" class="cd-container">
+	<h2 class="title" data-state="address.address"></h2>
+
+	<div class="cd-timeline-block template hidden">
+		<div class="cd-timeline-img cd-icon"></div>
+		<div class="cd-timeline-content">
+			<h2 class="cd-name"></h2>
+			<p class="cd-subtitle subtitle"></p>
+			<span class="cd-date"></span>
+		</div>
+	</div>
+	
+</section>
+
+<div class="copyright">
+	Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+	is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+</div>
+
+</body>
+</html>

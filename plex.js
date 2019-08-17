@@ -29,7 +29,8 @@ let unloaded;
 let dutyCycle, refreshCycle;
 
 let plex, tautulli, data;
-let players = [];
+let players = [], playing = [];
+let history = [];
 let upload = _multer({ dest: '/tmp/' });
 
 
@@ -46,7 +47,7 @@ function startAdapter(options)
 	});
 	
 	adapter = new utils.Adapter(options);
-	library = new Library(adapter);
+	library = new Library(adapter, { updatesInLog: true });
 	unloaded = false;
 
 	/*
@@ -73,6 +74,13 @@ function startAdapter(options)
 		}
 		else
 			key = adapter.config.encryptionKey;
+		
+		// get history
+		adapter.getState('events.history', function(err, state)
+		{
+			if (!err && state && state.val)
+				history = JSON.parse(state.val);
+		});
 		
 		// empty _playing on start
 		if (adapter.config.resetMedia)
@@ -104,120 +112,64 @@ function startAdapter(options)
 		});
 		
 		// test connection
-		plex.query('/status/sessions').catch(function(e)
-		{
-			library.terminate(e.message);
-		});
-		
-		// start duty cycle (deletion of old states, which have not been updated recently)
-		clearTimeout(dutyCycle);
-		dutyCycle = setTimeout(function dutyCycleRun()
-		{
-			if (!unloaded)
+		plex.query('/status/sessions')
+			.then(function(res)
 			{
-				adapter.log.debug('Running Duty Cycle...');
-				library.runDutyCycle('_playing', Math.floor(Date.now()/1000));
-				adapter.log.debug('Duty Cycle finished.');
-				dutyCycle = setTimeout(dutyCycleRun, 60*60*1000); // run every 1h
-			}
-			
-		}, 60*1000);
-		
-		// verify Tautulli settings
-		if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
-		{
-			adapter.log.debug('Tautulli IP or API token missing!');
-			tautulli = {get: function() {return Promise.reject('Not connected!')}}
-		}
-		
-		// initialize Tautulli API
-		else
-		{
-			tautulli = new Tautulli(
-				adapter.config.tautulliIp,
-				adapter.config.tautulliPort || 8181,
-				library.decode(key, adapter.config.tautulliToken)
-			);
-		}
-		
-		// retrieve data once
-		retrieveData();
-		
-		// regulary retrieve data
-		if (adapter.config.refresh === undefined || adapter.config.refresh === null)
-			adapter.config.refresh = 0;
-		
-		else if (adapter.config.refresh > 0 && adapter.config.refresh < 10)
-		{
-			adapter.log.warn('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
-			adapter.config.refresh = 10;
-		}
-		
-		if (adapter.config.refresh > 0 && !unloaded)
-		{
-			refreshCycle = setTimeout(function updater()
+				// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
+				adapter.getStates(adapterName + '.' + adapter.instance + '.*', function(err, states)
+				{
+					if (err || !states) return;
+					
+					for (let state in states)
+						library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+				});
+				
+				// verify Tautulli settings
+				if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
+				{
+					adapter.log.debug('Tautulli IP or API token missing!');
+					tautulli = {get: function() {return Promise.reject('Not connected!')}}
+				}
+				
+				// initialize Tautulli API
+				else
+				{
+					tautulli = new Tautulli(
+						adapter.config.tautulliIp,
+						adapter.config.tautulliPort || 8181,
+						library.decode(key, adapter.config.tautulliToken)
+					);
+				}
+				
+				// start duty cycle
+				startDutyCycle();
+				
+				// retrieve data
+				if (!adapter.config.refresh)
+					adapter.config.refresh = 0;
+				
+				else if (adapter.config.refresh > 0 && adapter.config.refresh < 10)
+				{
+					adapter.log.warn('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
+					adapter.config.refresh = 10;
+				}
+				
+				refreshCycle = setTimeout(function updater()
+				{
+					retrieveData();
+					if (adapter.config.refresh > 0 && !unloaded)
+						refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+					
+				}, 1000);
+				
+				// listen to events from Plex
+				startListener();
+				
+			})
+			.catch(function(err)
 			{
-				retrieveData();
-				if (!unloaded)
-					refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
-				
-			}, Math.round(parseInt(adapter.config.refresh)*1000));
-		}
-		
-		// listen to events from Plex
-		_http.use(_parser.json());
-		_http.use(_parser.urlencoded({extended: false}));
-		
-		_http.post('/plex', upload.single('thumb'), function(req, res, next)
-		{
-			let payload;
-			try
-			{
-				payload = JSON.parse(req.body.payload);
-				res.sendStatus(200);
-				
-				adapter.log.info('Received payload from Plex: ' + JSON.stringify(payload));
-				
-				// index event of payload
-				// events.history
-				// events.last
-				
-				// write payload to states
-				if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
-					setEvent(payload, 'plex');
-			}
-			catch(e) {
-				adapter.log.warn(e.message);
-				//res.sendStatus(500);
-			}
-		});
-		
-		// listen to events from Tautulli
-		_http.post('/tautulli', function(req, res, next)
-		{
-			let payload;
-			try
-			{
-				payload = req.body;
-				res.sendStatus(200);
-				
-				adapter.log.info('Received payload from Tautulli: ' + JSON.stringify(payload));
-				
-				// index event of payload
-				// events.history
-				// events.last
-				
-				// write payload to states
-				if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
-					setEvent(payload, 'tautulli');
-			}
-			catch(e) {
-				adapter.log.warn(e.message);
-				//res.sendStatus(500);
-			}
-		});
-		
-		_http.listen(adapter.config.port || 41891);
+				library.terminate(err.message);
+			});
 	});
 
 	/*
@@ -318,41 +270,132 @@ function startAdapter(options)
  * Receive event from webhook
  *
  */
-function setEvent(data, source)
+function setEvent(data, source, prefix)
 {
-	// group by player
-	data['Player'] = data['Player'] !== undefined ? data['Player'] : {};
-	let groupBy = data['Player']['title'] && data['Player']['uuid'] ? library.clean(data['Player']['title'], true) + '-' + data['Player']['uuid'] : 'unknown';
+	adapter.log.debug('Received playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
-	// create player
-	library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
-	library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')}, '');
+	// PLAYING
+	if (prefix == '_playing')
+	{
+		// group by player
+		data['Player'] = data['Player'] !== undefined ? data['Player'] : {};
+		let groupBy = data['Player']['title'] && data['Player']['uuid'] ? library.clean(data['Player']['title'], true) + '-' + data['Player']['uuid'] : 'unknown';
+		
+		// channel by player
+		library.set({node: prefix, role: 'channel', description: 'Plex Players'});
+		library.set({node: prefix + '.' + groupBy, role: 'channel', description: 'Player ' + (data['Player']['title'] || 'unknown')});
+		
+		// index current playing players
+		if (data['event'] && data['Player'] && data['Player']['title'])
+		{
+			if (['media.play', 'media.resume'].indexOf(data['event']) > -1 && playing.indexOf(data['Player']['title']) == -1)
+				playing.push(data['Player']['title']);
+			
+			if (['media.stop', 'media.pause'].indexOf(data['event']) > -1)
+				playing = playing.filter(player => player !== data['Player']['title']);
+			
+			library.set({node: '_playing.playing', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
+		}
+		
+		// add player controls
+		if (data['Player'] && data['Player']['uuid'] && players.indexOf(data['Player']['uuid']) == -1)
+			getPlayers();
+		
+		// adapt prefix
+		prefix = prefix + '.' + groupBy;
 	
-	// add player controls
-	if (data['Player'] && data['Player']['uuid'] && players.indexOf(data['Player']['uuid']) == -1)
-		getPlayers();
+		// add meta data
+		data.source = source;
+		data.timestamp = Math.floor(Date.now()/1000);
+		data.datetime = library.getDateTime(Date.now());
+	}
 	
-	// add meta data
-	data.source = source;
-	data.timestamp = Math.floor(Date.now()/1000);
-	data.datetime = library.getDateTime(Date.now());
+	// EVENTS
+	else if (prefix == 'events')
+	{
+		// channel
+		library.set({node: prefix, role: 'channel', description: 'Plex Events'});
+		
+		// description
+		let message = {
+			title: data.event,
+			subtitle: ''
+		};
+		
+		['playback', 'server', 'new', 'tautulli'].forEach(type =>
+		{
+			if (Object.keys(_EVENTS[type]).indexOf(data.event) > -1)
+			{
+				message.title = _EVENTS[type][data.event].title;
+				message.subtitle = _EVENTS[type][data.event].subtitle;
+			}
+		});
+		
+		// replace variables with state values
+		let pos, variable, placeholder, tmp, index;
+		['title', 'subtitle'].forEach(msg =>
+		{
+			while (message[msg].indexOf('%') > -1)
+			{
+				pos = message[msg].indexOf('%');
+				variable = message[msg].substring(pos+1, message[msg].indexOf('%', pos+1));
+				placeholder = variable;
+				
+				// go through data
+				tmp = Object.assign({}, data);
+				while (variable.indexOf('.') > -1)
+				{
+					try
+					{
+						index = variable.substr(0, variable.indexOf('.'));
+						variable = variable.substr(variable.indexOf('.')+1);
+						tmp = tmp[index];
+					}
+					catch(err) {adapter.log.debug(err.message);}
+				}
+				
+				// check value
+				if (tmp === undefined || tmp[variable] === undefined)
+					return;
+				
+				// replace variable with value
+				message[msg] = message[msg].replace(RegExp('%' + placeholder + '%', 'gi'), tmp[variable]);
+			}
+		});
+		
+		// structure event
+		let event = {
+			timestamp: Math.floor(Date.now()/1000),
+			datetime: library.getDateTime(Date.now()),
+			event: data.event,
+			source: source,
+			title: message.title,
+			subtitle: message.subtitle
+		}
+		
+		// add event to history
+		history.push(event);
+		
+		data = Object.assign({}, event); // copy object
+		data.history = JSON.stringify(history.slice(-250));
+	}
 	
 	for (let key in data)
-		readData('_playing.' + groupBy + '.' + key, data[key]);
+		readData(prefix + '.' + key, data[key], prefix);
 }
 
 /**
  * Read and write data received from event
  *
  */
-function readData(key, data)
+function readData(key, data, prefix)
 {
 	// only proceed if data is given
 	if (data === undefined || data === 'undefined' || data == '')
 		return false;
 	
 	// get node details
-	let node = get('playing.' + key.replace('_playing.', '').substr(key.replace('_playing.', '').indexOf('.')+1).replace(RegExp('\.[0-9][0-9][0-9]\.', ''), '.'));
+	let node = get(prefix + '.' + key.replace(prefix + '.', '').substr(key.replace(prefix + '.', '').indexOf('.')+1).replace(RegExp('\.[0-9][0-9][0-9]\.', ''), '.'));
 	
 	// loop nested data
 	if (typeof data == 'object')
@@ -870,6 +913,88 @@ function getPlayers()
 	});
 }
 
+/**
+ * Start Duty Cycle
+ *
+ */
+function startDutyCycle()
+{
+	// start duty cycle (deletion of old states, which have not been updated recently)
+	if (adapter.config.dutyCycle === undefined || adapter.config.dutyCycle === null)
+		adapter.config.dutyCycle = 0;
+	
+	else if (adapter.config.dutyCycle > 0 && adapter.config.dutyCycle < 10)
+	{
+		adapter.log.warn('Due to performance reasons, the duty cycle rate can not be set to less than 10 minutes. Using 10 minutes now.');
+		adapter.config.dutyCycle = 10;
+	}
+	
+	clearTimeout(dutyCycle);
+	dutyCycle = setTimeout(function dutyCycleRun()
+	{
+		if (!unloaded && adapter.config.dutyCycle > 0)
+		{
+			adapter.log.debug('Running Duty Cycle...');
+			library.runDutyCycle('_playing', Math.floor(Date.now()/1000));
+			adapter.log.debug('Duty Cycle finished.');
+			dutyCycle = setTimeout(dutyCycleRun, adapter.config.dutyCycle*60*1000); // run every 1h
+		}
+		
+	}, 60*1000);
+}
+
+/**
+ * Start Listener for Events
+ *
+ */
+function startListener()
+{
+	_http.use(_parser.json());
+	_http.use(_parser.urlencoded({extended: false}));
+	
+	_http.post('/plex', upload.single('thumb'), function(req, res, next)
+	{
+		let payload;
+		try
+		{
+			payload = JSON.parse(req.body.payload);
+			res.sendStatus(200);
+			
+			// write payload to states
+			if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
+				setEvent(payload, 'plex', '_playing');
+			
+			setEvent(payload, 'plex', 'events');
+		}
+		catch(e) {
+			adapter.log.warn(e.message);
+			//res.sendStatus(500);
+		}
+	});
+	
+	// listen to events from Tautulli
+	_http.post('/tautulli', function(req, res, next)
+	{
+		let payload;
+		try
+		{
+			payload = req.body;
+			res.sendStatus(200);
+			
+			// write payload to states
+			if (Object.keys(_EVENTS.playback).indexOf(payload.event) > -1)
+				setEvent(payload, 'tautulli', '_playing');
+			
+			setEvent(payload, 'tautulli', 'events');
+		}
+		catch(e) {
+			adapter.log.warn(e.message);
+			//res.sendStatus(500);
+		}
+	});
+	
+	_http.listen(adapter.config.port || 41891);
+}
 
 /*
  * COMPACT MODE

@@ -1,27 +1,60 @@
 module.exports =
 {
-	"playing.event": {"description": "Event triggered on Plex (play, pause, resume, stop, scrobble or rate)", "role": "text", "type": "string"},
+	// EVENTS
+	"events.history": {"description": "All events historicized", "role": "json", "type": "string"},
+	"events.event": {"description": "Last event triggered on Plex", "role": "text", "type": "string"},
+	"events.title": {"description": "Title of last event", "role": "text", "type": "string"},
+	"events.subtitle": {"description": "Description of last event", "role": "text", "type": "string"},
+	"events.source": {"description": "Last source an event was received from", "role": "text", "type": "string"},
+	"events.datetime": {"description": "DateTime of the event being received", "role": "text", "type": "string"},
+	"events.source": {"description": "Source of event (either plex or tautulli)", "role": "text", "type": "string"},
+	"events.timestamp": {"description": "Timestamp of the event being received", "role": "value", "type": "number"},
+	
+	// PLAYING
+	"playing.event": {"description": "Event triggered on Plex", "role": "text", "type": "string"},
 	"playing.owner": {"description": "Indicator if webhook was set by Plex Owner", "role": "indicator", "type": "boolean"},
 	"playing.user": {"description": "Indicator if webhook was set by Plex User", "role": "indicator", "type": "boolean"},
 	"playing.datetime": {"description": "DateTime of the event being received", "role": "text", "type": "string"},
 	"playing.source": {"description": "Source of event (either plex or tautulli)", "role": "text", "type": "string"},
 	"playing.timestamp": {"description": "Timestamp of the event being received", "role": "value", "type": "number"},
 	
+	// PLAYING - ACCOUNT
 	"playing.account.id": {"description": "Plex ID of Plex User", "role": "value", "type": "number"},
 	"playing.account.thumb": {"description": "Avatar of Plex User", "role": "text", "type": "string"},
 	"playing.account.title": {"description": "Name of Plex User", "role": "text", "type": "string"},
 	"playing.account.userid": {"description": "ID of Plex User", "role": "value", "type": "number"},
 	
+	// PLAYING - PLAYER
 	"playing.player.local": {"description": "Indication whether Player is local", "role": "indicator", "type": "boolean"},
 	"playing.player.localaddress": {"description": "Local IP address", "role": "info.ip", "type": "string"},
 	"playing.player.publicaddress": {"description": "Public IP address", "role": "info.ip", "type": "string"},
 	"playing.player.title": {"description": "Name of Plex Player", "role": "text", "type": "string"},
 	"playing.player.uuid": {"description": "ID of Plex Player", "role": "text", "type": "string"},
 	
+	// PLAYING - SERVER
 	"playing.server.title": {"description": "Name of Plex Server", "role": "text", "type": "string"},
 	"playing.server.uuid": {"description": "ID of Plex Server", "role": "text", "type": "string"},
 	
-	// METADATA
+	// PLAYING - METADATA (SERIES)
+	"playing.metadata.grandparentArt": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.grandparentGuid": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.grandparentKey": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.grandparentRatingKey": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.grandparentTheme": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.grandparentThumb": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.grandparentTitle": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.index": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.parentGuid": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.parentIndex": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.parentKey": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.parentRatingKey": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.parentThumb": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.parentTitle": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.ratingImage": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.viewCount": {"description": "", "role": "text", "type": "string"},
+	"playing.metadata.viewOffset": {"description": "", "role": "text", "type": "string"},
+	
+	// PLAYING - METADATA (ALL)
 	"playing.metadata.lastviewedat": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},
 	"playing.metadata.updatedat": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},
 	"playing.metadata.addedat": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},

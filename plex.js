@@ -93,7 +93,7 @@ function startAdapter(options)
 		
 		// verify Plex settings
 		if (!adapter.config.plexIp)
-			library.terminate('Plex IP not configured! Please go to settings and fill in Plex IP.');
+			return library.terminate('Plex IP not configured! Please go to settings and fill in Plex IP.');
 		
 		// initialize Plex API
 		plex = new Plex({

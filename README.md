@@ -2,6 +2,8 @@
 # ioBroker.plex
 Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Furthermore, Tautulli integration.
 
+[![Paypal Donation](https://img.shields.io/badge/paypal-donate%20|%20spenden-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=S45U45EHXGQHN&source=url)
+
 ![Number of Installations](http://iobroker.live/badges/plex-installed.svg)
 ![Stable version](http://iobroker.live/badges/plex-stable.svg)
 [![NPM version](http://img.shields.io/npm/v/iobroker.plex.svg)](https://www.npmjs.com/package/iobroker.plex)
@@ -25,15 +27,15 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 
 
 ## 1. Features
-- Receive events from Plex (via Plex Pass or Tautulli)
+- Receive `events` from Plex (via Plex Pass or Tautulli, [__see setup!__](#22-advanced-setup-plex-pass-or-tautulli))
 - Playback control for players
-- Retrieve servers
-- Retrieve libraries
+- Retrieve `servers`
+- Retrieve `libraries`
 - Retrieve all items within a library
-- Retrieve users (only with Tautulli)
-- Retrieve statistics (only with Tautulli)
-- Retrieve playlists
-- Retrieve settings 
+- Retrieve `users` (only with Tautulli)
+- Retrieve `statistics` (only with Tautulli)
+- Retrieve `playlists`
+- Retrieve `settings` 
 
 ## 2. Setup instructions
 ### 2.1. Basic Setup
@@ -47,11 +49,18 @@ Once this is given, ioBroker.plex will retrieve all the basic data (incl. Server
 
 ### 2.2. Advanced Setup (Plex Pass or Tautulli)
 #### 2.2.1. Plex Pass
+__Webhook__
+
 If you are a Plex Pass user, you may [setup a webhook](https://support.plex.tv/articles/115002267687-webhooks/#toc-0) in the Plex Settings to retrieve the current event / action from your Plex Media Server (play, pause, resume, stop, viewed and rated).
 
 Navigate to your Plex Media Server and go to ```Settings``` and ```Webhook```. Created a new webhook by clicking ```Add Webhook``` and enter your ioBroker IP adress with the custom port specified in the ioBroker.plex settings and trailing ```/plex``` path, e.g. ```http://192.168.178.29:41891/plex```:
 
 ![Plex Webhook](img/screenshot_plex-webhook.png)
+
+__Events__
+
+For information regarding the Plex Notifications, please [see the official documentation](https://support.plex.tv/articles/push-notifications/#toc-0). To turn on Notifications on your Plex Media Server, go to `Settings` > `Server` > `General` and then enable the `Push Notifications` preference.
+
 
 #### 2.2.2.Tautulli
 [Tautulli is a 3rd party application](https://tautulli.com/#about) that you can run alongside your Plex Media Server to monitor activity and track various statistics. Most importantly, these statistics include what has been watched, who watched it, when and where they watched it, and how it was watched. All statistics are presented in a nice and clean interface with many tables and graphs, which makes it easy to brag about your server to everyone else. Check out [Tautulli Preview](https://tautulli.com/#preview) and [install it on your preferred system](https://github.com/Tautulli/Tautulli-Wiki/wiki/Installation) if you are interested.

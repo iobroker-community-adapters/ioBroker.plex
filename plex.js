@@ -26,7 +26,7 @@ const _ACTIONS = require(__dirname + '/_ACTIONS.js');
 let adapter;
 let library;
 let unloaded;
-let dutyCycle, refreshCycle;
+let retryCycle, dutyCycle, refreshCycle;
 
 let plex, tautulli, data;
 let players = [], playing = [];
@@ -54,7 +54,7 @@ function startAdapter(options)
 	 * ADAPTER READY
 	 *
 	 */
-	adapter.on('ready', function()
+	adapter.on('ready', function ready()
 	{
 		// set encryption key
 		let key;
@@ -115,6 +115,8 @@ function startAdapter(options)
 		plex.query('/status/sessions')
 			.then(function(res)
 			{
+				library.set(Library.CONNECTION, true);
+				
 				// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
 				adapter.getStates(adapterName + '.' + adapter.instance + '.*', function(err, states)
 				{
@@ -168,7 +170,14 @@ function startAdapter(options)
 			})
 			.catch(function(err)
 			{
-				library.terminate(err.message);
+				if (err.message.indexOf('EHOSTUNREACH') > -1)
+				{
+					adapter.config.retry = 60;
+					adapter.log.error('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
+					retryCycle = setTimeout(ready, adapter.config.retry*60*1000);
+				}
+				else
+					library.terminate(err.message, true);
 			});
 	});
 
@@ -252,6 +261,7 @@ function startAdapter(options)
 			adapter.log.info('Adapter stopped und unloaded.');
 			
 			unloaded = true;
+			clearTimeout(retryCycle);
 			clearTimeout(refreshCycle);
 			clearTimeout(dutyCycle);
 			

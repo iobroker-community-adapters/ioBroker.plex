@@ -15,6 +15,7 @@ const Tautulli = require('tautulli-api');
  * internal libraries
  */
 const Library = require(__dirname + '/lib/library.js');
+const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
 const _NODES = require(__dirname + '/_NODES.js');
 const _EVENTS = require(__dirname + '/_EVENTS.js');
 const _ACTIONS = require(__dirname + '/_ACTIONS.js');
@@ -28,7 +29,8 @@ let library;
 let unloaded;
 let retryCycle, dutyCycle, refreshCycle;
 
-let plex, tautulli, data;
+let encryptionKey;
+let plex, plexAuth, tautulli, data;
 let players = [], playing = [];
 let history = [];
 let upload = _multer({ dest: '/tmp/' });
@@ -57,23 +59,22 @@ function startAdapter(options)
 	adapter.on('ready', function ready()
 	{
 		// set encryption key
-		let key;
 		if (adapter.config.encryptionKey === undefined || adapter.config.encryptionKey === '')
 		{
 			//let key = encryptor.getEncryptionKey();
-			key = library.getKey(20);
+			encryptionKey = library.getKey(20);
 			adapter.getForeignObject('system.adapter.plex.' + adapter.instance, function(err, obj)
 			{
 				if (err || obj === undefined) return;
 				
-				obj.native.encryptionKey = key;
+				obj.native.encryptionKey = encryptionKey;
 				adapter.setForeignObject(obj._id, obj);
 			});
 			
 			adapter.log.debug('Generated new encryption key for password encryption.');
 		}
 		else
-			key = adapter.config.encryptionKey;
+			encryptionKey = adapter.config.encryptionKey;
 		
 		// get history
 		adapter.getState('events.history', function(err, state)
@@ -92,16 +93,17 @@ function startAdapter(options)
 		}
 		
 		// verify Plex settings
-		if (!adapter.config.plexIp)
-			return library.terminate('Plex IP not configured! Please go to settings and fill in Plex IP.');
+		if (!adapter.config.plexIp || !adapter.config.plexToken)
+			return library.terminate('Plex IP and Plex Token not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token.');
 		
 		// initialize Plex API
 		plex = new Plex({
 			hostname: adapter.config.plexIp,
 			port: adapter.config.plexPort || 32400,
 			https: adapter.config.plexSecure || false,
-			username: adapter.config.plexUser || '',
-			password: adapter.config.plexPassword ? library.decode(key, adapter.config.plexPassword) : '',
+			token: adapter.config.plexToken,
+			//username: adapter.config.plexUser || '',
+			//password: adapter.config.plexPassword ? library.decode(encryptionKey, adapter.config.plexPassword) : '',
 			options: {
 				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 				product: 'Plex for ioBroker',
@@ -112,73 +114,7 @@ function startAdapter(options)
 		});
 		
 		// test connection
-		plex.query('/status/sessions')
-			.then(function(res)
-			{
-				library.set(Library.CONNECTION, true);
-				
-				// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
-				adapter.getStates(adapterName + '.' + adapter.instance + '.*', function(err, states)
-				{
-					if (err || !states) return;
-					
-					for (let state in states)
-						library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
-				});
-				
-				// verify Tautulli settings
-				if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
-				{
-					adapter.log.debug('Tautulli IP or API token missing!');
-					tautulli = {get: function() {return Promise.reject('Not connected!')}}
-				}
-				
-				// initialize Tautulli API
-				else
-				{
-					tautulli = new Tautulli(
-						adapter.config.tautulliIp,
-						adapter.config.tautulliPort || 8181,
-						library.decode(key, adapter.config.tautulliToken)
-					);
-				}
-				
-				// start duty cycle
-				startDutyCycle();
-				
-				// retrieve data
-				if (!adapter.config.refresh)
-					adapter.config.refresh = 0;
-				
-				else if (adapter.config.refresh > 0 && adapter.config.refresh < 10)
-				{
-					adapter.log.warn('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
-					adapter.config.refresh = 10;
-				}
-				
-				refreshCycle = setTimeout(function updater()
-				{
-					retrieveData();
-					if (adapter.config.refresh > 0 && !unloaded)
-						refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
-					
-				}, 1000);
-				
-				// listen to events from Plex
-				startListener();
-				
-			})
-			.catch(function(err)
-			{
-				if (err.message.indexOf('EHOSTUNREACH') > -1)
-				{
-					adapter.config.retry = 60;
-					adapter.log.error('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
-					retryCycle = setTimeout(ready, adapter.config.retry*60*1000);
-				}
-				else
-					library.terminate(err.message, true);
-			});
+		testConnection();
 	});
 
 	/*
@@ -251,6 +187,55 @@ function startAdapter(options)
 	});
 	
 	/*
+	 * HANDLE MESSAGES
+	 *
+	 */
+	adapter.on('message', function(msg)
+	{
+		adapter.log.debug('Message: ' + JSON.stringify(msg));
+		const plexPin = new PlexPinAuth(plex);
+		
+		switch(msg.command)
+		{
+			// get PIN
+			case 'getPin':
+				plexPin.getPin().then(pin =>
+				{
+					adapter.log.debug('Successfully retrieved PIN: ' + pin.code);
+					library.msg(msg.from, msg.command, {result: true, pin: pin}, msg.callback);
+				})
+				.catch(err =>
+				{
+					adapter.log.warn(err.message);
+					library.msg(msg.from, msg.command, {result: false, error: err.message}, msg.callback);
+				});
+				break;
+			
+			// get token
+			case 'getToken':
+				plexPin.getToken(msg.message.pinId).then(res =>
+				{
+					// success getting token
+					if (res.token === true)
+					{
+						adapter.log.debug('Successfully retrieved token.');
+						library.msg(msg.from, msg.command, {result: true, token: res.auth_token}, msg.callback);
+					}
+					
+					// failed getting token
+					else
+						library.msg(msg.from, msg.command, {result: false, error: 'No token retrieved!'}, msg.callback);
+				})
+				.catch(err =>
+				{
+					adapter.log.warn(err.message);
+					library.msg(msg.from, msg.command, {result: false, error: err.message}, msg.callback);
+				});
+				break;
+		}
+	});
+	
+	/*
 	 * ADAPTER UNLOAD
 	 *
 	 */
@@ -275,6 +260,83 @@ function startAdapter(options)
 
 	return adapter;	
 };
+
+/**
+ * Test connection
+ *
+ */
+function testConnection()
+{
+	plex.query('/status/sessions')
+		.then(function(res)
+		{
+			library.set(Library.CONNECTION, true);
+			
+			// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
+			adapter.getStates(adapterName + '.' + adapter.instance + '.*', function(err, states)
+			{
+				if (err || !states) return;
+				
+				for (let state in states)
+					library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+			});
+			
+			// verify Tautulli settings
+			if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
+			{
+				adapter.log.debug('Tautulli IP or API token missing!');
+				tautulli = {get: function() {return Promise.reject('Not connected!')}}
+			}
+			
+			// initialize Tautulli API
+			else
+			{
+				tautulli = new Tautulli(
+					adapter.config.tautulliIp,
+					adapter.config.tautulliPort || 8181,
+					library.decode(encryptionKey, adapter.config.tautulliToken)
+				);
+			}
+			
+			// start duty cycle
+			startDutyCycle();
+			
+			// retrieve data
+			if (!adapter.config.refresh)
+				adapter.config.refresh = 0;
+			
+			else if (adapter.config.refresh > 0 && adapter.config.refresh < 10)
+			{
+				adapter.log.warn('Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.');
+				adapter.config.refresh = 10;
+			}
+			
+			refreshCycle = setTimeout(function updater()
+			{
+				retrieveData();
+				if (adapter.config.refresh > 0 && !unloaded)
+					refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+				
+			}, 1000);
+			
+			// listen to events from Plex
+			startListener();
+			
+		})
+		.catch(function(err)
+		{
+			if (err.message.indexOf('EHOSTUNREACH') > -1)
+			{
+				adapter.config.retry = 60;
+				adapter.log.error('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
+				
+				library.set(Library.CONNECTION, false);
+				retryCycle = setTimeout(testConnection, adapter.config.retry*60*1000);
+			}
+			else
+				library.terminate(err.message);
+		});
+}
 
 /**
  * Receive event from webhook
@@ -920,6 +982,11 @@ function getPlayers()
 				adapter.subscribeStates(controls + '.' + mode + '.*');
 			});
 		});
+	})
+	.catch(function(e)
+	{
+		adapter.log.debug('Could not retrieve Players from Plex!');
+		adapter.log.debug(e);
 	});
 }
 

@@ -57,13 +57,72 @@
 			});
 			
 			// open modal
-			$('#modal').modal('open');
+			$('#modalInfo').modal('open');
 		}
 	}
 	
 	// page loaded
 	$(window).on('load', function()
 	{
+        $('.modal').modal(); // initialize all modals
+		
+		var pin;
+		var getPin = $('#button_getPin');
+		var getToken = $('#button_getToken');
+		
+		/*
+		 * Get PIN
+		 */
+		getPin.on('click', function()
+		{
+			$('#statusLog').text('');
+			$('#modalToken').modal('open');
+			
+			// cancel
+			_log(translateWord('message_connecting'));
+			var timeout = setTimeout(function() {_log(translateWord('message_noconnection'), 'error');}, 7000);
+
+			// send request
+			sendTo(null, 'getPin', {}, function(res)
+			{
+				_log(translateWord('message_connected_pin'));
+				clearTimeout(timeout);
+
+				if (res !== false && res.result !== false)
+				{
+					pin = res.pin;
+					_log(translateWord('message_gotpin').replace('%pin%', pin.code));
+				}
+				else
+					_log(res.error !== undefined ? res.error : translateWord('message_error-pin'), 'error');
+			});
+		});
+
+		/*
+		 * Get token
+		 */
+		getToken.on('click', function()
+		{
+			// cancel
+			_log(translateWord('message_connecting'));
+			var timeout = setTimeout(function() {_log(translateWord('message_noconnection'), 'error');}, 7000);
+
+			// send request
+			sendTo(null, 'getToken', { pinId: pin.id }, function(res)
+			{
+				_log(translateWord('message_connected_token'));
+				clearTimeout(timeout);
+
+				if (res !== false && res.result !== false)
+				{
+					$('#plexToken').val(res.token).focus();
+					$('#plexToken').trigger('change');
+					$('#modalToken').modal('close');
+				}
+				else
+					_log(res.error !== undefined ? res.error : translateWord('message_error-token'), 'error');
+			});
+		});
 	});
 	// -->
 	</script>
@@ -76,8 +135,8 @@
 
 <div class="m adapter-container" id="settings">
 	
-	<!-- Modal Structure -->
-	<div id="modal" class="modal">
+	<!-- Info Modal -->
+	<div id="modalInfo" class="modal">
 		<div class="modal-content">
 			<h3 class="modalTitle translate">modalTitle</h3>
 			<p class="modalMessage translate">modalMessage</p>
@@ -88,6 +147,27 @@
 			<a href="#!" id="buttonDismiss" class="modal-close btn-flat translate">buttonDismiss</a>
 		</div>
 	</div>
+	
+	<!-- Token Modal -->
+	<div id="modalToken" class="modal">
+		<div class="modal-content">
+			<strong class="translate">getTokenTitle</strong><br />
+			<p class="translate">getTokenInfo</p>
+
+			<div class="row">
+				<div class="col s12 m12">
+					<strong style="font-weight: bold">Status:</strong>
+					<div id="log"></div>
+				</div>
+			</div>
+
+		</div>
+		<div class="modal-footer">
+			<a href="#!" class="modal-close waves-effect waves-green btn-flat translate">button_closeModal</a>
+			<a href="#!" class="btn green translate" id="button_getToken">button_getToken</a>
+		</div>
+	</div>
+	
 
 	<div class="row">
 		
@@ -155,13 +235,12 @@
 							<input class="value" id="plexSecure" type="checkbox" />
 							<label for="plexSecure" class="translate">plexSecure</label>
 						</div>
-						<div class="input-field col s3 m3">
-							<input class="value" id="plexUser" type="text" />
-							<label for="plexUser" class="translate">plexUser</label>
+						<div class="input-field col s2 m2">
+							<input class="value" id="plexToken" type="text" />
+							<label for="plexToken" class="translate">plexToken</label>
 						</div>
-						<div class="input-field col s3 m3">
-							<input class="value" id="plexPassword" type="password" />
-							<label for="plexPassword" class="translate">plexPassword</label>
+						<div class="input-field col s2 m2">
+							<a class="btn blue translate" id="button_getPin">button_getToken</a>
 						</div>
 					</div>
 					
@@ -179,11 +258,11 @@
 					<div class="row box">
 						<p class="subtitle translate">tautulliAuthInfo</p>
 						
-						<div class="input-field col s4 m4">
+						<div class="input-field col s2 m2">
 							<input class="value" id="tautulliIp" type="text" />
 							<label for="tautulliIp" class="translate">tautulliIp</label>
 						</div>
-						<div class="input-field col s3 m3">
+						<div class="input-field col s1 m1">
 							<input class="value" id="tautulliPort" type="number" placeholder="8181" />
 							<label for="tautulliPort" class="translate">tautulliPort</label>
 						</div>
@@ -196,7 +275,7 @@
 				</div>
 			</div>
 			
-			<!-- Eventss -->
+			<!-- Events -->
 			<div class="row">
 				<div class="col s12 m12">
 					<div class="row" style="margin-bottom: 0">

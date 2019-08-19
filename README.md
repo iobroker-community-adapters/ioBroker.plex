@@ -133,6 +133,9 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 ### 1.0.0 (2019-xx-xx) [MILESTONES / PLANNED FEATURES FOR v1.0.0 RELEASE]
 - Remote Player Control
 
+### 0.6.0 (2019-08-19)
+- (Zefau) replaced password with token authentication
+
 ### 0.5.0 (2019-08-18)
 - (Zefau) added support for Plex Notifications ([#9](https://github.com/Zefau/ioBroker.plex/issues/9))
 - (Zefau) added support for all Tautulli triggers

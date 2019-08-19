@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.5.1",
+        "version": "0.6.0",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and your Tautulli",
@@ -16,9 +16,30 @@
             "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
         },
         "news": {
+            "0.6.0": {
+                "en": "- replaced password with token authentication",
+                "de": "- ersetzt Passwort-token-Authentifizierung",
+                "ru": "- заменить пароль с проверки подлинности на основе маркеров ",
+                "pt": "- substituiu a palavra-passe com o token de autenticação",
+                "nl": "- vervangen wachtwoord, token authenticatie",
+                "fr": "- remplacé le mot de passe avec un jeton d'authentification",
+                "it": "- sostituito la password con il token di autenticazione",
+                "es": "- reemplazar la contraseña con el token de autenticación",
+                "pl": "- wymienić hasło z uwierzytelniania na podstawie markerów ",
+                "zh-cn": "-替换密码和身份认证牌"
+            },
             "0.5.0": {
-				"en": "-added support for Plex Notifications\n- added support for all Tautulli triggers\n- added Adapter Web Interface that shows the recent events"
-			},
+                "en": "- added support for Plex Notifications\n- added support for all Tautulli triggers\n- added Adapter Web Interface that shows the recent events",
+                "de": "- Unterstützung für Plex-Benachrichtigungen\n- Unterstützung Hinzugefügt für alle Tautulli Trigger\n- Adapter werden Web-Interface zeigt, dass die jüngsten Ereignisse",
+                "ru": "- добавлена поддержка для уведомления Плекс \n- добавлена поддержка для всех Tautulli триггеры\n- добавлен веб-интерфейс адаптера, который показывает последние события",
+                "pt": "- adicionado suporte para Plex Notificações\n- adicionado suporte para todos os Tautulli dispara\n- adicionado Adaptador de Interface Web, que mostra os últimos acontecimentos",
+                "nl": "- toegevoegde ondersteuning voor Plex Meldingen\n- toegevoegde ondersteuning voor alle Tautulli triggers\n- toegevoegd Adapter Web Interface toont de recente gebeurtenissen",
+                "fr": "- ajout du support pour les Plex Notifications\n- ajout du support pour tous les Tautulli déclencheurs\n- ajout de l'Adaptateur d'Interface Web qui affiche les événements récents",
+                "it": "- aggiunto il supporto per le Notifiche Plex\n- aggiunto il supporto per tutte Tautulli trigger\n- aggiunta la Scheda di Interfaccia Web che mostra le recenti eventi",
+                "es": "- añadido soporte para Plex Notificaciones\n- añadido soporte para todos los Tautulli desencadenantes\n- añadido Adaptador de Interfaz Web que muestra los últimos eventos",
+                "pl": "- dodano wsparcie dla powiadomień plex dnia \n- dodano wsparcie dla wszystkich Tautulli wyzwalacze\n- dodano interfejs www adaptera, który pokazuje najnowsze wydarzenia",
+                "zh-cn": "- 增加支持复杂的通知\n-增加支持所有Tautulli触发器\n-添加适配器的网络接口，显示最近发生的事件"
+            },
             "0.4.3": {
                 "en": "- Performance improvements\n- added refresh button (to scan library files) to libraries",
                 "de": "- Performance-Verbesserungen\n- Hinzugefügt refresh-button (scan-Bibliothek-Dateien) an Bibliotheken",
@@ -120,6 +141,8 @@
         "compact": true,
         "enabled": true,
         "localLink": "%web_protocol%://%ip%:%web_port%/plex/index.html",
+        "messagebox": true,
+        "subscribe": "messagebox",
         "type": "multimedia",
         "authors": [
             {

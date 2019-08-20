@@ -35,6 +35,14 @@ let players = [], playing = [];
 let history = [];
 let upload = _multer({ dest: '/tmp/' });
 
+const plexOptions = {
+	identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
+	product: 'Plex for ioBroker',
+	version: '1.0',
+	deviceName: 'ioBroker',
+	platform: 'ioBroker'
+};
+
 
 /*
  * ADAPTER
@@ -104,13 +112,7 @@ function startAdapter(options)
 			token: adapter.config.plexToken,
 			//username: adapter.config.plexUser || '',
 			//password: adapter.config.plexPassword ? library.decode(encryptionKey, adapter.config.plexPassword) : '',
-			options: {
-				identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
-				product: 'Plex for ioBroker',
-				version: '1.0',
-				deviceName: 'ioBroker',
-				platform: 'ioBroker'
-			}
+			options: plexOptions
 		});
 		
 		// test connection
@@ -193,7 +195,7 @@ function startAdapter(options)
 	adapter.on('message', function(msg)
 	{
 		adapter.log.debug('Message: ' + JSON.stringify(msg));
-		const plexPin = new PlexPinAuth(plex);
+		const plexPin = new PlexPinAuth(plexOptions);
 		
 		switch(msg.command)
 		{

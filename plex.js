@@ -134,7 +134,7 @@ function startAdapter(options)
 		if (action == '_refresh')
 		{
 			let libId = id.substring(id.indexOf('libraries.')+10, id.indexOf('-'));
-			let url = 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1';
+			let url = 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1&X-Plex-Token=' + adapter.config.plexToken;
 			adapter.log.debug(url);
 			
 			_request(url).then(function(res)

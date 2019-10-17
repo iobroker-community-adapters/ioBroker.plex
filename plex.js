@@ -27,7 +27,7 @@ const _ACTIONS = require(__dirname + '/_ACTIONS.js');
 let adapter;
 let library;
 let unloaded;
-let retryCycle, dutyCycle, refreshCycle;
+let retryCycle, refreshCycle;
 
 let encryptionKey;
 let plex, plexAuth, tautulli, data;
@@ -51,21 +51,22 @@ const plexOptions = {
 function startAdapter(options)
 {
 	options = options || {};
-	Object.assign(options,
-	{
-		name: adapterName
-	});
+	adapter = new utils.Adapter({ ...options, name: adapterName });
 	
-	adapter = new utils.Adapter(options);
-	library = new Library(adapter, { updatesInLog: true });
-	unloaded = false;
-
 	/*
 	 * ADAPTER READY
 	 *
 	 */
 	adapter.on('ready', function ready()
 	{
+		library = new Library(adapter, { nodes: _NODES, updatesInLog: true });
+		unloaded = false;
+		
+		// Check Node.js Version
+		let version = parseInt(process.version.substr(1, process.version.indexOf('.')-1));
+		if (version <= 6)
+			return library.terminate('This Adapter is not compatible with your Node.js Version ' + process.version + ' (must be >= Node.js v7).', true);
+		
 		// set encryption key
 		if (adapter.config.encryptionKey === undefined || adapter.config.encryptionKey === '')
 		{
@@ -134,7 +135,7 @@ function startAdapter(options)
 		if (action == '_refresh')
 		{
 			let libId = id.substring(id.indexOf('libraries.')+10, id.indexOf('-'));
-			let url = 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1&X-Plex-Token=' + adapter.config.plexToken;
+			let url = 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1';
 			adapter.log.debug(url);
 			
 			_request(url).then(function(res)
@@ -250,7 +251,6 @@ function startAdapter(options)
 			unloaded = true;
 			clearTimeout(retryCycle);
 			clearTimeout(refreshCycle);
-			clearTimeout(dutyCycle);
 			
 			callback();
 		}
@@ -299,9 +299,6 @@ function testConnection()
 					library.decode(encryptionKey, adapter.config.tautulliToken)
 				);
 			}
-			
-			// start duty cycle
-			startDutyCycle();
 			
 			// retrieve data
 			if (!adapter.config.refresh)
@@ -454,8 +451,17 @@ function setEvent(data, source, prefix)
 		data.history = JSON.stringify(history.slice(-250));
 	}
 	
+	// write states
 	for (let key in data)
 		readData(prefix + '.' + key, data[key], prefix);
+	
+	// cleanup old states
+	if (prefix.indexOf('_playing') > -1)
+	{
+		adapter.log.debug('Running Garbage Collector for player ' + data['Player']['title'] +' (' + data['Player']['uuid'] + ')...');
+		library.runGarbageCollector(prefix, data.timestamp, false);
+		adapter.log.debug('Garbage Collector finished for player ' + data['Player']['title'] +' (' + data['Player']['uuid'] + ').');
+	}
 }
 
 /**
@@ -990,36 +996,6 @@ function getPlayers()
 		adapter.log.debug('Could not retrieve Players from Plex!');
 		adapter.log.debug(e);
 	});
-}
-
-/**
- * Start Duty Cycle
- *
- */
-function startDutyCycle()
-{
-	// start duty cycle (deletion of old states, which have not been updated recently)
-	if (adapter.config.dutyCycle === undefined || adapter.config.dutyCycle === null)
-		adapter.config.dutyCycle = 0;
-	
-	else if (adapter.config.dutyCycle > 0 && adapter.config.dutyCycle < 10)
-	{
-		adapter.log.warn('Due to performance reasons, the duty cycle rate can not be set to less than 10 minutes. Using 10 minutes now.');
-		adapter.config.dutyCycle = 10;
-	}
-	
-	clearTimeout(dutyCycle);
-	dutyCycle = setTimeout(function dutyCycleRun()
-	{
-		if (!unloaded && adapter.config.dutyCycle > 0)
-		{
-			adapter.log.debug('Running Duty Cycle...');
-			library.runDutyCycle('_playing', Math.floor(Date.now()/1000));
-			adapter.log.debug('Duty Cycle finished.');
-			dutyCycle = setTimeout(dutyCycleRun, adapter.config.dutyCycle*60*1000); // run every 1h
-		}
-		
-	}, 60*1000);
 }
 
 /**

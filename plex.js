@@ -868,7 +868,7 @@ function getSettings()
 			library.set(
 				{
 					node: 'settings.' + entry['group'] + '.' + entry['id'],
-					type: entry['type'] == 'bool' ? 'boolean' : (entry['type'] == 'int' ? 'number' : entry['type']),
+					type: entry['type'] == 'bool' ? 'boolean' : (entry['type'] == 'int' ? 'number' : 'string'),
 					role: entry['type'] == 'bool' ? 'indicator' : (entry['type'] == 'int' ? 'value' : 'text'),
 					description: entry['label']
 				},

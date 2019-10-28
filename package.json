@@ -1,27 +1,28 @@
 {
-  "_from": "iobroker.plex@0.6.0",
-  "_id": "iobroker.plex@0.6.0",
+  "_from": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+  "_id": "iobroker.plex@0.3.0",
   "_inBundle": false,
-  "_integrity": "sha512-b8bxcBSp5RESpMawvIjYOtHou1K3hK+xt0se3isj58SS7ycQJrIw7PrHjp2WZTDAFwJWN4FPcrjLMOQrbP0Y3A==",
+  "_integrity": "sha512-XALsJfS+vQEdm4uknqCiXClkuk6ggFUoiKJpog75dHTkT4oLYmv4E08M9fRPmYwYmZ6eDTnO1NLTJh/5CbJxFA==",
   "_location": "/iobroker.plex",
-  "_phantomChildren": {},
+  "_phantomChildren": {
+    "plex-api": "5.2.2",
+    "when": "3.7.8"
+  },
   "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "iobroker.plex@0.6.0",
-    "name": "iobroker.plex",
-    "escapedName": "iobroker.plex",
-    "rawSpec": "0.6.0",
-    "saveSpec": null,
-    "fetchSpec": "0.6.0"
+    "type": "remote",
+    "raw": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+    "rawSpec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+    "saveSpec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+    "fetchSpec": "https://github.com/Zefau/ioBroker.plex/tarball/master"
   },
   "_requiredBy": [
-    "#USER"
+    "#USER",
+    "/"
   ],
-  "_resolved": "https://registry.npmjs.org/iobroker.plex/-/iobroker.plex-0.6.0.tgz",
-  "_shasum": "1f51b4e2c14c1fa202499c9712b0afb320ed59b2",
-  "_spec": "iobroker.plex@0.6.0",
-  "_where": "C:\\Users\\Zefau\\iobroker",
+  "_resolved": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+  "_shasum": "bfcade76aa367cdccc486d2c207c0ba750ab031e",
+  "_spec": "https://github.com/Zefau/ioBroker.plex/tarball/master",
+  "_where": "/opt/iobroker",
   "author": {
     "name": "zefau",
     "email": "zefau@mailbox.org"
@@ -44,7 +45,8 @@
     "multer": "^1.4.2",
     "plex-api": "^5.2.3",
     "request-promise": "^4.2.4",
-    "tautulli-api": "^1.0.2"
+    "tautulli-api": "^1.0.2",
+    "uuid": "^3.3.3"
   },
   "deprecated": false,
   "description": "Integration of your Plex Media Server and / or your Tautulli",
@@ -75,5 +77,5 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit"
   },
-  "version": "0.7.0"
+  "version": "0.8.0"
 }

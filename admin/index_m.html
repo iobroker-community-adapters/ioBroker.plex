@@ -21,6 +21,8 @@
 	// load
 	function load(settings, onChange)
 	{
+		values2table('notifications', settings.notifications, onChange);
+		
 		initModal(settings.modal);
 		_load(settings, onChange);
 		globalParams = settings;
@@ -35,11 +37,13 @@
 	// save
 	function save(callback)
 	{
+		var saveParams = { "notifications": table2values('notifications') };
 		saveParams.plexPort = $('#plexPort').val() ? $('#plexPort').val() : 32400;
 		saveParams.plexProtocol = $('#plexSecure').prop('checked') ? 'https' : 'http';
 		saveParams.plexPassword = $('#plexPassword').val() ? encode(globalParams.encryptionKey, $('#plexPassword').val()) : '';
 		saveParams.tautulliToken = $('#tautulliToken').val() ? encode(globalParams.encryptionKey, $('#tautulliToken').val()) : '';
 		
+		console.log(saveParams);
 		_save(callback, saveParams);
 	}
 	
@@ -275,33 +279,6 @@
 				</div>
 			</div>
 			
-			<!-- Events -->
-			<div class="row">
-				<div class="col s12 m12">
-					<div class="row" style="margin-bottom: 0">
-						<div class="col s12 m12">
-							<p class="translate title">events</p>
-						</div>
-					</div>
-					<div class="row box">
-						<div class="input-field col s3 m3">
-							<p class="subtitle translate">eventsInfo</p>
-							
-							<input class="value" id="port" type="number" placeholder="41891" />
-							<label for="port" class="translate">webhookPort</label>
-						</div>
-						<div class="input-field col s1 m1"></div>
-						<div class="input-field col s4 m4">
-							<p class="subtitle translate">resetMediaInfo</p>
-							
-							<input class="value" id="resetMedia" type="checkbox" />
-							<label for="resetMedia" class="translate">resetMedia</label>
-						</div>
-						
-					</div>
-				</div>
-			</div>
-			
 			<!-- Refresh & Settings -->
 			<div class="row">
 				<div class="col s12 m12">
@@ -329,7 +306,7 @@
 								<label for="getLibraries" class="translate">getLibraries</label>
 							</div>
 							
-							<div style="display: block">
+							<div style="display: block; margin-left: 35px">
 								<input class="value" id="getAllItems" type="checkbox" />
 								<label for="getAllItems" class="translate">getAllItems</label>
 							</div>
@@ -355,11 +332,80 @@
 							</div>
 							
 						</div>
-						<div class="input-field col s4 m4">
-							<p class="subtitle translate">dutyCycleInfo</p>
+						
+					</div>
+				</div>
+			</div>
+			
+			<!-- Events -->
+			<div class="row">
+				<div class="col s12 m12">
+					<div class="row" style="margin-bottom: 0">
+						<div class="col s12 m12">
+							<p class="translate title">events</p>
+						</div>
+					</div>
+					<div class="row box">
+						<div class="input-field col s3 m3">
+							<p class="subtitle translate">eventsInfo</p>
 							
-							<input class="value" id="dutyCycle" type="number" placeholder="0" />
-							<label for="dutyCycle" class="translate" style="display: none">dutyCycle</label>
+							<input class="value" id="port" type="number" placeholder="41891" />
+							<label for="port" class="translate">webhookPort</label>
+						</div>
+						<div class="input-field col s1 m1"></div>
+						<div class="input-field col s4 m4">
+							<div class="row">
+								<div class="col s12 m12">
+									<p class="subtitle translate">resetMediaInfo</p>
+									
+									<input class="value" id="resetMedia" type="checkbox" />
+									<label for="resetMedia" class="translate">resetMedia</label>
+								</div>
+							</div>
+							<!--
+							<div class="row">
+								<div class="col s12 m12">
+									<p class="subtitle translate">getMetadataTrees</p>
+									
+									<input class="value" id="getMetadataTrees" type="checkbox" />
+									<label for="getMetadataTrees" class="translate">getMetadataTrees</label>
+								</div>
+							</div>
+							-->
+						</div>
+						
+					</div>
+				</div>
+			</div>
+			
+			<!-- Notification -->
+			<div class="row">
+				<div class="col s12 m12">
+					<div class="row" style="margin-bottom: 0">
+						<div class="col s12 m12">
+							<p class="translate title">notifications</p>
+						</div>
+					</div>
+					<div class="row box">
+						<div class="col s12" id="notifications">
+							<p class="subtitle translate">notificationsInfo</p>
+						
+							<a class="btn waves-effect waves-light table-button-add"><i class="material-icons">add_circle</i> <span class="translate">add_notification</span></a>
+							
+							<div class="table-values-div">
+								<table class="table-values">
+									<thead>
+										<tr>
+											<th data-name="media" class="translate" width="10%" data-options="any/any media type;movie/Movie;episode/Serie;track/Music;system/System" data-type="select">media</th> <!-- movie, serie, etc. -->
+											<th data-name="event" class="translate" width="15%" data-options="any/any event;play/Play;stop/Stop;pause/Pause;resume/Resume;watched/Watched;rate/Rated;library.on.deck/new item added on deck;library.new/new item added to library;admin.database.backup/Database backup;admin.database.corrupted/Database corrupted;device.new/new device streaming;playback.started/playback by shared user" data-type="select">event</th> <!-- media.play, media.stop, etc. -->
+											<th data-name="message" class="translate">message</th>
+											<th data-name="caption" class="translate">caption</th>
+											<th data-buttons="delete" style="width: 120px"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							
 						</div>
 						
 					</div>

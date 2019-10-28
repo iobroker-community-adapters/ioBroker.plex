@@ -119,6 +119,15 @@ This notification is __not__ recommended to use.
 ```
 {
 	"event":"media.scrobble"
+	
+	"Metadata":{
+		"title":"{title}",
+		"librarySectionTitle":"{library_name}"
+	}
+	
+	%Metadata.title% (%Metadata.year%) watched
+
+tautulli | Played by %Account.title% on %Player.title%
 }
 ```
 
@@ -147,7 +156,11 @@ This notification is __not__ recommended to use.
 ### Recently Added
 ```
 {
-	"event":"library.new"
+	"event":"library.new",
+	"Metadata":{
+		"title":"{title}",
+		"librarySectionTitle":"{library_name}"
+	}
 }
 ```
 

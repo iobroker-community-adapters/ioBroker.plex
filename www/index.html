@@ -16,42 +16,85 @@
 	<script src="../../lib/js/materialize.js"></script>
 	<script>
 	<!--
+	var lang = (navigator.languages != undefined ? navigator.languages[0] : navigator.language).substr(0, 2);
+	console.log('LANGUAGE: ' + lang);
+	
+	var logIDs = [], timeline = [];
 	var socketConnected;
 	var tl;
 	
 	// add entries
-	function timeline(entries)
+	function addTimeline(entries)
 	{
-		console.log(entries.length + ' entries found in feed.');
-		entries.forEach(function(entry) {add(entry)});
+		// compare payload to existing entries
+		let added = false;
+		let entry;
+		
+		for (let i = 0; i < entries.length; i++)
+		{
+			entry = entries[i];
+			entry.id = entry.id || entry.source + '_' + entry.event + '_' + entry.timestamp;
+			
+			if (logIDs.indexOf(entry.id) === -1)
+			{
+				added = true;
+				logIDs.push(entry.id);
+				
+				// 
+				entry.date = new Date(entry.timestamp*1000);
+				entry.dateFormatted = entry.date.toLocaleDateString(lang, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+				entry.timeFormatted = entry.date.toLocaleTimeString(lang, {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+				
+				// add to timeline
+				timeline.push(entry);
+			}
+		}
+		
+		if (added)
+		{
+			// sort
+			/*
+			timeline.sort(function(a, b)
+			{
+				return b.date - a.date
+			});
+			*/
+			
+			// show timeline
+			showTimeline(timeline);
+		}
+	}
+	
+	// show entries
+	function showTimeline(entries)
+	{
+		console.log("Show timeline with " + timeline.length + " entries.");
+		console.log(JSON.stringify(timeline));
+		
+		$('.cd-timeline-block').not('.template').remove();
+		entries.forEach(function(entry) {addLog(entry)});
 		
 		tl.hideBlocks();
 		$(window).trigger('scroll');
 	}
 	
-	// add entry
-	function add(entry)
+	// add log entry
+	function addLog(entry)
 	{
-		var lang = getLang();
-		var date = new Date(entry.timestamp*1000);
-		entry.date = date.toLocaleDateString(lang, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
-		entry.time = date.toLocaleTimeString(lang, {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-		
 		var icon = !ICONS[entry.event] ? 'unknown' : entry.event;
 		var tpl = $('.template').clone().removeClass('template hidden');
-		tpl.find('.cd-name').html(entry.title ? entry.title : '<em>Unknown event</em>');
-		tpl.find('.cd-subtitle').html(entry.source + ' | ' + (entry.subtitle ? entry.subtitle : ''));
-		tpl.find('.cd-icon').addClass('action-'+entry.event).css({'background-color': ICONS[icon].color, 'background-image': 'url(' + ICONS[icon].img + ')', 'background-color': ICONS[icon].color});
-		tpl.find('.cd-date').html(entry.date + ', ' + entry.time);
+		
+		tpl.find('.cd-message').html(entry.message);
+		tpl.find('.cd-caption').html(entry.caption);
+		
+		tpl.find('.cd-icon').addClass('action-' + entry.event).css({'background-color': ICONS[icon].color, 'background-image': 'url(' + ICONS[icon].img + ')', 'background-color': ICONS[icon].color});
+		tpl.find('.cd-date').html(entry.dateFormatted + ', ' + entry.timeFormatted);
 		
 		$('#cd-timeline .cd-timeline-block').first().before(tpl);
 	}
 	
-	// get lang
-	function getLang()
-	{
-		return navigator.languages != undefined ? navigator.languages[0] : navigator.language;
-	}
+	//
+	
 	
 	// page loaded
 	$(window).on('load', function()
@@ -75,28 +118,33 @@
 				console.log('Socket ' + (socketConnected ? 'connected' : 'disconnected') + '!');
 				
 				// retrieve states
-				if (socketConnected)
+				var updateData = setTimeout(function getData()
 				{
-					servConn.getStates(states.map(function(state) {return servConn.namespace + '.' + state}), function(err, _states)
+					if (socketConnected)
 					{
-						if (_states !== null && _states !== undefined)
+						servConn.getStates(states.map(function(state) {return servConn.namespace + '.' + state}), function(err, _states)
 						{
-							for (var key in _states)
+							if (_states !== null && _states !== undefined)
 							{
-								var content = _states[key] && _states[key].val;
-								var node = key.replace(servConn.namespace + '.', '');
-								if (!content) return;
-								
-								if (node == 'events.history')
-									timeline(JSON.parse(content));
-								
-								else
-									$('[data-state="' + node + '"]').html(content);
-								
+								for (var key in _states)
+								{
+									var content = _states[key] && _states[key].val;
+									var node = key.replace(servConn.namespace + '.', '');
+									if (!content) return;
+									
+									if (node == 'events.history')
+										addTimeline(JSON.parse(content));
+									
+									else
+										$('[data-state="' + node + '"]').html(content);
+									
+								}
 							}
-						}
-					});
-				}
+						});
+					}
+
+					updateData = setTimeout(getData, 10*1000);
+				}, 1000);
 			}
 		});
 	});
@@ -111,13 +159,12 @@
 
 
 <section id="cd-timeline" class="cd-container">
-	<h2 class="title" data-state="address.address"></h2>
 
 	<div class="cd-timeline-block template hidden">
 		<div class="cd-timeline-img cd-icon"></div>
 		<div class="cd-timeline-content">
-			<h2 class="cd-name"></h2>
-			<p class="cd-subtitle subtitle"></p>
+			<h2 class="cd-message"></h2>
+			<p class="cd-caption caption"></p>
 			<span class="cd-date"></span>
 		</div>
 	</div>

@@ -27,18 +27,13 @@ body, a {
     margin: 30px auto 0 auto;
 }
 
-.title {
-    margin: 0;
-	padding: 10px;
-}
-
-.subtitle {
+.caption {
 	margin: 0 0 10px 20px !important;
     padding: 0 0 0 0 !important;
     font-size: 10px !important;
 }
 
-.cd-name {
+.cd-message {
 	margin: 0;
 	padding: 20px 0 10px 20px;
 }

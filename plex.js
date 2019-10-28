@@ -31,7 +31,7 @@ let retryCycle, refreshCycle;
 
 let encryptionKey;
 let plex, plexAuth, tautulli, data;
-let players = [], playing = [];
+let players = [], playing = [], streams = 0;
 let history = [];
 let notifications = {};
 let upload = _multer({ dest: '/tmp/' });
@@ -283,6 +283,8 @@ function testConnection()
 					library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
 				
 				library.clearPromiseListener();
+				playing = library.getDeviceState('_playing.players') && library.getDeviceState('_playing.players').split(',') || [];
+				streams = library.getDeviceState('_playing.streams') || 0;
 			});
 			
 			// verify Tautulli settings
@@ -361,13 +363,19 @@ function setEvent(data, source, prefix)
 		// index current playing players
 		if (data.event && data.Player && data.Player.title)
 		{
-			if (['media.play', 'media.resume'].indexOf(data.event) > -1 && playing.indexOf(data.Player.title) == -1)
-				playing.push(data.Player.title);
-			
-			if (['media.stop', 'media.pause'].indexOf(data.event) > -1)
+			if (['media.play', 'media.resume'].indexOf(data.event) > -1)
+			{
+				if (playing.indexOf(data.Player.title) == -1) playing.push(data.Player.title);
+				streams++;
+			}
+			else if (['media.stop', 'media.pause'].indexOf(data.event) > -1)
+			{
 				playing = playing.filter(player => player !== data.Player.title);
+				streams > 0 && streams--;
+			}
 			
-			library.set({node: '_playing.playing', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
+			library.set({node: '_playing.players', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
+			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
 		}
 		
 		// add player controls

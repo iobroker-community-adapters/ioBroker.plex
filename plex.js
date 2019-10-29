@@ -1,5 +1,6 @@
 'use strict';
-const adapterName = require('./io-package.json').common.name;
+const ioPackage = require('./io-package.json');
+const adapterName = ioPackage.common.name;
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 
 const _http = require('express')();
@@ -87,11 +88,16 @@ function startAdapter(options)
 			encryptionKey = adapter.config.encryptionKey;
 		
 		// get notifications
-		adapter.config.notifications.forEach(notification =>
+		if (adapter.config.notifications)
 		{
-			if (!notifications[notification.media]) notifications[notification.media] = {};
-			notifications[notification.media][notification.event] = { 'message': notification.message, 'caption': notification.caption }
-		});
+			adapter.config.notifications.forEach(notification =>
+			{
+				if (!notifications[notification.media]) notifications[notification.media] = {};
+				notifications[notification.media][notification.event] = { 'message': notification.message, 'caption': notification.caption }
+			});
+		}
+		else
+			adapter.config.notifications = ioPackage.native.notifications;
 		
 		// get history
 		adapter.getState('events.history', (err, state) =>

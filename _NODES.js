@@ -7,12 +7,14 @@ module.exports =
 	"events.media": {"description": "Media type of last event (movie, show, track, etc.)", "role": "text", "type": "string"},
 	"events.history": {"description": "All events historicized", "role": "json", "type": "string"},
 	"events.event": {"description": "Last event triggered on Plex", "role": "text", "type": "string"},
-	"events.title": {"description": "Title of last event", "role": "text", "type": "string"},
-	"events.subtitle": {"description": "Description of last event", "role": "text", "type": "string"},
+	"events.message": {"description": "Message of last event", "role": "text", "type": "string"},
+	"events.caption": {"description": "Caption of last event", "role": "text", "type": "string"},
 	"events.source": {"description": "Last source an event was received from", "role": "text", "type": "string"},
 	"events.datetime": {"description": "DateTime of the event being received", "role": "text", "type": "string"},
 	"events.source": {"description": "Source of event (either plex or tautulli)", "role": "text", "type": "string"},
 	"events.timestamp": {"description": "Timestamp of the event being received", "role": "value", "type": "number"},
+	"events.account": {"description": "Name of Plex User", "role": "text", "type": "string"},
+	"events.player": {"description": "Name of Plex Player", "role": "text", "type": "string"},
 	
 	// PLAYING
 	"playing.event": {"description": "Event triggered on Plex", "role": "text", "type": "string"},
@@ -30,6 +32,7 @@ module.exports =
 	
 	// PLAYING - PLAYER
 	"playing.player.local": {"description": "Indication whether Player is local", "role": "indicator", "type": "boolean"},
+	"playing.player.port": {"description": "Port of Plex Player", "role": "info.port", "type": "number"},
 	"playing.player.localaddress": {"description": "Local IP address", "role": "info.ip", "type": "string"},
 	"playing.player.publicaddress": {"description": "Public IP address", "role": "info.ip", "type": "string"},
 	"playing.player.title": {"description": "Name of Plex Player", "role": "text", "type": "string"},

@@ -99,19 +99,6 @@ function startAdapter(options)
 		else
 			adapter.config.notifications = ioPackage.native.notifications;
 		
-		// get history
-		adapter.getState('events.history', (err, state) =>
-		{
-			if (!err && state && state.val)
-				history = JSON.parse(state.val);
-		});
-		
-		// empty _playing on start
-		if (adapter.config.resetMedia)
-		{
-			library.del('_playing', true, () => adapter.log.debug('Plex Media flushed!'));
-		}
-		
 		// verify Plex settings
 		if (!adapter.config.plexIp || !adapter.config.plexToken)
 			return library.terminate('Plex IP and Plex Token not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token.');
@@ -125,8 +112,28 @@ function startAdapter(options)
 			options: plexOptions
 		});
 		
-		// test connection
-		testConnection();
+		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
+		adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) =>
+		{
+			library.set(Library.CONNECTION, true);
+			
+			// set current states from objects
+			for (let state in states)
+			{
+				library.setDeviceState(state.replace(adapter.name + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+			
+				// set history
+				if (state.indexOf('events.history') > -1)
+					history = JSON.parse(states[state].val);
+			}
+			
+			// empty _playing on start
+			if (adapter.config.resetMedia)
+				library.del('_playing', true, () => adapter.log.debug('Plex Media flushed!'));
+			
+			// test connection
+			init();
+		});
 	});
 
 	/*
@@ -162,36 +169,37 @@ function startAdapter(options)
 		// Player Controls
 		else
 		{
-			adapter.getObject(id, (err, obj) =>
+			let path = id.replace(adapter.name + '.' + adapter.instance + '.', '').split('.');
+			action = path.pop();
+			let mode = path.pop();
+			
+			path.splice(-1);
+			let playerIp = library.getDeviceState(path.join('.') + '.Player.localaddress');
+			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
+			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
+			
+			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
 			{
-				if (err !== null || !obj || !obj.native) return;
+				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
 				
-				let mode = obj.native.mode;
-				let playerIp = obj.native.playerIp;
-				let playerPort = obj.native.playerPort;
-				let playerIdentifier = obj.native.playerIdentifier;
+				let key = _ACTIONS[mode][action].key || action;
+				let attribute = _ACTIONS[mode][action].attribute;
 				
-				if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
+				let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + state.val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier + '&X-Plex-Token=' + adapter.config.plexToken;
+				adapter.log.debug(url);
+				
+				_request(url).then(res =>
 				{
-					adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
-					
-					let key = obj.native.key || action;
-					let attribute = obj.native.attribute;
-					
-					let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + state.val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier;
-					_request(url).then(res =>
-					{
-						adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
-					})
-					.catch(err =>
-					{
-						adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
-						adapter.log.debug(err);
-					});
-				}
-				else
-					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
-			});
+					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+				})
+				.catch(err =>
+				{
+					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
+					adapter.log.debug(err);
+				});
+			}
+			else
+				adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
 		}
 	});
 	
@@ -273,7 +281,7 @@ function startAdapter(options)
  * Test connection
  *
  */
-function testConnection()
+function init()
 {
 	plex.query('/status/sessions')
 		.then(res =>
@@ -288,7 +296,6 @@ function testConnection()
 				for (let state in states)
 					library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
 				
-				library.clearPromiseListener();
 				playing = library.getDeviceState('_playing.players') && library.getDeviceState('_playing.players').split(',') || [];
 				streams = library.getDeviceState('_playing.streams') || 0;
 			});
@@ -355,6 +362,14 @@ function setEvent(data, source, prefix)
 {
 	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
+	// add meta data
+	data.media = data.Metadata && data.Metadata.type;
+	data.player = data.Player && data.Player.title;
+	data.account = data.Account && data.Account.title;
+	data.source = source;
+	data.timestamp = Math.floor(Date.now()/1000);
+	data.datetime = library.getDateTime(Date.now());
+	
 	// PLAYING
 	if (prefix == '_playing')
 	{
@@ -390,13 +405,6 @@ function setEvent(data, source, prefix)
 		
 		// adapt prefix
 		prefix = prefix + '.' + groupBy;
-	
-		// add meta data
-		data.media = data.Metadata && data.Metadata.type;
-		data.player = data.Player.uuid;
-		data.source = source;
-		data.timestamp = Math.floor(Date.now()/1000);
-		data.datetime = library.getDateTime(Date.now());
 	}
 	
 	// EVENTS
@@ -406,25 +414,26 @@ function setEvent(data, source, prefix)
 		library.set({node: prefix, role: 'channel', description: 'Plex Events'});
 		
 		// replace placeholders in notification message
-		let media = data.Metadata && data.Metadata.type;
 		let event = data.event && data.event.replace('media.', '');
 		
-		let message = notifications[media] && notifications[media][event] ||
+		let message = notifications[data.media] && notifications[data.media][event] ||
 						notifications['any'] && notifications['any'][event] ||
-						notifications[media] && notifications[media]['any'] ||
+						notifications[data.media] && notifications[data.media]['any'] ||
 						notifications['any']['any'] ||
 						{ 'message': '', 'caption': '' };
 		
 		// structure event
 		let notification = {
 			'id': _uuid(),
-			'timestamp': Math.floor(Date.now()/1000),
-			'datetime': library.getDateTime(Date.now()),
-			'media': media,
+			'timestamp': data.timestamp,
+			'datetime': data.datetime,
+			'account': data.account,
+			'player': data.player,
+			'media': data.media,
 			'event': event,
 			'message': replacePlaceholders(message.message, JSON.parse(JSON.stringify(data))),
 			'caption': replacePlaceholders(message.caption, JSON.parse(JSON.stringify(data))),
-			'source': source
+			'source': data.source
 		}
 		
 		// add event to history
@@ -435,13 +444,12 @@ function setEvent(data, source, prefix)
 	}
 	
 	// write states
-	library.clearPromiseListener(true);
 	for (let key in data)
 		readData(prefix + '.' + key, data[key], prefix);
 	
 	// cleanup old states when playing something new
 	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play')
-		library.runGarbageCollector(prefix, false, ['_Controls'], true);
+		library.runGarbageCollector(prefix, false, 30, ['_Controls']);
 }
 
 /**
@@ -985,6 +993,9 @@ function getPlayers()
 			library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + player.name}, '');
 			
 			// add player controls
+			library.set({'node': '_playing.' + groupBy + '.Player.localaddress', ...library.getNode('playing.player.localaddress') }, player.address);
+			library.set({'node': '_playing.' + groupBy + '.Player.port', ...library.getNode('playing.player.port') }, player.port);
+			
 			let controls = '_playing.' + groupBy + '._Controls';
 			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
 			
@@ -1010,16 +1021,6 @@ function getPlayers()
 							'write': true,
 							'states': _ACTIONS[mode][key].values
 						},
-						
-						'native': {
-							'mode': mode,
-							'key': _ACTIONS[mode][key].key,
-							'attribute': _ACTIONS[mode][key].attribute,
-							
-							'playerIp': player.address,
-							'playerPort': player.port,
-							'playerIdentifier': player.machineIdentifier
-						}
 					}, _ACTIONS[mode][key].default !== undefined ? _ACTIONS[mode][key].default : false);
 				}
 				

@@ -86,6 +86,10 @@
 		
 		tpl.find('.cd-message').html(entry.message);
 		tpl.find('.cd-caption').html(entry.caption);
+		if (entry.thumb)
+			tpl.find('.cd-thumb').attr('src', entry.thumb);
+		else
+			tpl.find('.cd-thumb').remove();
 		
 		tpl.find('.cd-icon').addClass('action-' + entry.event).css({'background-color': ICONS[icon].color, 'background-image': 'url(' + ICONS[icon].img + ')', 'background-color': ICONS[icon].color});
 		tpl.find('.cd-date').html(entry.dateFormatted + ', ' + entry.timeFormatted);
@@ -163,8 +167,14 @@
 	<div class="cd-timeline-block template hidden">
 		<div class="cd-timeline-img cd-icon"></div>
 		<div class="cd-timeline-content">
-			<h2 class="cd-message"></h2>
-			<p class="cd-caption caption"></p>
+			<div class="thumb">
+				<img class="cd-thumb" />
+			</div>
+			<div class="information">
+				<h2 class="cd-message"></h2>
+				<p class="cd-caption caption"></p>
+			</div>
+			
 			<span class="cd-date"></span>
 		</div>
 	</div>

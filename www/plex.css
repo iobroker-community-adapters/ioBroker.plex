@@ -1,0 +1,26 @@
+.thumb {
+	float: left;
+    width: 90px;
+	margin-right: 10px;
+}
+
+.thumb img {
+	border-top-left-radius: 0.25em;
+	border-bottom-left-radius: 0.25em;
+	display: block;
+}
+
+.cd-timeline-block:nth-child(2n) .thumb {
+	float: right;
+	margin: 0;
+	margin-left: 10px;
+}
+
+.cd-timeline-block:nth-child(2n) .thumb img {
+	border-radius: 0;
+	border-top-right-radius: 0.25em;
+	border-bottom-right-radius: 0.25em;
+}
+
+.information {
+}

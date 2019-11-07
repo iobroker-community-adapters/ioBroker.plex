@@ -93,7 +93,7 @@ function startAdapter(options)
 			adapter.config.notifications.forEach(notification =>
 			{
 				if (!notifications[notification.media]) notifications[notification.media] = {};
-				notifications[notification.media][notification.event] = { 'message': notification.message, 'caption': notification.caption }
+				notifications[notification.media][notification.event] = { 'message': notification.message, 'caption': notification.caption, 'thumb': notification.thumb }
 			});
 		}
 		else
@@ -104,9 +104,10 @@ function startAdapter(options)
 			return library.terminate('Plex IP and Plex Token not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token.');
 		
 		// initialize Plex API
+		adapter.config.plexPort = adapter.config.plexPort || 32400;
 		plex = new Plex({
 			hostname: adapter.config.plexIp,
-			port: adapter.config.plexPort || 32400,
+			port: adapter.config.plexPort,
 			https: adapter.config.plexSecure || false,
 			token: adapter.config.plexToken,
 			options: plexOptions
@@ -131,6 +132,10 @@ function startAdapter(options)
 			if (adapter.config.resetMedia)
 				library.del('_playing', true, () => adapter.log.debug('Plex Media flushed!'));
 			
+			// subscribe to remote player
+			adapter.subscribeForeignStates('iot.0.services.custom_plex');
+			adapter.subscribeForeignStates('cloud.0.services.custom_plex');
+			
 			// test connection
 			init();
 		});
@@ -146,6 +151,23 @@ function startAdapter(options)
 		
 		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
 		let action = id.substr(id.lastIndexOf('.')+1);
+		let val = state.val;
+		
+		// Cloud / iot Adapter
+		if (action == 'custom_plex')
+		{
+			try
+			{
+				let playerNamespace;
+				[ playerNamespace, action, val ] = state.val.split('_');
+				id = '_playing.' + playerNamespace + '._Controls.playback.' + action;
+			}
+			catch(err)
+			{
+				adapter.log.warn(err.message);
+				return;
+			}
+		}
 		
 		// Refresh Library
 		if (action == '_refresh')
@@ -174,9 +196,9 @@ function startAdapter(options)
 			let mode = path.pop();
 			
 			path.splice(-1);
-			let playerIp = library.getDeviceState(path.join('.') + '.Player.localaddress');
-			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
 			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
+			let playerIp = library.getDeviceState(path.join('.') + '._Controls.remotePlayer') ? library.getDeviceState(path.join('.') + '.Player.publicAddress') : library.getDeviceState(path.join('.') + '.Player.localaddress');
+			let playerPort = library.getDeviceState(path.join('.') + '._Controls.remotePlayer') ? adapter.config.remotePort : library.getDeviceState(path.join('.') + '.Player.port');
 			
 			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
 			{
@@ -185,7 +207,7 @@ function startAdapter(options)
 				let key = _ACTIONS[mode][action].key || action;
 				let attribute = _ACTIONS[mode][action].attribute;
 				
-				let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + state.val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier + '&X-Plex-Token=' + adapter.config.plexToken;
+				let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier + '&X-Plex-Token=' + adapter.config.plexToken;
 				adapter.log.debug(url);
 				
 				_request(url).then(res =>
@@ -420,9 +442,10 @@ function setEvent(data, source, prefix)
 						notifications['any'] && notifications['any'][event] ||
 						notifications[data.media] && notifications[data.media]['any'] ||
 						notifications['any']['any'] ||
-						{ 'message': '', 'caption': '' };
+						{ 'message': '', 'caption': '', 'thumb': '' };
 		
 		// structure event
+		let eventData = JSON.parse(JSON.stringify(data));
 		let notification = {
 			'id': _uuid(),
 			'timestamp': data.timestamp,
@@ -431,8 +454,9 @@ function setEvent(data, source, prefix)
 			'player': data.player,
 			'media': data.media,
 			'event': event,
-			'message': replacePlaceholders(message.message, JSON.parse(JSON.stringify(data))),
-			'caption': replacePlaceholders(message.caption, JSON.parse(JSON.stringify(data))),
+			'thumb': message.thumb ? 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) : '',
+			'message': replacePlaceholders(message.message, eventData),
+			'caption': replacePlaceholders(message.caption, eventData),
 			'source': data.source
 		}
 		
@@ -998,6 +1022,7 @@ function getPlayers()
 			
 			let controls = '_playing.' + groupBy + '._Controls';
 			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
+			library.set({node: controls + '.remotePlayer', role: 'switch', type: 'boolean', description: 'Use remote/public instead of local player IP'}, false);
 			
 			player.protocolCapabilities.split(',').forEach(mode => // e.g. "timeline,playback,navigation,mirror,playqueues"
 			{

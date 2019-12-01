@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.8.4",
+        "version": "0.8.5",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and your Tautulli",
@@ -165,175 +165,175 @@
                 "event": "any",
                 "message": "No Message defined for media %Metadata.type% and event %event%",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "any",
                 "event": "media.play",
                 "message": "%Metadata.title% (%Metadata.year%) playing",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.thumb%"
+                "thumb": "%Metadata.thumb%"
             },
             {
                 "media": "any",
                 "event": "media.pause",
                 "message": "%Metadata.title% (%Metadata.year%) paused",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.thumb%"
+                "thumb": "%Metadata.thumb%"
             },
             {
                 "media": "any",
                 "event": "media.stop",
                 "message": "%Metadata.title% (%Metadata.year%) stopped",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.thumb%"
+                "thumb": "%Metadata.thumb%"
             },
             {
                 "media": "any",
                 "event": "media.resume",
                 "message": "%Metadata.title% (%Metadata.year%) resumed",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.thumb%"
+                "thumb": "%Metadata.thumb%"
             },
             {
                 "media": "any",
                 "event": "media.rate",
                 "message": "%Metadata.title% (%Metadata.year%) rated",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.thumb%"
+                "thumb": "%Metadata.thumb%"
             },
             {
                 "media": "any",
                 "event": "media.watched",
                 "message": "%Metadata.title% (%Metadata.year%) watched",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.thumb%"
+                "thumb": "%Metadata.thumb%"
             },
             {
                 "media": "episode",
                 "event": "media.play",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.grandparentThumb%"
+                "thumb": "%Metadata.grandparentThumb%"
             },
             {
                 "media": "episode",
                 "event": "media.pause",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.grandparentThumb%"
+                "thumb": "%Metadata.grandparentThumb%"
             },
             {
                 "media": "episode",
                 "event": "media.stop",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.grandparentThumb%"
+                "thumb": "%Metadata.grandparentThumb%"
             },
             {
                 "media": "episode",
                 "event": "media.resume",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.grandparentThumb%"
+                "thumb": "%Metadata.grandparentThumb%"
             },
             {
                 "media": "episode",
                 "event": "media.rate",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.grandparentThumb%"
+                "thumb": "%Metadata.grandparentThumb%"
             },
             {
                 "media": "episode",
                 "event": "media.watched",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": "%Metadata.grandparentThumb%"
+                "thumb": "%Metadata.grandparentThumb%"
             },
             {
                 "media": "track",
                 "event": "media.play",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "track",
                 "event": "media.pause",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "track",
                 "event": "media.stop",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "track",
                 "event": "media.resume",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "track",
                 "event": "media.rate",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "track",
                 "event": "media.watched",
                 "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
                 "caption": "Played by %Account.title% on %Player.title%",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "system",
                 "event": "library.on.deck",
                 "message": "A new item is added that appears in the user’s On Deck.",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "system",
                 "event": "library.new",
                 "message": "A new item is added to a library.",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "system",
                 "event": "admin.database.backup",
                 "message": "A database backup is completed successfully via scheduled tasks.",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "system",
                 "event": "admin.database.corrupted",
                 "message": "Corruption is detected in the server database.",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "system",
                 "event": "device.new",
                 "message": "A new device is using the Plex Media Server.",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             },
             {
                 "media": "system",
                 "event": "playback.started",
                 "message": "Playback is started by a shared user.",
                 "caption": "",
-				"thumb": ""
+                "thumb": ""
             }
         ]
     },

@@ -3,6 +3,7 @@ const ioPackage = require('./io-package.json');
 const adapterName = ioPackage.common.name;
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 
+const _fs = require('fs');
 const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');
@@ -37,6 +38,8 @@ let history = [];
 let notifications = {};
 let upload = _multer({ dest: '/tmp/' });
 
+let REQUEST_OPTIONS = {};
+const watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
 const plexOptions = {
 	identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
 	product: 'Plex for ioBroker',
@@ -87,6 +90,38 @@ function startAdapter(options)
 		else
 			encryptionKey = adapter.config.encryptionKey;
 		
+		// Secure connection
+		REQUEST_OPTIONS.secureConnection = false;
+		if (adapter.config.secureConnection)
+		{
+			adapter.log.info('Establishing secure connection to Plex Media Server...');
+			
+			try
+			{
+				REQUEST_OPTIONS = {
+					...REQUEST_OPTIONS,
+					'cert': _fs.readFileSync(adapter.config.certPublicPath),
+					'key': _fs.readFileSync(adapter.config.certPrivatePath),
+					'rejectUnauthorized': false,
+					'secureConnection': true,
+					'_protocol': 'https:'
+				};
+				
+				if (adapter.config.certChainedPath)
+					REQUEST_OPTIONS.ca = _fs.readFileSync(adapter.config.certChainedPath);
+				
+				if (REQUEST_OPTIONS.key.indexOf('ENCRYPTED') > -1)
+					REQUEST_OPTIONS.passphrase = adapter.config.passphrase;
+			}
+			catch(err)
+			{
+				REQUEST_OPTIONS.secureConnection = false;
+				REQUEST_OPTIONS._protocol = 'http:';
+			}
+		}
+		else
+			adapter.log.info('Establishing insecure connection to Plex Media Server...');
+		
 		// get notifications
 		if (adapter.config.notifications)
 		{
@@ -106,11 +141,12 @@ function startAdapter(options)
 		// initialize Plex API
 		adapter.config.plexPort = adapter.config.plexPort || 32400;
 		plex = new Plex({
-			hostname: adapter.config.plexIp,
-			port: adapter.config.plexPort,
-			https: adapter.config.plexSecure || false,
-			token: adapter.config.plexToken,
-			options: plexOptions
+			'hostname': adapter.config.plexIp,
+			'port': adapter.config.plexPort,
+			'https': REQUEST_OPTIONS.secureConnection,
+			'token': adapter.config.plexToken,
+			'requestOptions': REQUEST_OPTIONS,
+			'options': plexOptions
 		});
 		
 		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
@@ -173,10 +209,16 @@ function startAdapter(options)
 		if (action == '_refresh')
 		{
 			let libId = id.substring(id.indexOf('libraries.')+10, id.indexOf('-'));
-			let url = 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1&X-Plex-Token=' + adapter.config.plexToken;
-			adapter.log.debug(url);
+			let options = {
+				...REQUEST_OPTIONS,
+				'method': 'POST',
+				'url': REQUEST_OPTIONS.protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1',
+				'headers': {
+					'X-Plex-Token': adapter.config.plexToken
+				}
+			};
 			
-			_request(url).then(res =>
+			_request(options).then(res =>
 			{
 				adapter.log.info('Successfully triggered refresh on library with ID ' + libId + '.');
 				adapter.log.debug(JSON.stringify(res));
@@ -206,11 +248,17 @@ function startAdapter(options)
 				
 				let key = _ACTIONS[mode][action].key || action;
 				let attribute = _ACTIONS[mode][action].attribute;
+				let options = {
+					...REQUEST_OPTIONS,
+					'method': 'POST',
+					'url': REQUEST_OPTIONS.protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
+					'headers': {
+						'X-Plex-Token': adapter.config.plexToken,
+						'X-Plex-Target-Client-Identifier': playerIdentifier
+					}
+				};
 				
-				let url = 'http://' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '') + 'X-Plex-Target-Client-Identifier=' + playerIdentifier + '&X-Plex-Token=' + adapter.config.plexToken;
-				adapter.log.debug(url);
-				
-				_request(url).then(res =>
+				_request(options).then(res =>
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
 				})
@@ -363,13 +411,15 @@ function init()
 		})
 		.catch(err =>
 		{
+			adapter.log.debug(err.stack);
+			
 			if (err.message.indexOf('EHOSTUNREACH') > -1)
 			{
 				adapter.config.retry = 60;
 				adapter.log.error('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
 				
 				library.set(Library.CONNECTION, false);
-				retryCycle = setTimeout(testConnection, adapter.config.retry*60*1000);
+				retryCycle = setTimeout(init, adapter.config.retry*60*1000);
 			}
 			else
 				library.terminate(err.message);
@@ -454,7 +504,7 @@ function setEvent(data, source, prefix)
 			'player': data.player,
 			'media': data.media,
 			'event': event,
-			'thumb': message.thumb ? 'http://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) : '',
+			'thumb': message.thumb ? 'https://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '&X-Plex-Token=' + adapter.config.plexToken : '',
 			'message': replacePlaceholders(message.message, eventData),
 			'caption': replacePlaceholders(message.caption, eventData),
 			'source': data.source
@@ -710,8 +760,6 @@ function getItems(path, key, node)
  */
 function retrieveData()
 {
-	let watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
-	
 	// GET SERVERS
 	if (adapter.config.getServers)
 		getServers();
@@ -838,7 +886,7 @@ function getLibraries()
 					{
 						let id = watched[i];
 						library.set({node: 'statistics.libraries.' + libId + '.' + id, type: library.getNode('statistics.' + id).type, role: library.getNode('statistics.' + id).role, description: library.getNode('statistics.' + id).description}, '');
-							
+						
 						for (let key in entry)
 							library.set({node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: library.getNode('statistics.' + key).type, role: library.getNode('statistics.' + key).role, description: library.getNode('statistics.' + key).description}, entry[key]);
 					});
@@ -869,10 +917,10 @@ function getUsers()
 		
 		data.forEach(entry =>
 		{
-			let userId = library.clean(entry['friendly_name'], true);
+			let userId = library.clean(entry['username'], true);
 			if (userId === 'local') return;
 			
-			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, entry['friendly_name'])}, '');
+			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, entry['username'])}, '');
 			
 			// index all keys as states
 			for (let key in entry)
@@ -889,10 +937,10 @@ function getUsers()
 				tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(res =>
 				{
 					if (!is(res)) return; else data = res.response.data || [];
-					adapter.log.debug('Retrieved Watch Statistics for User ' + entry['friendly_name'] + ' from Tautulli.');
+					adapter.log.debug('Retrieved Watch Statistics for User ' + entry['username'] + ' from Tautulli.');
 					
 					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, '')}, '');
-					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, entry['friendly_name'])}, '');
+					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, entry['username'])}, '');
 					
 					data.forEach((entry, i) =>
 					{

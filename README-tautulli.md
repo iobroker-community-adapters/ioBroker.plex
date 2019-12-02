@@ -102,6 +102,96 @@ You may copy the following example into Tautulli to have a full detailed payload
 			"subtitle_location": "{subtitle_location}",
 			"subtitle_language": "{subtitle_language}",
 			"subtitle_language_code": "{subtitle_language_code}"
+		},
+		"file": {
+			"path": "{file}",
+			"name": "{filename}",
+			"size": "{file_size}"
+		},
+		"transcoding": {
+			"transcode_decision": "{transcode_decision}",
+			"video_decision": "{video_decision}",
+			"audio_decision": "{audio_decision}",
+			"subtitle_decision": "{subtitle_decision}",
+			"transcode_container": "{transcode_container}",
+			"transcode_video_codec": "{transcode_video_codec}",
+			"transcode_video_width": "{transcode_video_width}",
+			"transcode_video_height": "{transcode_video_height}",
+			"transcode_audio_codec": "{transcode_audio_codec}",
+			"transcode_audio_channels": "{transcode_audio_channels}",
+			"transcode_hw_requested": "{transcode_hw_requested}",
+			"transcode_hw_decoding": "{transcode_hw_decoding}",
+			"transcode_hw_decode": "{transcode_hw_decode}",
+			"transcode_hw_decode_title": "{transcode_hw_decode_title}",
+			"transcode_hw_encoding": "{transcode_hw_encoding}",
+			"transcode_hw_encode": "{transcode_hw_encode}",
+			"transcode_hw_encode_title": "{transcode_hw_encode_title}"
+		},
+		"stream": {
+			"user": {
+				"streams": "{streams}",
+				"user_streams": "{user_streams}",
+				"name": "{user}",
+				"user": "{username}",
+				"email": "{user_email}"
+			},
+			"player": {
+				"device": "{device}",
+				"platform": "{platform}",
+				"product": "{product}",
+				"player": "{player}",
+				"ip_address": "{ip_address}"
+			},
+			"quality_profile": "{quality_profile}",
+			"optimized_version": "{optimized_version}",
+			"optimized_version_profile": "{optimized_version_profile}",
+			"synced_version": "{synced_version}",
+			"live": "{live}",
+			"stream_local": "{stream_local}",
+			"stream_location": "{stream_location}",
+			"stream_bandwidth": "{stream_bandwidth}",
+			"stream_container": "{stream_container}",
+			"stream_bitrate": "{stream_bitrate}",
+			"stream_aspect_ratio": "{stream_aspect_ratio}",
+			"stream_duration": "{stream_duration}",
+			"stream_time": "{stream_time}",
+			"remaining_duration": "{remaining_duration}",
+			"remaining_time": "{remaining_time}",
+			"progress_duration": "{progress_duration}",
+			"progress_time": "{progress_time}",
+			"progress_percent": "{progress_percent}",
+			"stream_video": {
+				"stream_video_codec": "{stream_video_codec}",
+				"stream_video_codec_level": "{stream_video_codec_level}",
+				"stream_video_bitrate": "{stream_video_bitrate}",
+				"stream_video_bit_depth": "{stream_video_bit_depth}",
+				"stream_video_framerate": "{stream_video_framerate}",
+				"stream_video_ref_frames": "{stream_video_ref_frames}",
+				"stream_video_resolution": "{stream_video_resolution}",
+				"stream_video_height": "{stream_video_height}",
+				"stream_video_width": "{stream_video_width}",
+				"stream_video_language": "{stream_video_language}",
+				"stream_video_language_code": "{stream_video_language_code}"
+			},
+			"stream_audio": {
+				"stream_audio_bitrate": "{stream_audio_bitrate}",
+				"stream_audio_bitrate_mode": "{stream_audio_bitrate_mode}",
+				"stream_audio_codec": "{stream_audio_codec}",
+				"stream_audio_channels": "{stream_audio_channels}",
+				"stream_audio_channel_layout": "{stream_audio_channel_layout}",
+				"stream_audio_sample_rate": "{stream_audio_sample_rate}",
+				"stream_audio_language": "{stream_audio_language}",
+				"stream_audio_language_code": "{stream_audio_language_code}"
+			},
+			"stream_subtitle": {
+				"stream_subtitle_codec": "{stream_subtitle_codec}",
+				"stream_subtitle_container": "{stream_subtitle_container}",
+				"stream_subtitle_format": "{stream_subtitle_format}",
+				"stream_subtitle_forced": "{stream_subtitle_forced}",
+				"stream_subtitle_language": "{stream_subtitle_language}",
+				"stream_subtitle_language_code": "{stream_subtitle_language_code}",
+				"stream_subtitle_location": "{stream_subtitle_location}"
+			}
 		}
 	}
 }

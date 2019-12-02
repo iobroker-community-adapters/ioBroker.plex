@@ -504,7 +504,7 @@ function setEvent(data, source, prefix)
 			'player': data.player,
 			'media': data.media,
 			'event': event,
-			'thumb': message.thumb ? 'https://' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '&X-Plex-Token=' + adapter.config.plexToken : '',
+			'thumb': message.thumb ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
 			'message': replacePlaceholders(message.message, eventData),
 			'caption': replacePlaceholders(message.caption, eventData),
 			'source': data.source
@@ -654,7 +654,7 @@ function replacePlaceholders(message, data)
 			message = message.replace(RegExp('%' + variable + '%', 'gi'), tmp[path]);
 	}
 	
-	return message;
+	return message.replace(/ /g, '');
 }
 
 /**

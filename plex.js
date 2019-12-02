@@ -92,6 +92,8 @@ function startAdapter(options)
 		
 		// Secure connection
 		REQUEST_OPTIONS.secureConnection = false;
+		REQUEST_OPTIONS._protocol = 'http:';
+		
 		if (adapter.config.secureConnection)
 		{
 			adapter.log.info('Establishing secure connection to Plex Media Server...');

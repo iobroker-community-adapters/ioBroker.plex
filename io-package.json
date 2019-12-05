@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "plex",
-        "version": "0.8.7",
+        "version": "0.8.8",
         "title": "Plex Media Server",
         "desc": {
             "en": "Integration of your Plex Media Server and your Tautulli",

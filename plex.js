@@ -213,8 +213,8 @@ function startAdapter(options)
 			let libId = id.substring(id.indexOf('libraries.')+10, id.indexOf('-'));
 			let options = {
 				...REQUEST_OPTIONS,
+				'url': REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1',
 				'method': 'POST',
-				'url': REQUEST_OPTIONS.protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1',
 				'headers': {
 					'X-Plex-Token': adapter.config.plexToken
 				}
@@ -241,8 +241,8 @@ function startAdapter(options)
 			
 			path.splice(-1);
 			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
-			let playerIp = library.getDeviceState(path.join('.') + '._Controls.remotePlayer') ? library.getDeviceState(path.join('.') + '.Player.publicAddress') : library.getDeviceState(path.join('.') + '.Player.localaddress');
-			let playerPort = library.getDeviceState(path.join('.') + '._Controls.remotePlayer') ? adapter.config.remotePort : library.getDeviceState(path.join('.') + '.Player.port');
+			let playerIp = library.getDeviceState(path.join('.') + '.Player.localAddress');
+			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
 			
 			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
 			{
@@ -253,7 +253,7 @@ function startAdapter(options)
 				let options = {
 					...REQUEST_OPTIONS,
 					'method': 'POST',
-					'url': REQUEST_OPTIONS.protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
+					'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
 					'headers': {
 						'X-Plex-Token': adapter.config.plexToken,
 						'X-Plex-Target-Client-Identifier': playerIdentifier
@@ -919,7 +919,8 @@ function getUsers()
 		
 		data.forEach(entry =>
 		{
-			let userId = library.clean(entry['username'], true);
+			entry['username'] = entry['username'] || entry['email'] || entry['user_id'];
+			let userId = library.clean(entry['username'], true).replace(/./g, '');
 			if (userId === 'local') return;
 			
 			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, entry['username'])}, '');
@@ -1072,7 +1073,7 @@ function getPlayers()
 			
 			let controls = '_playing.' + groupBy + '._Controls';
 			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
-			library.set({node: controls + '.remotePlayer', role: 'switch', type: 'boolean', description: 'Use remote/public instead of local player IP'}, false);
+			//library.set({node: controls + '.remotePlayer', role: 'switch', type: 'boolean', write: true, description: 'Use remote/public instead of local player IP'}, false);
 			
 			player.protocolCapabilities.split(',').forEach(mode => // e.g. "timeline,playback,navigation,mirror,playqueues"
 			{

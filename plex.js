@@ -418,7 +418,7 @@ function init()
 			if (err.message.indexOf('EHOSTUNREACH') > -1)
 			{
 				adapter.config.retry = 60;
-				adapter.log.error('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
+				adapter.log.warn('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
 				
 				library.set(Library.CONNECTION, false);
 				retryCycle = setTimeout(init, adapter.config.retry*60*1000);
@@ -656,7 +656,7 @@ function replacePlaceholders(message, data)
 			message = message.replace(RegExp('%' + variable + '%', 'gi'), tmp[path]);
 	}
 	
-	return message.replace(/ /g, '');
+	return message; // .replace(/ /g, '');
 }
 
 /**
@@ -919,11 +919,11 @@ function getUsers()
 		
 		data.forEach(entry =>
 		{
-			entry['username'] = entry['username'] || entry['email'] || entry['user_id'];
-			let userId = library.clean(entry['username'], true).replace(/./g, '');
+			let userName = entry['username'] || entry['friendly_name'] || entry['email'] || entry['user_id'];
+			let userId = library.clean(userName, true).replace(/\./g, '');
 			if (userId === 'local') return;
 			
-			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, entry['username'])}, '');
+			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, userName)}, '');
 			
 			// index all keys as states
 			for (let key in entry)
@@ -940,10 +940,10 @@ function getUsers()
 				tautulli.get('get_user_watch_time_stats', {'user_id': entry['user_id']}).then(res =>
 				{
 					if (!is(res)) return; else data = res.response.data || [];
-					adapter.log.debug('Retrieved Watch Statistics for User ' + entry['username'] + ' from Tautulli.');
+					adapter.log.debug('Retrieved Watch Statistics for User ' + userName + ' from Tautulli.');
 					
 					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, '')}, '');
-					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, entry['username'])}, '');
+					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, userName)}, '');
 					
 					data.forEach((entry, i) =>
 					{

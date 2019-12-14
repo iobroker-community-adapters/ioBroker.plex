@@ -51,7 +51,7 @@ You may copy the following example into Tautulli to have a full detailed payload
 		"lastViewedAt":"{last_viewed_date}",
 		"year":"{year}",
 		"tagline":"{tagline}",
-		"thumb":"{thumb}",
+		"thumb":"<movie>{thumb}</movie><show>{grandparent_thumb}</show><artist>{grandparent_thumb}</artist>",
 		"art":"undefined",
 		"duration":"{duration}",
 		"originallyAvailableAt":"{release_date}",

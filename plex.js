@@ -436,6 +436,12 @@ function setEvent(data, source, prefix)
 {
 	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
+	// empty payload
+	if (Object.keys(data).length === 0 || !data['event']) {
+		adapter.log.warn('Empty payload received from ' + source + '! Please go to ' + source + ' and configure payload!');
+		return false;
+	}
+	
 	// add meta data
 	data.media = data.Metadata && data.Metadata.type;
 	data.player = data.Player && data.Player.title;
@@ -447,16 +453,21 @@ function setEvent(data, source, prefix)
 	// PLAYING
 	if (prefix == '_playing')
 	{
+		// update latest player
+		if (data.Player && data.Player.title != '_recent') {
+			setEvent({ ...data, 'Player': { 'title': '_recent', 'uuid': 'player' } }, source, prefix);
+		}
+		
 		// group by player
 		data.Player = data.Player !== undefined ? data.Player : {};
-		let groupBy = data.Player.title && data.Player.uuid ? library.clean(data.Player.title, true) + '-' + data.Player.uuid : 'unknown';
+		let groupBy = data.Player.title && data.Player.uuid !== undefined ? library.clean(data.Player.title, true) + '-' + data.Player.uuid : 'unknown';
 		
 		// channel by player
 		library.set({node: prefix, role: 'channel', description: 'Plex Players'});
 		library.set({node: prefix + '.' + groupBy, role: 'channel', description: 'Player ' + (data.Player.title || 'unknown')});
 		
 		// index current playing players
-		if (data.event && data.Player && data.Player.title)
+		if (data.event && data.Player && data.Player.title != '_recent')
 		{
 			if (['media.play', 'media.resume'].indexOf(data.event) > -1)
 			{
@@ -474,8 +485,9 @@ function setEvent(data, source, prefix)
 		}
 		
 		// add player controls
-		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1)
+		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
+		}
 		
 		// adapt prefix
 		prefix = prefix + '.' + groupBy;
@@ -493,7 +505,7 @@ function setEvent(data, source, prefix)
 		let message = notifications[data.media] && notifications[data.media][event] ||
 						notifications['any'] && notifications['any'][event] ||
 						notifications[data.media] && notifications[data.media]['any'] ||
-						notifications['any']['any'] ||
+						notifications['any'] && notifications['any']['any'] ||
 						{ 'message': '', 'caption': '', 'thumb': '' };
 		
 		// structure event
@@ -520,12 +532,14 @@ function setEvent(data, source, prefix)
 	}
 	
 	// write states
-	for (let key in data)
+	for (let key in data) {
 		readData(prefix + '.' + key, data[key], prefix);
+	}
 	
 	// cleanup old states when playing something new
-	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play')
+	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play') {
 		library.runGarbageCollector(prefix, false, 30, ['_Controls']);
+	}
 }
 
 /**

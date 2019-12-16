@@ -33,8 +33,10 @@ You may copy the following example into Tautulli to have a full detailed payload
 		"uuid":"{machine_id}"
 	},
 	"Metadata":{
-		"librarySectionType":"undefined",
+		"librarySectionType":"{media_type}",
 		"ratingKey":"{rating_key}",
+		"parentRatingKey":"{parent_rating_key}",
+		"grandparentRatingKey":"{grandparent_rating_key}",
 		"key":"/library/metadata/{rating_key}",
 		"guid":"com.plexapp.agents.imdb://{imdb_id}?lang=en",
 		"librarySectionTitle":"{library_name}",
@@ -43,6 +45,8 @@ You may copy the following example into Tautulli to have a full detailed payload
 		"studio":"{studio}",
 		"type":"{media_type}",
 		"title":"{title}",
+		"grandparentTitle":"<show>{show_name}</show><artist>{artist_name}</artist>",
+		"parentTitle":"<show>{show_name}</show><artist>{artist_name}</artist>",
 		"titleSort":"undefined",
 		"contentRating":"{content_rating}",
 		"summary":"{summary}",
@@ -51,7 +55,10 @@ You may copy the following example into Tautulli to have a full detailed payload
 		"lastViewedAt":"{last_viewed_date}",
 		"year":"{year}",
 		"tagline":"{tagline}",
-		"thumb":"<movie>{thumb}</movie><show>{grandparent_thumb}</show><artist>{grandparent_thumb}</artist>",
+		"thumb":"<movie>{thumb}</movie><show>{grandparent_thumb}</show><season>{grandparent_thumb}</season><episode>{grandparent_thumb}</episode><artist>{grandparent_thumb}</artist><album>{grandparent_thumb}</album><track>{grandparent_thumb}</track>",
+		"parentThumb":"{parent_thumb}",
+		"grandparentThumb":"{grandparent_thumb}",
+		"posterThumb":"{poster_thumb}",
 		"art":"undefined",
 		"duration":"{duration}",
 		"originallyAvailableAt":"{release_date}",
@@ -208,16 +215,11 @@ This notification is __not__ recommended to use.
 ### Watched
 ```
 {
-	"event":"media.scrobble"
-	
+	"event":"media.scrobble",
 	"Metadata":{
 		"title":"{title}",
 		"librarySectionTitle":"{library_name}"
 	}
-	
-	%Metadata.title% (%Metadata.year%) watched
-
-tautulli | Played by %Account.title% on %Player.title%
 }
 ```
 

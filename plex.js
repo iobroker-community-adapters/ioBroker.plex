@@ -94,7 +94,7 @@ function startAdapter(options)
 		REQUEST_OPTIONS.secureConnection = false;
 		REQUEST_OPTIONS._protocol = 'http:';
 		
-		if (adapter.config.secureConnection)
+		if (adapter.config.secureConnection && adapter.config.certPublicVal && adapter.config.certPrivateVal)
 		{
 			adapter.log.info('Establishing secure connection to Plex Media Server...');
 			
@@ -102,22 +102,24 @@ function startAdapter(options)
 			{
 				REQUEST_OPTIONS = {
 					...REQUEST_OPTIONS,
-					'cert': _fs.readFileSync(adapter.config.certPublicPath),
-					'key': _fs.readFileSync(adapter.config.certPrivatePath),
+					'cert': adapter.config.certPublicVal.indexOf('.') === -1 ? adapter.config.certPublicVal : _fs.readFileSync(adapter.config.certPublicVal),
+					'key': adapter.config.certPrivateVal.indexOf('.') === -1 ? adapter.config.certPrivateVal : _fs.readFileSync(adapter.config.certPrivateVal),
 					'rejectUnauthorized': false,
 					'secureConnection': true,
 					'_protocol': 'https:'
 				};
 				
-				if (adapter.config.certChainedPath)
-					REQUEST_OPTIONS.ca = _fs.readFileSync(adapter.config.certChainedPath);
+				if (adapter.config.certChainedVal) {
+					REQUEST_OPTIONS.ca = adapter.config.certChainedVal.indexOf('.') === -1 ? adapter.config.certChainedVal : _fs.readFileSync(adapter.config.certChainedVal);
+				}
 				
-				if (REQUEST_OPTIONS.key.indexOf('ENCRYPTED') > -1)
+				if (REQUEST_OPTIONS.key.indexOf('ENCRYPTED') > -1) {
 					REQUEST_OPTIONS.passphrase = adapter.config.passphrase;
+				}
 			}
 			catch(err)
 			{
-				adapter.log.warn('Failed loading certificates!');
+				adapter.log.warn('Failed loading certificates! Falling back to insecure connection to Plex Media Server...');
 				adapter.log.debug(err.message);
 				
 				REQUEST_OPTIONS.secureConnection = false;
@@ -340,6 +342,9 @@ function startAdapter(options)
 			unloaded = true;
 			clearTimeout(retryCycle);
 			clearTimeout(refreshCycle);
+			if (_http) {
+				_http.close(() => adapter.log.debug('Server for listener closed.'));
+			}
 			
 			callback();
 		}

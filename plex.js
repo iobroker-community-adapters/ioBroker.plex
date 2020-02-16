@@ -117,6 +117,9 @@ function startAdapter(options)
 			}
 			catch(err)
 			{
+				adapter.log.warn('Failed loading certificates!');
+				adapter.log.debug(err.message);
+				
 				REQUEST_OPTIONS.secureConnection = false;
 				REQUEST_OPTIONS._protocol = 'http:';
 			}
@@ -413,12 +416,14 @@ function init()
 		})
 		.catch(err =>
 		{
-			adapter.log.debug(err.stack);
+			adapter.log.debug('Configuration: ' + JSON.stringify(adapter.config));
+			adapter.log.debug('Request-Options: ' + JSON.stringify(REQUEST_OPTIONS));
+			adapter.log.debug('Stack-Trace: ' + JSON.stringify(err.stack));
 			
 			if (err.message.indexOf('EHOSTUNREACH') > -1)
 			{
 				adapter.config.retry = 60;
-				adapter.log.warn('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
+				adapter.log.info('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
 				
 				library.set(Library.CONNECTION, false);
 				retryCycle = setTimeout(init, adapter.config.retry*60*1000);
@@ -449,6 +454,7 @@ function setEvent(data, source, prefix)
 	data.source = source;
 	data.timestamp = Math.floor(Date.now()/1000);
 	data.datetime = library.getDateTime(Date.now());
+	data.playing = data.event.indexOf('play') > -1 || data.event.indexOf('resume') > -1;
 	
 	// PLAYING
 	if (prefix == '_playing')

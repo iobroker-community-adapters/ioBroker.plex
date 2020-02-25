@@ -157,18 +157,19 @@ function startAdapter(options)
 		});
 		
 		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
-		adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) =>
-		{
+		adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) => {
 			library.set(Library.CONNECTION, true);
 			
 			// set current states from objects
-			for (let state in states)
-			{
-				library.setDeviceState(state.replace(adapter.name + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
-			
-				// set history
-				if (state.indexOf('events.history') > -1)
-					history = JSON.parse(states[state].val);
+			for (let state in states) {
+				if (states[state] !== null) {
+					library.setDeviceState(state.replace(adapter.name + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+				
+					// set history
+					if (state.indexOf('events.history') > -1) {
+						history = JSON.parse(states[state].val);
+					}
+				}
 			}
 			
 			// empty _playing on start
@@ -337,15 +338,13 @@ function startAdapter(options)
 	{
 		try
 		{
-			adapter.log.info('Adapter stopped und unloaded.');
+			adapter.log.info('Plex Adapter stopped und unloaded.');
 			
 			unloaded = true;
+			
+			_http.close(() => adapter.log.debug('Server for listener closed.'));
 			clearTimeout(retryCycle);
 			clearTimeout(refreshCycle);
-			if (_http) {
-				_http.close(() => adapter.log.debug('Server for listener closed.'));
-			}
-			
 			callback();
 		}
 		catch(e)

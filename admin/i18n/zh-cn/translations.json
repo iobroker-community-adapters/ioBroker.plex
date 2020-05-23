@@ -82,5 +82,7 @@
     "tautulliIp": "IP地址",
     "tautulliPort": "口",
     "tautulliToken": "API令牌",
+    "webhookIp": "两者的Ip",
+    "webhookIpInfo": "两者回Ip，只，如果丛运行在Docker",
     "webhookPort": "两者口"
 }

@@ -149,7 +149,8 @@
                 "name": "Zefau",
                 "email": "zefau@mailbox.org"
             }
-        ]
+        ],
+        "installedFrom": "iobroker.plex@0.8.11"
     },
     "native": {
         "getServers": true,

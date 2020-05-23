@@ -8,7 +8,7 @@ const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');
 const _request = require('request-promise');
-const _uuid = require('uuid/v1');
+const { v1: uuid } = require('uuid');
 
 const Plex = require('plex-api');
 const Tautulli = require('tautulli-api');
@@ -1187,7 +1187,7 @@ function startListener()
 		}
 	});
 	
-	_http.listen(adapter.config.port || 41891);
+	_http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
 }
 
 /*

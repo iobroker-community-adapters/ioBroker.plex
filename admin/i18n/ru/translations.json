@@ -82,5 +82,7 @@
     "tautulliIp": "IP-адрес",
     "tautulliPort": "Порт",
     "tautulliToken": "Токен API ",
+    "webhookIp": "Веб-Перехватчик ИС",
+    "webhookIpInfo": "Веб-перехватчика обратного вызова ИС, только, если Плекс работает в Докер",
     "webhookPort": "Порт Веб-Перехватчик "
 }

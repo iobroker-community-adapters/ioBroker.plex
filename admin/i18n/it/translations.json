@@ -82,5 +82,7 @@
     "tautulliIp": "Indirizzo IP",
     "tautulliPort": "Porta",
     "tautulliToken": "API Token",
+    "webhookIp": "Webhook Ip",
+    "webhookIpInfo": "Webhook Richiamata Ip, SOLO, se Plex è in esecuzione in finestra Mobile",
     "webhookPort": "Webhook Porta"
 }

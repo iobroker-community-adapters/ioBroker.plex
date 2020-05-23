@@ -82,5 +82,7 @@
     "tautulliIp": "Adres IP",
     "tautulliPort": "Port",
     "tautulliToken": "Token API ",
+    "webhookIp": "Strony Pościgowa IZ",
+    "webhookIpInfo": "Web przechwytujący oddzwonienia IP, tylko, jeśli plex dnia pracuje w Docker",
     "webhookPort": "Port Web-Pościgowa "
 }

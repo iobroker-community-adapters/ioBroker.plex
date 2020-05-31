@@ -1,343 +1,348 @@
 {
-    "common": {
-        "name": "plex",
-        "version": "0.9.0",
-        "title": "Plex Media Server",
-        "desc": {
-            "en": "Integration of your Plex Media Server and your Tautulli",
-            "de": "Integration des Plex Media Servers und Tautulli",
-            "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
-            "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
-            "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
-            "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
-            "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
-            "es": "La integración de su Plex Media Server y / o su Tautulli",
-            "pl": "Integracja Plex media serwer i / lub Tautulli",
-            "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
-        },
-        "news": {
-            "0.6.0": {
-                "en": "- replaced password with token authentication",
-                "de": "- ersetzt Passwort-token-Authentifizierung",
-                "ru": "- заменить пароль с проверки подлинности на основе маркеров ",
-                "pt": "- substituiu a palavra-passe com o token de autenticação",
-                "nl": "- vervangen wachtwoord, token authenticatie",
-                "fr": "- remplacé le mot de passe avec un jeton d'authentification",
-                "it": "- sostituito la password con il token di autenticazione",
-                "es": "- reemplazar la contraseña con el token de autenticación",
-                "pl": "- wymienić hasło z uwierzytelniania na podstawie markerów ",
-                "zh-cn": "-替换密码和身份认证牌"
-            },
-            "0.5.0": {
-                "en": "- added support for Plex Notifications\n- added support for all Tautulli triggers\n- added Adapter Web Interface that shows the recent events",
-                "de": "- Unterstützung für Plex-Benachrichtigungen\n- Unterstützung Hinzugefügt für alle Tautulli Trigger\n- Adapter werden Web-Interface zeigt, dass die jüngsten Ereignisse",
-                "ru": "- добавлена поддержка для уведомления Плекс \n- добавлена поддержка для всех Tautulli триггеры\n- добавлен веб-интерфейс адаптера, который показывает последние события",
-                "pt": "- adicionado suporte para Plex Notificações\n- adicionado suporte para todos os Tautulli dispara\n- adicionado Adaptador de Interface Web, que mostra os últimos acontecimentos",
-                "nl": "- toegevoegde ondersteuning voor Plex Meldingen\n- toegevoegde ondersteuning voor alle Tautulli triggers\n- toegevoegd Adapter Web Interface toont de recente gebeurtenissen",
-                "fr": "- ajout du support pour les Plex Notifications\n- ajout du support pour tous les Tautulli déclencheurs\n- ajout de l'Adaptateur d'Interface Web qui affiche les événements récents",
-                "it": "- aggiunto il supporto per le Notifiche Plex\n- aggiunto il supporto per tutte Tautulli trigger\n- aggiunta la Scheda di Interfaccia Web che mostra le recenti eventi",
-                "es": "- añadido soporte para Plex Notificaciones\n- añadido soporte para todos los Tautulli desencadenantes\n- añadido Adaptador de Interfaz Web que muestra los últimos eventos",
-                "pl": "- dodano wsparcie dla powiadomień plex dnia \n- dodano wsparcie dla wszystkich Tautulli wyzwalacze\n- dodano interfejs www adaptera, który pokazuje najnowsze wydarzenia",
-                "zh-cn": "- 增加支持复杂的通知\n-增加支持所有Tautulli触发器\n-添加适配器的网络接口，显示最近发生的事件"
-            },
-            "0.4.3": {
-                "en": "- Performance improvements\n- added refresh button (to scan library files) to libraries",
-                "de": "- Performance-Verbesserungen\n- Hinzugefügt refresh-button (scan-Bibliothek-Dateien) an Bibliotheken",
-                "ru": "- Улучшения производительности \n- добавлена кнопка Обновить (для сканирования файлы библиотек) для библиотеки",
-                "pt": "- Melhorias de desempenho\n- adicionado botão de atualização (para digitalização de arquivos de biblioteca) para bibliotecas",
-                "nl": "- Performance verbeteringen\nde toegevoegde knop vernieuwen (om te scannen bibliotheek-bestanden) bibliotheken",
-                "fr": "- Améliorations des performances\n- ajout de bouton actualiser (scan des fichiers de la bibliothèque) pour les bibliothèques",
-                "it": "- Miglioramenti delle prestazioni\n- aggiunto il pulsante di aggiornamento (per la scansione di file di libreria) per le biblioteche",
-                "es": "- Mejoras de rendimiento\n- añadido botón de actualización (para escanear los archivos de la biblioteca) a las bibliotecas",
-                "pl": "- Poprawa wydajności \n- dodano przycisk Odśwież (do skanowania pliki bibliotek) dla biblioteki",
-                "zh-cn": "-性能的改进\n-补充刷新键(扫描文件)图书馆"
-            },
-            "0.4.0": {
-                "en": "- added playback control for players\n- added configuration options to only retrieve specific objects from Plex",
-                "de": "- Steuerung der Wiedergabe der Player\n- Optionen nur bestimmte Konfiguration von Plex abzurufen",
-                "ru": "- добавлено управление воспроизведением для игроков\n- добавлены параметры конфигурации для извлечения только определенных объектов из плекса",
-                "pt": "- adicionado controle de reprodução para os jogadores\n- adicionado opções de configuração para obter apenas os objetos específicos do Plex",
-                "nl": "- toegevoegd playback control voor spelers\nde toegevoegde configuratie opties om alleen het ophalen van specifieke objecten van Plex",
-                "fr": "- ajout de la lecture de contrôle pour les joueurs\n- ajout d'options de configuration pour récupérer uniquement les objets spécifiques de Plex",
-                "it": "- aggiunto controllo della riproduzione per i giocatori\n- aggiunte opzioni di configurazione per recuperare oggetti specifici da Plex",
-                "es": "- añadido control de reproducción para los jugadores\n- añadido opciones de configuración para recuperar sólo los objetos específicos de Plex",
-                "pl": "- dodano sterowanie odtwarzaniem dla graczy\n- dodano opcje konfiguracji w celu wyodrębnienia pewnych obiektów z plexus",
-                "zh-cn": "-增加播放控制的球员\n-增加配置选项只有检索的具体对象的复杂"
-            },
-            "0.3.2": {
-                "en": "- added file, streaming and transcoding information to Tautulli event\n- fixed bug when no playlists exist",
-                "de": "- Hinzugefügt file -, streaming-und transcoding-Informationen zu Tautulli Veranstaltung\n- behoben: Fehler, wenn keine Playlisten vorhanden sind",
-                "ru": "- добавлен файл, потоковая передача и перекодирование информации Tautulli событие\n- Исправлена ошибка, когда не существует плейлисты",
-                "pt": "- arquivo adicionado, a transmissão e a transcodificação de informações para Tautulli evento\n- corrigido o erro quando não existem listas de reprodução",
-                "nl": "- toegevoegde bestand, streaming en het transcoderen van informatie te Tautulli evenement\n- bug opgelost als er geen afspeellijsten bestaan",
-                "fr": "- ajout de fichiers, le streaming et le transcodage de l'information à Tautulli événement\n- correction d'un bug lorsque aucune liste de lecture existent",
-                "it": "- aggiunto il file, lo streaming e la transcodifica di informazioni per Tautulli evento\n- corretto il bug quando non esiste playlist",
-                "es": "- añadido archivo, de transmisión y de transcodificación de información para Tautulli evento\n- corregido un fallo cuando no existen listas de reproducción",
-                "pl": "- dodano plik, przesyłanie i transkodowanie informacji Tautulli wydarzenie\n- Naprawiono błąd, gdy nie istnieje playlisty",
-                "zh-cn": "-加入文件，流和代码转换信息Tautulli事件\n-固定错误时，没有存在的播放列表"
-            },
-            "0.3.1": {
-                "en": "- updated dependencies to fix security vulnerabilities in depending packages",
-                "de": "- Abhängigkeiten aktualisiert, um Sicherheitslücken in je-Pakete",
-                "ru": "- обновлены зависимости, чтобы исправить найденные уязвимости в зависимости от пакетов",
-                "pt": "- atualizado dependências para corrigir vulnerabilidades de segurança em pacotes de acordo",
-                "nl": "- bijgewerkt afhankelijkheden op te lossen beveiligingsproblemen in afhankelijk van pakketten",
-                "fr": "- mise à jour des dépendances à réparer les failles de sécurité en fonction des paquets",
-                "it": "- aggiornato dipendenze per risolvere vulnerabilità di sicurezza in base pacchetti",
-                "es": "- actualizado a las dependencias para corregir las vulnerabilidades de seguridad en función de los paquetes",
-                "pl": "- zaktualizowane zależności, aby naprawić znalezione luki w zależności od pakietów",
-                "zh-cn": "-更新的依赖关系，以解决安全漏洞，根据包"
-            },
-            "0.3.0": {
-                "en": "- updated testing for Node.js v12 (#6)\n- added support / discovery in iobroker.discovery (#62)\n- added playlists to states\n- added state description for object tree _playing\n- updated German translation (instead of generating it from English)",
-                "de": "- aktualisiert-Tests für Node.js v12 (#6)\n- Unterstützung / Entdeckung in iobroker.discovery (#62)\n- Hinzugefügt Wiedergabelisten Staaten\n- Hinzugefügt Staat Beschreibung für Objekt Baum _playing\n- Deutsche übersetzung überarbeitet (anstatt der Erzeugung aus dem englischen)",
-                "ru": "- обновленное тестирование Node.js В12 (#6)\n- добавлена поддержка / открытие в iobroker.открытие (#62)\n- добавлены плейлисты для государства\n- добавлена описание дерева объектов _playing\n- обновлен немецкий перевод (вместо того чтобы создавать его с английского)",
-                "pt": "- atualizado para testar Node.js v12 (#6)\n- adicionado suporte / descoberta em iobroker.descoberta (#62)\n- adicionado listas de reprodução para os estados\n- adicionado estado de descrição para o objeto árvore _playing\n- atualizado em tradução para o alemão (em vez de gerá-lo a partir do inglês)",
-                "nl": "- bijgewerkt testen voor Node.js v12 (#6)\n- toegevoegde ondersteuning / ontdekking in iobroker.discovery (#62)\n- toegevoegd afspeellijsten naar staten\n- toegevoegd staat de beschrijving voor het object boom _playing\n- bijgewerkt duitse vertaling (in plaats van het genereren uit het engels)",
-                "fr": "- mise à jour de test pour Node.js v12 (#6)\n- ajout du support / découverte à iobroker.de la découverte (n ° 62)\n- ajout de listes de lecture pour les états\n- ajout de description de l'état de l'objet de l'arbre _playing\n- mise à jour de la traduction en allemand (au lieu de générer de l'anglais)",
-                "it": "- aggiornati i test per Node.js v12 (#6)\n- aggiunto il supporto / scoperta in iobroker.scoperta (#62)\n- aggiunto playlist stati\n- aggiunta la descrizione dello stato per l'albero di oggetti _playing\n- aggiornata la traduzione in tedesco (invece di generare dall'inglese)",
-                "es": "- actualizados de las pruebas para Node.js v12 (#6)\n- añadido soporte / descubrimiento en iobroker.descubrimiento (#62)\n- añadido listas de reproducción a los estados\n- añadida la descripción de estado para el árbol de objetos _playing\n- actualizada la traducción al alemán (en lugar de la generación de inglés)",
-                "pl": "- aktualizacja testy Node.js B12 (#6)\n- dodano wsparcie / otwieranie w iobroker.otwieranie (#62)\n- dodane do listy odtwarzania dla państwa\n- dodano opis drzewa obiektów _playing\n- zaktualizowany tłumaczenie na niemiecki (zamiast tworzyć z języka angielskiego)",
-                "zh-cn": "-更新测试Node.js v12(第6条)\n-增加支助/发现在iobroker的。发现(#62)\n-增加国家的播放列表\n-加入状态描述为对象树_playing\n-更新的德语翻译(而不是产生从文)"
-            },
-            "0.2.0": {
-                "en": "- added authentication method (using Plex user and Plex password)\n- fixed @iobroker/adapter-core dependency",
-                "de": "- Hinzugefügt Authentifizierung-Methode (mit Plex-user und Plex Passwort)\n- fixed @iobroker/adapter-core-Abhängigkeit",
-                "ru": "- добавлен новый метод проверки подлинности (с помощью пользователя и пароля Плекс Плекс)\n- исправлена @iobroker/адаптер-основных зависимостей",
-                "pt": "- adicionado o método de autenticação (usando o Plex usuário e Plex senha)\n- fixo @iobroker/adaptador-núcleo de dependência",
-                "nl": "- toegevoegd authenticatie methode (het gebruik van Plex gebruiker en Plex wachtwoord)\n- vaste @iobroker/adapter-core afhankelijkheid",
-                "fr": "- ajout de la méthode d'authentification (à l'aide de Plex utilisateur et Plex mot de passe)\n- correction d' @iobroker/adaptateur-core dépendance",
-                "it": " aggiunto metodo di autenticazione (tramite Plex utente e Plex password)\n- fisso @iobroker/adattatore-core di dipendenza",
-                "es": " añadido método de autenticación (usando Plex usuario y Plex contraseña)\n- corregido @iobroker/adaptador de núcleo de dependencia",
-                "pl": "- dodano nową metodę uwierzytelniania za pomocą użytkownika i hasła plex dnia plex dnia)\n- naprawiono @iobroker/adapter-podstawowe zależności",
-                "zh-cn": "-加入认证方法(使用复杂的用户和复杂的密码)\n-固定@iobroker/器核的依赖"
-            },
-            "0.1.0": {
-                "en": "- get initial data from Plex API\n- receive events from Plex Webhook (Plex Pass only)\n- receive events from Tatulli (if used)",
-                "de": "- erste Daten aus Plex-API\n- Ereignisse empfangen, die von Plex Webhook (Plex Pass nur)\n- empfangen von Ereignissen vom Tatulli (falls verwendet)",
-                "ru": "- получить исходные данные от плекса по API\n- получать события от веб-перехватчик Плекс (Plex пасс только)\n- получать события от Tatulli (если используется)",
-                "pt": "- obter dados iniciais do Plex API\n- receber eventos do Plex Webhook (Plex Passar apenas)\n- receber eventos de Tatulli (se usado)",
-                "nl": "- de eerste gegevens van Plex API\n- ontvangen van gebeurtenissen uit Plex Webhook (Plex Pass)\n- ontvangen van gebeurtenissen uit Tatulli (indien gebruikt)",
-                "fr": "- obtenir des données initiales de Plex API\n- recevoir des événements de Plex Webhook (Plex Pass uniquement)\n- recevoir des événements de Tatulli (si utilisé)",
-                "it": "- ottenere i dati iniziali da Plex API\n- la ricezione di eventi da Plex Webhook (Plex Pass)\n- la ricezione di eventi da Tatulli (se usato)",
-                "es": "- obtener datos iniciales de Plex API\n- recibir eventos de Plex Webhook (Plex Pass solo)\n- recibir eventos de Tatulli (si se utiliza)",
-                "pl": "- zobacz dane źródłowe od plexus API\n- odbierać zdarzenia od strony pościgowa plex dnia (Plex pass tylko)\n- odbierać zdarzenia z Tatulli (jeśli jest używany)",
-                "zh-cn": "-得到最初的数据丛API\n-接收活动从丛两者(丛只通过)\n-接收活动从Tatulli(如果使用)"
-            }
-        },
-        "license": "MIT",
-        "platform": "Javascript/Node.js",
-        "mode": "daemon",
-        "icon": "plex.jpg",
-        "extIcon": "https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/admin/plex.jpg",
-        "keywords": [
-            "tautulli",
-            "plex",
-            "media"
-        ],
-        "readme": "https://github.com/Zefau/ioBroker.plex/blob/master/README.md",
-        "loglevel": "info",
-        "materialize": true,
-        "compact": true,
-        "enabled": true,
-        "localLink": "%web_protocol%://%ip%:%web_port%/plex/index.html",
-        "messagebox": true,
-        "subscribe": "messagebox",
-        "type": "multimedia",
-        "authors": [
-            {
-                "name": "Zefau",
-                "email": "zefau@mailbox.org"
-            }
-        ],
-        "installedFrom": "iobroker.plex@0.8.11"
+  "common": {
+    "name": "plex",
+    "version": "0.9.0",
+    "title": "Plex Media Server",
+    "desc": {
+      "en": "Integration of your Plex Media Server and your Tautulli",
+      "de": "Integration des Plex Media Servers und Tautulli",
+      "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
+      "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
+      "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
+      "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
+      "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
+      "es": "La integración de su Plex Media Server y / o su Tautulli",
+      "pl": "Integracja Plex media serwer i / lub Tautulli",
+      "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
     },
-    "native": {
-        "getServers": true,
-        "getLibraries": true,
-        "getAllItems": false,
-        "getUsers": false,
-        "getStatistics": false,
-        "getPlaylists": true,
-        "getSettings": true,
-        "notifications": [
-            {
-                "media": "any",
-                "event": "any",
-                "message": "No Message defined for media %Metadata.type% and event %event%",
-                "caption": "",
-                "thumb": ""
-            },
-            {
-                "media": "any",
-                "event": "media.play",
-                "message": "%Metadata.title% (%Metadata.year%) playing",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "media": "any",
-                "event": "media.pause",
-                "message": "%Metadata.title% (%Metadata.year%) paused",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "media": "any",
-                "event": "media.stop",
-                "message": "%Metadata.title% (%Metadata.year%) stopped",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "media": "any",
-                "event": "media.resume",
-                "message": "%Metadata.title% (%Metadata.year%) resumed",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "media": "any",
-                "event": "media.rate",
-                "message": "%Metadata.title% (%Metadata.year%) rated",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "media": "any",
-                "event": "media.watched",
-                "message": "%Metadata.title% (%Metadata.year%) watched",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "media": "episode",
-                "event": "media.play",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "media": "episode",
-                "event": "media.pause",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "media": "episode",
-                "event": "media.stop",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "media": "episode",
-                "event": "media.resume",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "media": "episode",
-                "event": "media.rate",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "media": "episode",
-                "event": "media.watched",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "media": "track",
-                "event": "media.play",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": ""
-            },
-            {
-                "media": "track",
-                "event": "media.pause",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": ""
-            },
-            {
-                "media": "track",
-                "event": "media.stop",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": ""
-            },
-            {
-                "media": "track",
-                "event": "media.resume",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": ""
-            },
-            {
-                "media": "track",
-                "event": "media.rate",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": ""
-            },
-            {
-                "media": "track",
-                "event": "media.watched",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
-                "caption": "Played by %Account.title% on %Player.title%",
-                "thumb": ""
-            },
-            {
-                "media": "system",
-                "event": "library.on.deck",
-                "message": "A new item is added that appears in the user’s On Deck.",
-                "caption": "",
-                "thumb": ""
-            },
-            {
-                "media": "system",
-                "event": "library.new",
-                "message": "A new item is added to a library.",
-                "caption": "",
-                "thumb": ""
-            },
-            {
-                "media": "system",
-                "event": "admin.database.backup",
-                "message": "A database backup is completed successfully via scheduled tasks.",
-                "caption": "",
-                "thumb": ""
-            },
-            {
-                "media": "system",
-                "event": "admin.database.corrupted",
-                "message": "Corruption is detected in the server database.",
-                "caption": "",
-                "thumb": ""
-            },
-            {
-                "media": "system",
-                "event": "device.new",
-                "message": "A new device is using the Plex Media Server.",
-                "caption": "",
-                "thumb": ""
-            },
-            {
-                "media": "system",
-                "event": "playback.started",
-                "message": "Playback is started by a shared user.",
-                "caption": "",
-                "thumb": ""
-            }
-        ]
+    "news": {
+      "0.9.0": {
+        "en": "- added option for webhook IP address in case Plex is running in a Docker environment\n- updated dependencies"
+      },
+      "0.8.11": {
+        "en": "- fixed error with state retrieval on startup when no states are given\n- updated dependencies"
+      },
+      "0.6.0": {
+        "en": "- replaced password with token authentication",
+        "de": "- ersetzt Passwort-token-Authentifizierung",
+        "ru": "- заменить пароль с проверки подлинности на основе маркеров ",
+        "pt": "- substituiu a palavra-passe com o token de autenticação",
+        "nl": "- vervangen wachtwoord, token authenticatie",
+        "fr": "- remplacé le mot de passe avec un jeton d'authentification",
+        "it": "- sostituito la password con il token di autenticazione",
+        "es": "- reemplazar la contraseña con el token de autenticación",
+        "pl": "- wymienić hasło z uwierzytelniania na podstawie markerów ",
+        "zh-cn": "-替换密码和身份认证牌"
+      },
+      "0.5.0": {
+        "en": "- added support for Plex Notifications\n- added support for all Tautulli triggers\n- added Adapter Web Interface that shows the recent events",
+        "de": "- Unterstützung für Plex-Benachrichtigungen\n- Unterstützung Hinzugefügt für alle Tautulli Trigger\n- Adapter werden Web-Interface zeigt, dass die jüngsten Ereignisse",
+        "ru": "- добавлена поддержка для уведомления Плекс \n- добавлена поддержка для всех Tautulli триггеры\n- добавлен веб-интерфейс адаптера, который показывает последние события",
+        "pt": "- adicionado suporte para Plex Notificações\n- adicionado suporte para todos os Tautulli dispara\n- adicionado Adaptador de Interface Web, que mostra os últimos acontecimentos",
+        "nl": "- toegevoegde ondersteuning voor Plex Meldingen\n- toegevoegde ondersteuning voor alle Tautulli triggers\n- toegevoegd Adapter Web Interface toont de recente gebeurtenissen",
+        "fr": "- ajout du support pour les Plex Notifications\n- ajout du support pour tous les Tautulli déclencheurs\n- ajout de l'Adaptateur d'Interface Web qui affiche les événements récents",
+        "it": "- aggiunto il supporto per le Notifiche Plex\n- aggiunto il supporto per tutte Tautulli trigger\n- aggiunta la Scheda di Interfaccia Web che mostra le recenti eventi",
+        "es": "- añadido soporte para Plex Notificaciones\n- añadido soporte para todos los Tautulli desencadenantes\n- añadido Adaptador de Interfaz Web que muestra los últimos eventos",
+        "pl": "- dodano wsparcie dla powiadomień plex dnia \n- dodano wsparcie dla wszystkich Tautulli wyzwalacze\n- dodano interfejs www adaptera, który pokazuje najnowsze wydarzenia",
+        "zh-cn": "- 增加支持复杂的通知\n-增加支持所有Tautulli触发器\n-添加适配器的网络接口，显示最近发生的事件"
+      },
+      "0.4.3": {
+        "en": "- Performance improvements\n- added refresh button (to scan library files) to libraries",
+        "de": "- Performance-Verbesserungen\n- Hinzugefügt refresh-button (scan-Bibliothek-Dateien) an Bibliotheken",
+        "ru": "- Улучшения производительности \n- добавлена кнопка Обновить (для сканирования файлы библиотек) для библиотеки",
+        "pt": "- Melhorias de desempenho\n- adicionado botão de atualização (para digitalização de arquivos de biblioteca) para bibliotecas",
+        "nl": "- Performance verbeteringen\nde toegevoegde knop vernieuwen (om te scannen bibliotheek-bestanden) bibliotheken",
+        "fr": "- Améliorations des performances\n- ajout de bouton actualiser (scan des fichiers de la bibliothèque) pour les bibliothèques",
+        "it": "- Miglioramenti delle prestazioni\n- aggiunto il pulsante di aggiornamento (per la scansione di file di libreria) per le biblioteche",
+        "es": "- Mejoras de rendimiento\n- añadido botón de actualización (para escanear los archivos de la biblioteca) a las bibliotecas",
+        "pl": "- Poprawa wydajności \n- dodano przycisk Odśwież (do skanowania pliki bibliotek) dla biblioteki",
+        "zh-cn": "-性能的改进\n-补充刷新键(扫描文件)图书馆"
+      },
+      "0.4.0": {
+        "en": "- added playback control for players\n- added configuration options to only retrieve specific objects from Plex",
+        "de": "- Steuerung der Wiedergabe der Player\n- Optionen nur bestimmte Konfiguration von Plex abzurufen",
+        "ru": "- добавлено управление воспроизведением для игроков\n- добавлены параметры конфигурации для извлечения только определенных объектов из плекса",
+        "pt": "- adicionado controle de reprodução para os jogadores\n- adicionado opções de configuração para obter apenas os objetos específicos do Plex",
+        "nl": "- toegevoegd playback control voor spelers\nde toegevoegde configuratie opties om alleen het ophalen van specifieke objecten van Plex",
+        "fr": "- ajout de la lecture de contrôle pour les joueurs\n- ajout d'options de configuration pour récupérer uniquement les objets spécifiques de Plex",
+        "it": "- aggiunto controllo della riproduzione per i giocatori\n- aggiunte opzioni di configurazione per recuperare oggetti specifici da Plex",
+        "es": "- añadido control de reproducción para los jugadores\n- añadido opciones de configuración para recuperar sólo los objetos específicos de Plex",
+        "pl": "- dodano sterowanie odtwarzaniem dla graczy\n- dodano opcje konfiguracji w celu wyodrębnienia pewnych obiektów z plexus",
+        "zh-cn": "-增加播放控制的球员\n-增加配置选项只有检索的具体对象的复杂"
+      },
+      "0.3.2": {
+        "en": "- added file, streaming and transcoding information to Tautulli event\n- fixed bug when no playlists exist",
+        "de": "- Hinzugefügt file -, streaming-und transcoding-Informationen zu Tautulli Veranstaltung\n- behoben: Fehler, wenn keine Playlisten vorhanden sind",
+        "ru": "- добавлен файл, потоковая передача и перекодирование информации Tautulli событие\n- Исправлена ошибка, когда не существует плейлисты",
+        "pt": "- arquivo adicionado, a transmissão e a transcodificação de informações para Tautulli evento\n- corrigido o erro quando não existem listas de reprodução",
+        "nl": "- toegevoegde bestand, streaming en het transcoderen van informatie te Tautulli evenement\n- bug opgelost als er geen afspeellijsten bestaan",
+        "fr": "- ajout de fichiers, le streaming et le transcodage de l'information à Tautulli événement\n- correction d'un bug lorsque aucune liste de lecture existent",
+        "it": "- aggiunto il file, lo streaming e la transcodifica di informazioni per Tautulli evento\n- corretto il bug quando non esiste playlist",
+        "es": "- añadido archivo, de transmisión y de transcodificación de información para Tautulli evento\n- corregido un fallo cuando no existen listas de reproducción",
+        "pl": "- dodano plik, przesyłanie i transkodowanie informacji Tautulli wydarzenie\n- Naprawiono błąd, gdy nie istnieje playlisty",
+        "zh-cn": "-加入文件，流和代码转换信息Tautulli事件\n-固定错误时，没有存在的播放列表"
+      },
+      "0.3.1": {
+        "en": "- updated dependencies to fix security vulnerabilities in depending packages",
+        "de": "- Abhängigkeiten aktualisiert, um Sicherheitslücken in je-Pakete",
+        "ru": "- обновлены зависимости, чтобы исправить найденные уязвимости в зависимости от пакетов",
+        "pt": "- atualizado dependências para corrigir vulnerabilidades de segurança em pacotes de acordo",
+        "nl": "- bijgewerkt afhankelijkheden op te lossen beveiligingsproblemen in afhankelijk van pakketten",
+        "fr": "- mise à jour des dépendances à réparer les failles de sécurité en fonction des paquets",
+        "it": "- aggiornato dipendenze per risolvere vulnerabilità di sicurezza in base pacchetti",
+        "es": "- actualizado a las dependencias para corregir las vulnerabilidades de seguridad en función de los paquetes",
+        "pl": "- zaktualizowane zależności, aby naprawić znalezione luki w zależności od pakietów",
+        "zh-cn": "-更新的依赖关系，以解决安全漏洞，根据包"
+      },
+      "0.3.0": {
+        "en": "- updated testing for Node.js v12 (#6)\n- added support / discovery in iobroker.discovery (#62)\n- added playlists to states\n- added state description for object tree _playing\n- updated German translation (instead of generating it from English)",
+        "de": "- aktualisiert-Tests für Node.js v12 (#6)\n- Unterstützung / Entdeckung in iobroker.discovery (#62)\n- Hinzugefügt Wiedergabelisten Staaten\n- Hinzugefügt Staat Beschreibung für Objekt Baum _playing\n- Deutsche übersetzung überarbeitet (anstatt der Erzeugung aus dem englischen)",
+        "ru": "- обновленное тестирование Node.js В12 (#6)\n- добавлена поддержка / открытие в iobroker.открытие (#62)\n- добавлены плейлисты для государства\n- добавлена описание дерева объектов _playing\n- обновлен немецкий перевод (вместо того чтобы создавать его с английского)",
+        "pt": "- atualizado para testar Node.js v12 (#6)\n- adicionado suporte / descoberta em iobroker.descoberta (#62)\n- adicionado listas de reprodução para os estados\n- adicionado estado de descrição para o objeto árvore _playing\n- atualizado em tradução para o alemão (em vez de gerá-lo a partir do inglês)",
+        "nl": "- bijgewerkt testen voor Node.js v12 (#6)\n- toegevoegde ondersteuning / ontdekking in iobroker.discovery (#62)\n- toegevoegd afspeellijsten naar staten\n- toegevoegd staat de beschrijving voor het object boom _playing\n- bijgewerkt duitse vertaling (in plaats van het genereren uit het engels)",
+        "fr": "- mise à jour de test pour Node.js v12 (#6)\n- ajout du support / découverte à iobroker.de la découverte (n ° 62)\n- ajout de listes de lecture pour les états\n- ajout de description de l'état de l'objet de l'arbre _playing\n- mise à jour de la traduction en allemand (au lieu de générer de l'anglais)",
+        "it": "- aggiornati i test per Node.js v12 (#6)\n- aggiunto il supporto / scoperta in iobroker.scoperta (#62)\n- aggiunto playlist stati\n- aggiunta la descrizione dello stato per l'albero di oggetti _playing\n- aggiornata la traduzione in tedesco (invece di generare dall'inglese)",
+        "es": "- actualizados de las pruebas para Node.js v12 (#6)\n- añadido soporte / descubrimiento en iobroker.descubrimiento (#62)\n- añadido listas de reproducción a los estados\n- añadida la descripción de estado para el árbol de objetos _playing\n- actualizada la traducción al alemán (en lugar de la generación de inglés)",
+        "pl": "- aktualizacja testy Node.js B12 (#6)\n- dodano wsparcie / otwieranie w iobroker.otwieranie (#62)\n- dodane do listy odtwarzania dla państwa\n- dodano opis drzewa obiektów _playing\n- zaktualizowany tłumaczenie na niemiecki (zamiast tworzyć z języka angielskiego)",
+        "zh-cn": "-更新测试Node.js v12(第6条)\n-增加支助/发现在iobroker的。发现(#62)\n-增加国家的播放列表\n-加入状态描述为对象树_playing\n-更新的德语翻译(而不是产生从文)"
+      },
+      "0.2.0": {
+        "en": "- added authentication method (using Plex user and Plex password)\n- fixed @iobroker/adapter-core dependency",
+        "de": "- Hinzugefügt Authentifizierung-Methode (mit Plex-user und Plex Passwort)\n- fixed @iobroker/adapter-core-Abhängigkeit",
+        "ru": "- добавлен новый метод проверки подлинности (с помощью пользователя и пароля Плекс Плекс)\n- исправлена @iobroker/адаптер-основных зависимостей",
+        "pt": "- adicionado o método de autenticação (usando o Plex usuário e Plex senha)\n- fixo @iobroker/adaptador-núcleo de dependência",
+        "nl": "- toegevoegd authenticatie methode (het gebruik van Plex gebruiker en Plex wachtwoord)\n- vaste @iobroker/adapter-core afhankelijkheid",
+        "fr": "- ajout de la méthode d'authentification (à l'aide de Plex utilisateur et Plex mot de passe)\n- correction d' @iobroker/adaptateur-core dépendance",
+        "it": " aggiunto metodo di autenticazione (tramite Plex utente e Plex password)\n- fisso @iobroker/adattatore-core di dipendenza",
+        "es": " añadido método de autenticación (usando Plex usuario y Plex contraseña)\n- corregido @iobroker/adaptador de núcleo de dependencia",
+        "pl": "- dodano nową metodę uwierzytelniania za pomocą użytkownika i hasła plex dnia plex dnia)\n- naprawiono @iobroker/adapter-podstawowe zależności",
+        "zh-cn": "-加入认证方法(使用复杂的用户和复杂的密码)\n-固定@iobroker/器核的依赖"
+      },
+      "0.1.0": {
+        "en": "- get initial data from Plex API\n- receive events from Plex Webhook (Plex Pass only)\n- receive events from Tatulli (if used)",
+        "de": "- erste Daten aus Plex-API\n- Ereignisse empfangen, die von Plex Webhook (Plex Pass nur)\n- empfangen von Ereignissen vom Tatulli (falls verwendet)",
+        "ru": "- получить исходные данные от плекса по API\n- получать события от веб-перехватчик Плекс (Plex пасс только)\n- получать события от Tatulli (если используется)",
+        "pt": "- obter dados iniciais do Plex API\n- receber eventos do Plex Webhook (Plex Passar apenas)\n- receber eventos de Tatulli (se usado)",
+        "nl": "- de eerste gegevens van Plex API\n- ontvangen van gebeurtenissen uit Plex Webhook (Plex Pass)\n- ontvangen van gebeurtenissen uit Tatulli (indien gebruikt)",
+        "fr": "- obtenir des données initiales de Plex API\n- recevoir des événements de Plex Webhook (Plex Pass uniquement)\n- recevoir des événements de Tatulli (si utilisé)",
+        "it": "- ottenere i dati iniziali da Plex API\n- la ricezione di eventi da Plex Webhook (Plex Pass)\n- la ricezione di eventi da Tatulli (se usato)",
+        "es": "- obtener datos iniciales de Plex API\n- recibir eventos de Plex Webhook (Plex Pass solo)\n- recibir eventos de Tatulli (si se utiliza)",
+        "pl": "- zobacz dane źródłowe od plexus API\n- odbierać zdarzenia od strony pościgowa plex dnia (Plex pass tylko)\n- odbierać zdarzenia z Tatulli (jeśli jest używany)",
+        "zh-cn": "-得到最初的数据丛API\n-接收活动从丛两者(丛只通过)\n-接收活动从Tatulli(如果使用)"
+      }
     },
-    "objects": [],
-    "instanceObjects": []
+    "license": "MIT",
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "icon": "plex.jpg",
+    "extIcon": "https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/admin/plex.jpg",
+    "keywords": [
+      "tautulli",
+      "plex",
+      "media"
+    ],
+    "readme": "https://github.com/Zefau/ioBroker.plex/blob/master/README.md",
+    "loglevel": "info",
+    "materialize": true,
+    "compact": true,
+    "enabled": true,
+    "localLink": "%web_protocol%://%ip%:%web_port%/plex/index.html",
+    "messagebox": true,
+    "subscribe": "messagebox",
+    "type": "multimedia",
+    "authors": [
+      {
+        "name": "Zefau",
+        "email": "zefau@mailbox.org"
+      }
+    ]
+  },
+  "native": {
+    "getServers": true,
+    "getLibraries": true,
+    "getAllItems": false,
+    "getUsers": false,
+    "getStatistics": false,
+    "getPlaylists": true,
+    "getSettings": true,
+    "notifications": [
+      {
+        "media": "any",
+        "event": "any",
+        "message": "No Message defined for media %Metadata.type% and event %event%",
+        "caption": "",
+        "thumb": ""
+      },
+      {
+        "media": "any",
+        "event": "media.play",
+        "message": "%Metadata.title% (%Metadata.year%) playing",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "media": "any",
+        "event": "media.pause",
+        "message": "%Metadata.title% (%Metadata.year%) paused",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "media": "any",
+        "event": "media.stop",
+        "message": "%Metadata.title% (%Metadata.year%) stopped",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "media": "any",
+        "event": "media.resume",
+        "message": "%Metadata.title% (%Metadata.year%) resumed",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "media": "any",
+        "event": "media.rate",
+        "message": "%Metadata.title% (%Metadata.year%) rated",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "media": "any",
+        "event": "media.watched",
+        "message": "%Metadata.title% (%Metadata.year%) watched",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "media": "episode",
+        "event": "media.play",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "media": "episode",
+        "event": "media.pause",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "media": "episode",
+        "event": "media.stop",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "media": "episode",
+        "event": "media.resume",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "media": "episode",
+        "event": "media.rate",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "media": "episode",
+        "event": "media.watched",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "media": "track",
+        "event": "media.play",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": ""
+      },
+      {
+        "media": "track",
+        "event": "media.pause",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": ""
+      },
+      {
+        "media": "track",
+        "event": "media.stop",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": ""
+      },
+      {
+        "media": "track",
+        "event": "media.resume",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": ""
+      },
+      {
+        "media": "track",
+        "event": "media.rate",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": ""
+      },
+      {
+        "media": "track",
+        "event": "media.watched",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
+        "caption": "Played by %Account.title% on %Player.title%",
+        "thumb": ""
+      },
+      {
+        "media": "system",
+        "event": "library.on.deck",
+        "message": "A new item is added that appears in the user’s On Deck.",
+        "caption": "",
+        "thumb": ""
+      },
+      {
+        "media": "system",
+        "event": "library.new",
+        "message": "A new item is added to a library.",
+        "caption": "",
+        "thumb": ""
+      },
+      {
+        "media": "system",
+        "event": "admin.database.backup",
+        "message": "A database backup is completed successfully via scheduled tasks.",
+        "caption": "",
+        "thumb": ""
+      },
+      {
+        "media": "system",
+        "event": "admin.database.corrupted",
+        "message": "Corruption is detected in the server database.",
+        "caption": "",
+        "thumb": ""
+      },
+      {
+        "media": "system",
+        "event": "device.new",
+        "message": "A new device is using the Plex Media Server.",
+        "caption": "",
+        "thumb": ""
+      },
+      {
+        "media": "system",
+        "event": "playback.started",
+        "message": "Playback is started by a shared user.",
+        "caption": "",
+        "thumb": ""
+      }
+    ]
+  },
+  "objects": [],
+  "instanceObjects": []
 }

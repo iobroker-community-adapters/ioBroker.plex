@@ -48,7 +48,7 @@
     "plex-api": "^5.3.1",
     "request-promise": "^4.2.5",
     "tautulli-api": "^1.0.2",
-    "uuid": "^7.0.1"
+    "uuid": "^8.3.0"
   },
   "deprecated": false,
   "description": "Integration of your Plex Media Server and / or your Tautulli",

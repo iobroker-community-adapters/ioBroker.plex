@@ -8,7 +8,7 @@ const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');
 const _request = require('request-promise');
-const { v1: uuid } = require('uuid');
+const { v1: _uuid } = require('uuid');
 
 const Plex = require('plex-api');
 const Tautulli = require('tautulli-api');

@@ -3,6 +3,18 @@
     "name": "plex",
     "version": "0.9.1",
     "title": "Plex Media Server",
+    "titleLang": {
+      "en": "Plex Media Server",
+      "de": "Plex Media Server",
+      "ru": "Plex Media Server",
+      "pt": "Plex Media Server",
+      "nl": "Plex Media Server",
+      "fr": "Plex Media Server",
+      "it": "Plex Media Server",
+      "es": "Plex Media Server",
+      "pl": "Plex Media Server",
+      "zh-cn": "Plex Media Server"
+    },
     "desc": {
       "en": "Integration of your Plex Media Server and your Tautulli",
       "de": "Integration des Plex Media Servers und Tautulli",

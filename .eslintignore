@@ -1,2 +1,4 @@
 **/.eslintrc.js
 admin/words.js
+_*.js
+www/**

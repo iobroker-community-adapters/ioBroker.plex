@@ -1,3 +1,7 @@
 /node_modules
 /.idea
 /tmp
+
+
+# ioBroker dev-server
+.dev-server/

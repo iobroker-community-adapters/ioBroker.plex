@@ -12,6 +12,7 @@ const { v1: _uuid } = require('uuid');
 
 const Plex = require('plex-api');
 const Tautulli = require('tautulli-api');
+const { log } = require('console');
 
 
 /*
@@ -576,7 +577,7 @@ function readData(key, data, prefix, properties)
 				library.set(
 					{
 						'node': key,
-						'type':  node.type,
+						'type': node.type,
 						'role': node.role,
 						'description': node.description
 					},
@@ -635,7 +636,7 @@ function readData(key, data, prefix, properties)
 		library.set(
 			{
 				'node': key,
-				'type': node.type,
+				'type': typeof data,
 				'role': node.role,
 				'description': node.description
 			},

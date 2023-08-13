@@ -13,8 +13,6 @@ const { v1: _uuid } = require('uuid');
 
 const Plex = require('plex-api');
 const Tautulli = require('tautulli-api');
-const { log } = require('console');
-
 
 /*
  * internal libraries

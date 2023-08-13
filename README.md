@@ -127,8 +127,11 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 
 ## Changelog
 
-### *** WORK_IN_PROGRESS ***
-- (ticaki) fix common.type warnings
+### **WORK IN PROGRESS**
+- (ticaki) change: common.role/type for mediaplayer
+- (ticaki) fix: common.type warnings and add missing state definitions
+- (ticaki) fix: player controls dont work with https
+
 
 ### 0.9.0 (2020-05-23)
 - (Zefau) added option for webhook IP address in case Plex is running in a Docker environment (see [#53](https://github.com/Zefau/ioBroker.plex/issues/53))

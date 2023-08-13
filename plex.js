@@ -8,6 +8,7 @@ const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');
 const _request = require('request-promise');
+const _axios = require('axios')
 const { v1: _uuid } = require('uuid');
 
 const Plex = require('plex-api');
@@ -65,7 +66,7 @@ function startAdapter(options)
 	 */
 	adapter.on('ready', function ready()
 	{
-		library = new Library(adapter, { nodes: _NODES, updatesInLog: adapter.config.debug || false });
+		library = new Library(adapter, { nodes: _NODES, actions: _ACTIONS, updatesInLog: adapter.config.debug || false });
 		unloaded = false;
 		
 		// Check Node.js Version
@@ -163,6 +164,9 @@ function startAdapter(options)
 			
 			// set current states from objects
 			for (let state in states) {
+				//Reset own states common.type and common.role
+				library.extendState(state)
+
 				if (states[state] !== null) {
 					library.setDeviceState(state.replace(adapter.name + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
 				
@@ -227,7 +231,7 @@ function startAdapter(options)
 				}
 			};
 			
-			_request(options).then(res =>
+			_axios(options).then(res =>
 			{
 				adapter.log.info('Successfully triggered refresh on library with ID ' + libId + '.');
 				adapter.log.debug(JSON.stringify(res));
@@ -248,7 +252,7 @@ function startAdapter(options)
 			
 			path.splice(-1);
 			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
-			let playerIp = library.getDeviceState(path.join('.') + '.Player.localAddress');
+			let playerIp = library.getDeviceState(path.join('.') + '.Player.localaddress');
 			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
 			
 			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
@@ -260,14 +264,16 @@ function startAdapter(options)
 				let options = {
 					...REQUEST_OPTIONS,
 					'method': 'POST',
-					'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
+					// Dont work for me with https:
+					//'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
+					'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
 					'headers': {
 						'X-Plex-Token': adapter.config.plexToken,
 						'X-Plex-Target-Client-Identifier': playerIdentifier
 					}
 				};
-				
-				_request(options).then(res =>
+
+				_axios(options).then(res =>
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
 				})
@@ -599,7 +605,7 @@ function readData(key, data, prefix, properties)
 					'role': 'channel',
 					'description': RegExp('\.[0-9]{3}$').test(key.substr(-4)) ? 'Index ' + key.substr(key.lastIndexOf('.')+1) : library.ucFirst(key.substr(key.lastIndexOf('.')+1).replace('Tree', '')) + ' Information'
 				},
-				'',
+				undefined,
 				properties
 			);
 			
@@ -631,12 +637,31 @@ function readData(key, data, prefix, properties)
 		// convert data
 		node.key = key;
 		data = convertNode(node, data);
-		
+
+		try {
+			if (node.type !== typeof data)
+			{
+				switch (node.type) 
+				{
+					case 'string':
+						data = data.toString()
+						break
+					case 'number':
+						data = Number(data)
+						break
+					case 'boolean':
+						data = !!data
+						break
+				}
+			}
+		} catch(error) {
+			adapter.log.warn('State ' + key + ' has wrong common.type!')
+		}
 		// set data
 		library.set(
 			{
 				'node': key,
-				'type': typeof data,
+				'type': node.type,
 				'role': node.role,
 				'description': node.description
 			},
@@ -820,13 +845,13 @@ function getServers()
 	plex.query('/servers').then(res =>
 	{
 		adapter.log.debug('Retrieved Servers from Plex.');
-		library.set({node: 'servers', role: library.getNode('servers').role, description: library.getNode('servers').description}, '');
+		library.set({node: 'servers', role: library.getNode('servers').role, description: library.getNode('servers').description});
 		
 		let data = res.MediaContainer.Server || [];
 		data.forEach(entry =>
 		{
 			let serverId = entry['name'].toLowerCase();
-			library.set({node: 'servers.' + serverId, role: library.getNode('server').role, description: library.getNode('server').description.replace(/%server%/gi, entry['name'])}, '');
+			library.set({node: 'servers.' + serverId, role: library.getNode('server').role, description: library.getNode('server').description.replace(/%server%/gi, entry['name'])});
 			
 			// index all keys as states
 			for (let key in entry)
@@ -859,13 +884,13 @@ function getLibraries()
 	plex.query('/library/sections').then(res =>
 	{
 		adapter.log.debug('Retrieved Libraries from Plex.');
-		library.set({node: 'libraries', role: library.getNode('libraries').role, description: library.getNode('libraries').description}, '');
+		library.set({node: 'libraries', role: library.getNode('libraries').role, description: library.getNode('libraries').description});
 		
 		let data = res.MediaContainer.Directory || [];
 		data.forEach(entry =>
 		{
 			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
-			library.set({node: 'libraries.' + libId, role: library.getNode('library').role, description: library.getNode('library').description.replace(/%library%/gi, entry['title'])}, '');
+			library.set({node: 'libraries.' + libId, role: library.getNode('library').role, description: library.getNode('library').description.replace(/%library%/gi, entry['title'])});
 			
 			// refresh button
 			library.set(
@@ -905,14 +930,14 @@ function getLibraries()
 					if (!is(res)) return; else data = res.response.data || [];
 					adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
 					
-					library.set({node: 'statistics', role: library.getNode('statistics').role, description: library.getNode('statistics').description}, '');
-					library.set({node: 'statistics.libraries', role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, '')}, '');
-					library.set({node: 'statistics.libraries.' + libId, role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, entry['title'])}, '');
+					library.set({node: 'statistics', role: library.getNode('statistics').role, description: library.getNode('statistics').description});
+					library.set({node: 'statistics.libraries', role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, '')});
+					library.set({node: 'statistics.libraries.' + libId, role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, entry['title'])});
 					
 					data.forEach((entry, i) =>
 					{
 						let id = watched[i];
-						library.set({node: 'statistics.libraries.' + libId + '.' + id, type: library.getNode('statistics.' + id).type, role: library.getNode('statistics.' + id).role, description: library.getNode('statistics.' + id).description}, '');
+						library.set({node: 'statistics.libraries.' + libId + '.' + id, type: library.getNode('statistics.' + id).type, role: library.getNode('statistics.' + id).role, description: library.getNode('statistics.' + id).description});
 						
 						for (let key in entry)
 							library.set({node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: library.getNode('statistics.' + key).type, role: library.getNode('statistics.' + key).role, description: library.getNode('statistics.' + key).description}, entry[key]);
@@ -940,7 +965,7 @@ function getUsers()
 	{
 		if (!is(res)) return; else data = res.response.data || [];
 		adapter.log.debug('Retrieved Users from Tautulli.');
-		library.set({node: 'users', role: library.getNode('users').role, description: library.getNode('users').description}, '');
+		library.set({node: 'users', role: library.getNode('users').role, description: library.getNode('users').description});
 		
 		data.forEach(entry =>
 		{
@@ -948,13 +973,13 @@ function getUsers()
 			let userId = library.clean(userName, true).replace(/\./g, '');
 			if (userId === 'local') return;
 			
-			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, userName)}, '');
+			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, userName)});
 			
 			// index all keys as states
 			for (let key in entry)
 			{
 				if (key === 'server_token') continue;
-				library.set({node: 'users.' + userId + '.' + key, role: library.getNode('users.' + key.toLowerCase()).role, description: library.getNode('users.' + key.toLowerCase()).description}, entry[key]);
+				library.set({node: 'users.' + userId + '.' + key, role: library.getNode('users.' + key.toLowerCase()).role, type: library.getNode('users.' + key.toLowerCase()).type, description: library.getNode('users.' + key.toLowerCase()).description}, entry[key]);
 			}
 			
 			// get statistics / watch time
@@ -967,13 +992,13 @@ function getUsers()
 					if (!is(res)) return; else data = res.response.data || [];
 					adapter.log.debug('Retrieved Watch Statistics for User ' + userName + ' from Tautulli.');
 					
-					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, '')}, '');
-					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, userName)}, '');
+					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, '')});
+					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, userName)});
 					
 					data.forEach((entry, i) =>
 					{
 						let id = watched[i];
-						library.set({node: 'statistics.users.' + userId + '.' + id, type: library.getNode('statistics.' + id).type, role: library.getNode('statistics.' + id).role, description: library.getNode('statistics.' + id).description}, '');
+						library.set({node: 'statistics.users.' + userId + '.' + id, type: library.getNode('statistics.' + id).type, role: library.getNode('statistics.' + id).role, description: library.getNode('statistics.' + id).description});
 						
 						for (let key in entry)
 							library.set({node: 'statistics.users.' + userId + '.' + id + '.' + key, type: library.getNode('statistics.' + key).type, role: library.getNode('statistics.' + key).role, description: library.getNode('statistics.' + key).description}, entry[key]);
@@ -1001,12 +1026,12 @@ function getSettings()
 	{
 		let data = res.MediaContainer.Setting || [];
 		adapter.log.debug('Retrieved Settings from Plex.');
-		library.set({node: 'settings', role: library.getNode('settings').role, description: library.getNode('settings').description}, '');
+		library.set({node: 'settings', role: library.getNode('settings').role, description: library.getNode('settings').description});
 		
 		data.forEach(entry =>
 		{
 			entry['group'] = !entry['group'] ? 'other' : entry['group'];
-			library.set({node: 'settings.' + entry['group'], role: 'channel', description: 'Settings ' + library.ucFirst(entry['group'])}, '');
+			library.set({node: 'settings.' + entry['group'], role: 'channel', description: 'Settings ' + library.ucFirst(entry['group'])});
 			library.set(
 				{
 					'node': 'settings.' + entry['group'] + '.' + entry['id'],
@@ -1035,12 +1060,12 @@ function getPlaylists()
 	{
 		let data = res.MediaContainer.Metadata || [];
 		adapter.log.debug('Retrieved Playlists from Plex.');
-		library.set({node: 'playlists', role: library.getNode('playlists').role, description: library.getNode('playlists').description}, '');
+		library.set({node: 'playlists', role: library.getNode('playlists').role, description: library.getNode('playlists').description});
 		
 		data.forEach(entry =>
 		{
 			let playlistId = library.clean(entry['title'], true);
-			library.set({node: 'playlists.' + playlistId, role: 'channel', description: 'Playlist ' + entry['title']}, '');
+			library.set({node: 'playlists.' + playlistId, role: 'channel', description: 'Playlist ' + entry['title']});
 			
 			// index all keys as states
 			for (let key in entry)
@@ -1089,22 +1114,22 @@ function getPlayers()
 			let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
 			
 			// create player
-			library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'}, '');
-			library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + player.name}, '');
+			library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'});
+			library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + player.name});
 			
 			// add player controls
 			library.set({'node': '_playing.' + groupBy + '.Player.localaddress', ...library.getNode('playing.player.localaddress') }, player.address);
 			library.set({'node': '_playing.' + groupBy + '.Player.port', ...library.getNode('playing.player.port') }, player.port);
 			
 			let controls = '_playing.' + groupBy + '._Controls';
-			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'}, '');
+			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'});
 			//library.set({node: controls + '.remotePlayer', role: 'switch', type: 'boolean', write: true, description: 'Use remote/public instead of local player IP'}, false);
 			
 			player.protocolCapabilities.split(',').forEach(mode => // e.g. "timeline,playback,navigation,mirror,playqueues"
 			{
 				if (_ACTIONS[mode] === undefined) return;
 				
-				library.set({node: controls + '.' + mode, role: 'channel', description: library.ucFirst(mode) + ' Controls'}, '');
+				library.set({node: controls + '.' + mode, role: 'channel', description: library.ucFirst(mode) + ' Controls'});
 				
 				let button;
 				for (let key in _ACTIONS[mode])
@@ -1115,8 +1140,8 @@ function getPlayers()
 						'node': controls + '.' + mode + '.' + key,
 						'description': 'Playback ' + library.ucFirst(button.description),
 						
-						'role': _ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'value' : 'text') : 'button',
-						'type': _ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'number' : 'string') : 'boolean',
+						'role': _ACTIONS[mode][key].role !== undefined ? _ACTIONS[mode][key].role : (_ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'value' : 'text') : 'button'),
+						'type': _ACTIONS[mode][key].type !== undefined ? _ACTIONS[mode][key].type : (_ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'number' : 'string') : 'boolean'),
 						
 						'common': {
 							'write': true,

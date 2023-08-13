@@ -84,5 +84,5 @@
     "tautulliToken": "Token de API",
     "webhookIp": "Webhook Ip",
     "webhookIpInfo": "Webhook de Retorno de chamada Ip, APENAS, se Plex está sendo executado na janela de Encaixe",
-    "webhookPort": "Webhook Porta"
+    "webhookPort": "Webhook Porta",
 }

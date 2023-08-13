@@ -7,7 +7,6 @@ const _fs = require('fs');
 const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');
-const _request = require('request-promise');
 const _axios = require('axios')
 const { v1: _uuid } = require('uuid');
 

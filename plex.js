@@ -1186,7 +1186,7 @@ function startListener()
 			setEvent(payload, 'tautulli', 'events');
 		}
 		catch(e) {
-			adapter.log.warn(e.message);
+			adapter.log.warn('Tautulli notification ' + e.message + ' - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571 ');
 			//res.sendStatus(500);
 		}
 	});

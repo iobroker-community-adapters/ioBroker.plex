@@ -5,7 +5,7 @@ module.exports =
 	// EVENTS
 	"events.id": {"description": "Generated unique ID", "role": "text", "type": "string"},
 	"events.media": {"description": "Media type of last event (movie, show, track, etc.)", "role": "text", "type": "string"},
-	"events.history": {"description": "All events historicized", "role": "json", "type": "string"},
+	"events.history": {"description": "All events historicized", "role": "json", "type": "json"},
 	"events.event": {"description": "Last event triggered on Plex", "role": "text", "type": "string"},
 	"events.message": {"description": "Message of last event", "role": "text", "type": "string"},
 	"events.caption": {"description": "Caption of last event", "role": "text", "type": "string"},

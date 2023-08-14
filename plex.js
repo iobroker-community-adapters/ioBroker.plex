@@ -635,25 +635,6 @@ function readData(key, data, prefix, properties)
 		node.key = key;
 		data = convertNode(node, data);
 
-		try {
-			if (node.type !== typeof data)
-			{
-				switch (node.type) 
-				{
-					case 'string':
-						data = data.toString()
-						break
-					case 'number':
-						data = Number(data)
-						break
-					case 'boolean':
-						data = !!data
-						break
-				}
-			}
-		} catch(error) {
-			adapter.log.warn('State ' + key + ' has wrong common.type!')
-		}
 		// set data
 		library.set(
 			{

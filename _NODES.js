@@ -26,7 +26,7 @@ module.exports =
 	"playing.source": {"description": "Source of event (either plex or tautulli)", "role": "text", "type": "string"},
 	"playing.timestamp": {"description": "Timestamp of the event being received", "role": "value", "type": "number"},
 	"playing.player": {"description": "Viewing device", "role": "value", "type": "string"},
-	"playing.playing": {"description": "Current playing", "role": "value", "type": "boolean"},
+	"playing.playing": {"description": "Current playing", "role": "indicator", "type": "boolean"},
 	//"playing.server": {"description": "Timestamp of the event being received", "role": "value", "type": "number"},
 	"playing.media": {"description": "media type", "role": "value", "type": "string"},
 	
@@ -38,7 +38,7 @@ module.exports =
 	
 	// PLAYING - PLAYER
 	"playing.player.local": {"description": "Indication whether Player is local", "role": "indicator", "type": "boolean"},
-	"playing.player.port": {"description": "Port of Plex Player", "role": "info.port", "type": "string"},
+	"playing.player.port": {"description": "Port of Plex Player", "role": "info.port", "type": "number"},
 	"playing.player.localaddress": {"description": "Local IP address", "role": "info.ip", "type": "string"},
 	"playing.player.publicaddress": {"description": "Public IP address", "role": "info.ip", "type": "string"},
 	"playing.player.title": {"description": "Name of Plex Player", "role": "text", "type": "string"},
@@ -52,7 +52,7 @@ module.exports =
 	"playing.metadata.grandparentart": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.grandparentguid": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.grandparentkey": {"description": "", "role": "text", "type": "string"},
-	"playing.metadata.grandparentratingkey": {"description": "", "role": "value", "type": "string"},
+	"playing.metadata.grandparentratingkey": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.grandparenttheme": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.grandparentthumb": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.grandparenttitle": {"description": "Parent title (e.g of show or artist)", "role": "media.season", "type": "string"},
@@ -65,7 +65,6 @@ module.exports =
 	"playing.metadata.parenttitle": {"description": "Parent title (e.g of season or album)", "role": "media.album", "type": "string"},
 	"playing.metadata.ratingimage": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.viewcount": {"description": "Number item has been watched", "role": "value", "type": "number"},
-	"playing.metadata.viewoffset": {"description": "", "role": "value", "type": "string"},
 	"playing.metadata.userRating": {"description": "User Rating", "role": "value", "type": "number"},
 	"playing.metadata.originalTitle": {"description": "Original Title", "role": "media.episode", "type": "string"},
 	"playing.metadata.subtype": {"description": "Media subtype (e.g. trailer)", "role": "text", "type": "string"},
@@ -73,9 +72,9 @@ module.exports =
 	// PLAYING - METADATA (ALL)
 	"playing.metadata.audiencerating": {"description": "Rating", "role": "value", "type": "number"},
 	"playing.metadata.audienceratingimage": {"description": "Rating image", "role": "value", "type": "string"},
-	"playing.metadata.lastviewedat": {"description": "Timestamp of last watched time", "role": "value", "type": "number", "convert": "date-timestamp"},
-	"playing.metadata.updatedat": {"description": "Timestamp of last updated time", "role": "value", "type": "number", "convert": "date-timestamp"},
-	"playing.metadata.addedat": {"description": "Timestamp of add media to database", "role": "value", "type": "number", "convert": "date-timestamp"},
+	"playing.metadata.lastviewedat": {"description": "Timestamp of last watched time", "role": "date", "type": "number", "convert": "date-timestamp"},
+	"playing.metadata.updatedat": {"description": "Timestamp of last updated time", "role": "date", "type": "number", "convert": "date-timestamp"},
+	"playing.metadata.addedat": {"description": "Timestamp of add media to database", "role": "date", "type": "number", "convert": "date-timestamp"},
 	"playing.metadata.addedatdate": {"description": "Date of add media to database", "role": "value", "type": "string", "convert": "date-timestamp"},
 	"playing.metadata.lastviewedatdate": {"description": "add media at date", "role": "value", "type": "string", "convert": "date-timestamp"},
 	"playing.metadata.updatedatdate": {"description": "Date of last viewed time", "role": "value", "type": "string", "convert": "date-timestamp"},
@@ -97,7 +96,7 @@ module.exports =
 	"playing.metadata.librarysectiontype": {"description": "The library type of the item", "role": "text", "type": "string"},
 	"playing.metadata.primaryextrakey": {"description": "Key (#2) of the item", "role": "text", "type": "string"},
 	"playing.metadata.producer": {"description": "Producers as a list", "role": "text", "type": "string"},
-	"playing.metadata.rating": {"description": "The rating (out of 10) for the item", "role": "text", "type": "string"},
+	"playing.metadata.rating": {"description": "The rating (out of 10) for the item", "role": "state", "type": "number"},
 	"playing.metadata.ratingimage": {"description": "", "role": "text", "type": "string"},
 	"playing.metadata.ratingkey": {"description": "The unique identifier for the movie, episode, or track.", "role": "value", "type": "string"},
 	"playing.metadata.role": {"description": "Roles as a list", "role": "text", "type": "string"},
@@ -108,7 +107,8 @@ module.exports =
 	"playing.metadata.thumb": {"description": "The thumbnail of the item", "role": "text", "type": "string"},
 	"playing.metadata.title": {"description": "The full title of the item", "role": "media.title", "type": "string"},
 	"playing.metadata.titlesort": {"description": "The sorting title of the item", "role": "text", "type": "string"},
-	"playing.metadata.viewoffset": {"description": "", "role": "value", "type": "number"},
+	"playing.metadata.viewoffset": {"description": "Last viewing position in milliseconds", "role": "value", "type": "number", "convert": "seconds-readable"},
+	"playing.metadata.viewoffsethuman": {"description": "Last viewing position", "role": "value", "type": "string", "convert": "seconds-readable"},
 	"playing.metadata.type": {"description": "The type of media. (movie, show, season, episode, artist, album, track, clip)", "role": "text", "type": "string"},
 	"playing.metadata.writer": {"description": "Writers as a list", "role": "text", "type": "string"},
 	"playing.metadata.year": {"description": "The release year for the item", "role": "text", "type": "number"},
@@ -320,8 +320,8 @@ module.exports =
 	// USERS
 	"user": {"description": "Plex User %user%", "role": "channel"},
 	"users": {"description": "Plex Users", "role": "channel"},
-	"users.allow_guest": {"description": "Allow Guest", "role": "state", "type": "number"},
-	"users.do_notify": {"description": "Do Notify", "role": "state", "type": "number"},
+	"users.allow_guest": {"description": "Allow Guest", "role": "indicator", "type": "boolean"},
+	"users.do_notify": {"description": "Do Notify", "role": "indicator", "type": "boolean"},
 	"users.email": {"description": "Email address", "role": "text", "type": "string"},
 	"users.filter_all": {"description": "Filter All", "role": "text", "type": "string"},
 	"users.filter_movies": {"description": "Filter Movies", "role": "text", "type": "string"},
@@ -329,12 +329,12 @@ module.exports =
 	"users.filter_photos": {"description": "Filter Photos", "role": "text", "type": "string"},
 	"users.filter_tv": {"description": "Filter TV", "role": "text", "type": "string"},
 	"users.friendly_name": {"description": "Friendly Name", "role": "text", "type": "string"},
-	"users.is_admin": {"description": "User is admin", "role": "state", "type": "number"},
-	"users.is_active": {"description": "is active", "role": "state", "type": "number"},
-	"users.is_allow_sync": {"description": "User may sync media", "role": "state", "type": "number"},
-	"users.is_home_user": {"description": "User is Home User", "role": "state", "type": "number"},
-	"users.is_restricted": {"description": "User is restricted", "role": "state", "type": "number"},
-	"users.keep_history": {"description": "Keep History", "role": "state", "type": "number"},
+	"users.is_admin": {"description": "User is admin", "role": "indicator", "type": "boolean"},
+	"users.is_active": {"description": "is active", "role": "indicator", "type": "boolean"},
+	"users.is_allow_sync": {"description": "User may sync media", "role": "indicator", "type": "boolean"},
+	"users.is_home_user": {"description": "User is Home User", "role": "indicator", "type": "boolean"},
+	"users.is_restricted": {"description": "User is restricted", "role": "indicator", "type": "boolean"},
+	"users.keep_history": {"description": "Keep History", "role": "indicator", "type": "boolean"},
 	"users.shared_libraries": {"description": "Shared Libraries", "role": "text", "type": "array"},
 	"users.thumb": {"description": "Thumbnail", "role": "text", "type": "string"},
 	"users.user_id": {"description": "User ID", "role": "value", "type": "number"},
@@ -343,6 +343,6 @@ module.exports =
 	
 	// SETTINGS
 	"settings": {"description": "Plex Settings", "role": "channel"},
-	"settings.transcoder.transcoderh264minimumcrf": {"description": "no clue", "role": "state", "type": "string"}	
+	"settings.transcoder.transcoderh264minimumcrf": {"description": "transcoderh264minimumcrf", "role": "state", "type": "string"}	
 	
 }

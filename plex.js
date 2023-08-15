@@ -31,7 +31,7 @@ let unloaded;
 let retryCycle, refreshCycle;
 
 let encryptionKey;
-let plex, plexAuth, tautulli, data;
+let plex, tautulli, data;
 let players = [], playing = [], streams = 0;
 let history = [];
 let notifications = {};
@@ -92,7 +92,8 @@ function startAdapter(options)
 		// Secure connection
 		REQUEST_OPTIONS.secureConnection = false;
 		REQUEST_OPTIONS._protocol = 'http:';
-		
+		REQUEST_OPTIONS.timeout = 1000;
+
 		if (adapter.config.secureConnection && adapter.config.certPublicVal && adapter.config.certPrivateVal)
 		{
 			adapter.log.info('Establishing secure connection to Plex Media Server...');
@@ -744,6 +745,20 @@ function convertNode(node, data)
 				},
 				date
 			);
+			break;
+			case "seconds-readable":
+			let d = new Date(data)
+			let value = (d.getHours()-1) ? (d.getHours()-1).toString() : '' 
+			value += value ? ':'+('0'+d.getMinutes()).substr(-2) : d.getMinutes().toString() + ':' + ('0'+d.getSeconds()).substr(-2)
+			library.set(
+				{
+					'node': node.key + 'human',
+					'type': 'string',
+					'role': 'text',
+					'description': 'Last viewing position'
+				},
+				value
+			)
 			break;
 		
 		case "ms-min":

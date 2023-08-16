@@ -39,7 +39,7 @@
     "multer": "^1.4.2",
     "plex-api": "^5.3.1",
     "tautulli-api": "^1.0.2",
-    "uuid": "^8.3.0"
+    "uuid": "^9.0.0"
   },
   "deprecated": false,
   "devDependencies": {

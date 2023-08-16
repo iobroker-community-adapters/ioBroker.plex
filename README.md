@@ -124,6 +124,13 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 
 
 ## Changelog
+<!--
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
+-->
+### **WORK IN PROGRESS**
+- (mcm1957) Dependencies have been updated 
+
 ### 1.0.0-alpha.0 (2023-08-16)
 - (ticaki) changed: common.role/types for mediaplayer added
 - (ticaki) fixed: common.type warnings have been fixed and missing state definitions havew been added

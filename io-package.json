@@ -32,7 +32,7 @@
     "news": {
       "1.0.0-alpha.0": {
         "en": "changed: common.role/types for mediaplayer added\nfixed: common.type warnings have been fixed and missing state definitions havew been added\nfixed: player controls didnt work with https\nchanged: some dependencies have been updated",
-        "de": "geändert: common.role/typen für mediaplayer hinzugefügt\nfest: common.type warnungen wurden behoben und fehlende zustandsdefinitionen wurden hinzugefügt\nbehoben: spielersteuerungen funktionierte nicht mit https\ngeändert: einige abhängigkeiten wurden aktualisiert",
+        "de": "geändert: common.role/typen für Mediaplayer hinzugefügt\nbehoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt\nbehoben: Steuerungen funktionierte nicht mit https\ngeändert: einige Abhängigkeiten wurden aktualisiert",
         "ru": "изменено: common.role/types для mediaplayer добавлен\nисправлено: common.type предупреждения были исправлены и отсутствуют государственные определения были добавлены\nисправлено: игрок контролирует не работает с https\nизменено: некоторые зависимости были обновлены",
         "pt": "alterado: common.role/types para mediaplayer adicionado\ncorrigido: avisos comuns do tipo foram corrigidos e as definições do estado em falta foram adicionadas\nfixo: controles do jogador não funcionou com https\nalterado: algumas dependências foram atualizadas",
         "nl": "verandering:\nvertaling:\nbeheersing werkte niet met htp's\nsommige afhankelijkheid is geüpload",

@@ -30,7 +30,7 @@
     "email": "zefau@mailbox.org"
   },
   "bugs": {
-    "url": "https://github.com/Zefau/ioBroker.plex/issues"
+    "url": "https://github.com/iobroker-community-adapters/ioBroker.plex/issues"
   },
   "contributors": [
     {
@@ -78,7 +78,7 @@
     "sinon-chai": "^3.7.0",
     "typescript": "~5.1.6"
   },
-  "homepage": "https://github.com/Zefau/ioBroker.plex",
+  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.plex",
   "keywords": [
     "ioBroker",
     "plex",
@@ -90,7 +90,7 @@
   "name": "iobroker.plex",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Zefau/ioBroker.plex.git"
+    "url": "git+https://github.com/iobroker-community-adapters/ioBroker.plex.git"
   },
   "scripts": {
     "test:js": "mocha --config test/mocharc.custom.json \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup).js}\"",

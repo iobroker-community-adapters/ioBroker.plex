@@ -1,36 +1,10 @@
 {
-  "_from": "iobroker.plex@0.8.11",
-  "_id": "iobroker.plex@0.8.11",
-  "_inBundle": false,
-  "_integrity": "sha512-IvzLVpd1CHQRVI65Nog9rwRfb0mfLYMbS6yrQfd0L435hajWjx3eG3Cf+SW2e3Dj4ZEewQiPp8UuJ/VOipm/iA==",
-  "_location": "/iobroker.plex",
-  "_phantomChildren": {
-    "@types/node": "13.7.7"
-  },
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "iobroker.plex@0.8.11",
-    "name": "iobroker.plex",
-    "escapedName": "iobroker.plex",
-    "rawSpec": "0.8.11",
-    "saveSpec": null,
-    "fetchSpec": "0.8.11"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/iobroker.plex/-/iobroker.plex-0.8.11.tgz",
-  "_shasum": "384a8fb7fa964cfa623c8bb128400a5dbda64d78",
-  "_spec": "iobroker.plex@0.8.11",
-  "_where": "/opt/iobroker",
+  "name": "iobroker.plex",
+  "version": "0.9.1",
+  "description": "Integration of your Plex Media Server and / or your Tautulli",
   "author": {
     "name": "zefau",
     "email": "zefau@mailbox.org"
-  },
-  "bugs": {
-    "url": "https://github.com/iobroker-community-adapters/ioBroker.plex/issues"
   },
   "contributors": [
     {
@@ -38,6 +12,24 @@
       "email": "zefau@mailbox.org"
     }
   ],
+  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.plex",
+  "license": "MIT",
+  "keywords": [
+    "ioBroker",
+    "plex",
+    "tautulli",
+    "media server"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iobroker-community-adapters/ioBroker.plex.git"
+  },
+  "bugs": {
+    "url": "https://github.com/iobroker-community-adapters/ioBroker.plex/issues"
+  },
+  "engines": {
+    "node": ">= 16"
+  },
   "dependencies": {
     "@iobroker/adapter-core": "^2.2.1",
     "axios": "^1.4.0",
@@ -50,7 +42,6 @@
     "uuid": "^8.3.0"
   },
   "deprecated": false,
-  "description": "Integration of your Plex Media Server and / or your Tautulli",
   "devDependencies": {
     "@alcalzone/release-script": "^3.6.0",
     "@alcalzone/release-script-plugin-iobroker": "^3.6.0",
@@ -78,20 +69,7 @@
     "sinon-chai": "^3.7.0",
     "typescript": "~5.1.6"
   },
-  "homepage": "https://github.com/iobroker-community-adapters/ioBroker.plex",
-  "keywords": [
-    "ioBroker",
-    "plex",
-    "tautulli",
-    "media server"
-  ],
-  "license": "MIT",
   "main": "plex.js",
-  "name": "iobroker.plex",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iobroker-community-adapters/ioBroker.plex.git"
-  },
   "scripts": {
     "test:js": "mocha --config test/mocharc.custom.json \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup).js}\"",
     "test:package": "mocha test/package --exit",
@@ -101,6 +79,5 @@
     "lint": "eslint .",
     "translate": "translate-adapter",
     "release": "release-script"
-  },
-  "version": "0.9.1"
+  }
 }

@@ -1,3 +1,7 @@
 /node_modules
 /.idea
 /tmp
+.vscode
+
+# ioBroker dev-server
+.dev-server/

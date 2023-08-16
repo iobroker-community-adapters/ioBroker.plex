@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.0-alpha.0",
+    "version": "1.0.0-alpha.1",
     "title": "Plex Media Server",
     "titleLang": {
       "en": "Plex Media Server",
@@ -30,6 +30,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.0-alpha.1": {
+        "en": "Dependencies have been updated",
+        "de": "Abhängigkeiten wurden aktualisiert",
+        "ru": "В зависимости были обновлены",
+        "pt": "As dependências foram atualizadas",
+        "nl": "Afhankelijkheid",
+        "fr": "Les dépendances ont été mises à jour",
+        "it": "Le dipendenze sono state aggiornate",
+        "es": "Se han actualizado las dependencias",
+        "pl": "Zależności zostały zaktualizowane",
+        "uk": "Оновлено залежність",
+        "zh-cn": "已更新了属地"
+      },
       "1.0.0-alpha.0": {
         "en": "changed: common.role/types for mediaplayer added\nfixed: common.type warnings have been fixed and missing state definitions havew been added\nfixed: player controls didnt work with https\nchanged: some dependencies have been updated",
         "de": "geändert: common.role/typen für Mediaplayer hinzugefügt\nbehoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt\nbehoben: Steuerungen funktionierte nicht mit https\ngeändert: einige Abhängigkeiten wurden aktualisiert",
@@ -107,19 +120,6 @@
         "pl": "- Poprawa wydajności \n- dodano przycisk Odśwież (do skanowania pliki bibliotek) dla biblioteki",
         "zh-cn": "-性能的改进\n-补充刷新键(扫描文件)图书馆",
         "uk": "— Покращення продуктивності\n- до бібліотек додано кнопку оновлення (для сканування файлів бібліотек)."
-      },
-      "0.4.0": {
-        "en": "- added playback control for players\n- added configuration options to only retrieve specific objects from Plex",
-        "de": "- Steuerung der Wiedergabe der Player\n- Optionen nur bestimmte Konfiguration von Plex abzurufen",
-        "ru": "- добавлено управление воспроизведением для игроков\n- добавлены параметры конфигурации для извлечения только определенных объектов из плекса",
-        "pt": "- adicionado controle de reprodução para os jogadores\n- adicionado opções de configuração para obter apenas os objetos específicos do Plex",
-        "nl": "- toegevoegd playback control voor spelers\nde toegevoegde configuratie opties om alleen het ophalen van specifieke objecten van Plex",
-        "fr": "- ajout de la lecture de contrôle pour les joueurs\n- ajout d'options de configuration pour récupérer uniquement les objets spécifiques de Plex",
-        "it": "- aggiunto controllo della riproduzione per i giocatori\n- aggiunte opzioni di configurazione per recuperare oggetti specifici da Plex",
-        "es": "- añadido control de reproducción para los jugadores\n- añadido opciones de configuración para recuperar sólo los objetos específicos de Plex",
-        "pl": "- dodano sterowanie odtwarzaniem dla graczy\n- dodano opcje konfiguracji w celu wyodrębnienia pewnych obiektów z plexus",
-        "zh-cn": "-增加播放控制的球员\n-增加配置选项只有检索的具体对象的复杂",
-        "uk": "- додано керування відтворенням для гравців\n— додано параметри конфігурації для отримання лише певних об’єктів із Plex"
       }
     },
     "license": "MIT",

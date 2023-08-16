@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.0-alpha.2",
+    "version": "1.0.0-alpha.3",
     "title": "Plex Media Server",
     "titleLang": {
       "en": "Plex Media Server",
@@ -30,6 +30,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.0-alpha.3": {
+        "en": "fixed: common.type warnings have been fixed and missing state definitions have been added #114 #101 #100\nfixed: player controls only worked with http \nfixed: history page ioBroker/ioBroker.socketio has been fixed #32\nfixed: translation error has been fixed #108",
+        "de": "behoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt #114 #101 #100\nbehoben: Spielerkontrollen funktionierten nur mit http\nbehoben: ioBroker/ioBroker.socketio Fehler #32 wurde behoben\nbehoben: Übersetzungsfehler wurde #108 behoben",
+        "ru": "исправлено: common.type предупреждения были исправлены и отсутствуют государственные определения были добавлены #114 #101 #100\nфиксированный: игрок контролирует только работу с http\nисправлено: страница истории ioBroker/ioBroker. socketio был исправлен #32\nисправлено: ошибка трабсляции была исправлена #108",
+        "pt": "corrigido: avisos comuns.tipo foram corrigidos e as definições de estado em falta foram adicionadas #114 #101 #100\nfixo: controles do jogador só trabalhou com http\ncorrigido: página de história ioBroker/ioBroker. socketio foi corrigido #32\ncorrigido: erro de trabslation foi corrigido #108",
+        "nl": "vertaling:\nde speler controleerde alleen met htp\ngeschiedenispagina ioBroker/ioBroker. Socketio is gerepareerd 32\nvertaling:",
+        "fr": "fixe: les avertissements de type commun ont été corrigés et les définitions d'état manquantes ont été ajoutées #114 #101 #100\nfixe: les commandes de lecteur seulement travaillé avec http\ncorrigé: page d'histoire ioBroker/ioBroker. socketio a été corrigé #32\ncorrigé: erreur de trabslation a été corrigée #108",
+        "it": "fisso: common.type avvisi sono stati fissati e le definizioni di stato mancanti sono state aggiunte #114 #101 #100\nfisso: i controlli dei giocatori hanno lavorato solo con http\nfisso: pagina di storia ioBroker/ioBroker. socketio è stato fissato #32\nfisso: errore di trabslation è stato fissato #108",
+        "es": "fijos: las advertencias de tipo común han sido fijadas y las definiciones de estado desaparecidas se han añadido #114 #101 #100\nfijo: los controles del jugador solo funcionan con http\nfijo: página de historia ioBroker/ioBroker. socketio ha sido fijado #32\nfijo: error de trabslación se ha fijado #108",
+        "pl": "ustalono następujące ostrzeżenia: ustalane są i brakujące definicje państwowe o numerze #114 #100\nzastosowanie: kontrola gracza działała tylko z http\noficjalna strona internetowa ioBroker/ioBroker Został ustalony numer #32\nuruchomiono błędy w przeliczeniu #108",
+        "uk": "виправлено: загальний.типові попередження були виправлені та відсутні державні визначення #114 #101 #100\nфіксована: контроль гравця тільки працює з http://\nфіксована: історія сторінки ioBroker/ioBroker. бензофіксовано #32\nвиправлено: виправлено помилку перетягування #108",
+        "zh-cn": "固定:共有的原型警告已经确定,并增添了第114 号第101号 #100\n固定:角色控制只与网站合作。\n固定:生物Broker/ioBroker的历史页。 零件已固定在编号32 #32\n固定:trabsl错误已定为第108号。"
+      },
       "1.0.0-alpha.2": {
         "en": "Dependencies have been updated",
         "de": "Abhängigkeiten wurden aktualisiert",
@@ -107,19 +120,6 @@
         "pl": "- wymienić hasło z uwierzytelniania na podstawie markerów ",
         "zh-cn": "-替换密码和身份认证牌",
         "uk": "- замінено пароль на токен аутентифікації"
-      },
-      "0.5.0": {
-        "en": "- added support for Plex Notifications\n- added support for all Tautulli triggers\n- added Adapter Web Interface that shows the recent events",
-        "de": "- Unterstützung für Plex-Benachrichtigungen\n- Unterstützung Hinzugefügt für alle Tautulli Trigger\n- Adapter werden Web-Interface zeigt, dass die jüngsten Ereignisse",
-        "ru": "- добавлена поддержка для уведомления Плекс \n- добавлена поддержка для всех Tautulli триггеры\n- добавлен веб-интерфейс адаптера, который показывает последние события",
-        "pt": "- adicionado suporte para Plex Notificações\n- adicionado suporte para todos os Tautulli dispara\n- adicionado Adaptador de Interface Web, que mostra os últimos acontecimentos",
-        "nl": "- toegevoegde ondersteuning voor Plex Meldingen\n- toegevoegde ondersteuning voor alle Tautulli triggers\n- toegevoegd Adapter Web Interface toont de recente gebeurtenissen",
-        "fr": "- ajout du support pour les Plex Notifications\n- ajout du support pour tous les Tautulli déclencheurs\n- ajout de l'Adaptateur d'Interface Web qui affiche les événements récents",
-        "it": "- aggiunto il supporto per le Notifiche Plex\n- aggiunto il supporto per tutte Tautulli trigger\n- aggiunta la Scheda di Interfaccia Web che mostra le recenti eventi",
-        "es": "- añadido soporte para Plex Notificaciones\n- añadido soporte para todos los Tautulli desencadenantes\n- añadido Adaptador de Interfaz Web que muestra los últimos eventos",
-        "pl": "- dodano wsparcie dla powiadomień plex dnia \n- dodano wsparcie dla wszystkich Tautulli wyzwalacze\n- dodano interfejs www adaptera, który pokazuje najnowsze wydarzenia",
-        "zh-cn": "- 增加支持复杂的通知\n-增加支持所有Tautulli触发器\n-添加适配器的网络接口，显示最近发生的事件",
-        "uk": "- додана підтримка Plex Notifications\n- додана підтримка всіх тригерів Tautulli\n- додано веб-інтерфейс адаптера, який показує останні події"
       }
     },
     "license": "MIT",

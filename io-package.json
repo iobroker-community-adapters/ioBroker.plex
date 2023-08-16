@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.0-alpha.1",
+    "version": "1.0.0-alpha.2",
     "title": "Plex Media Server",
     "titleLang": {
       "en": "Plex Media Server",
@@ -30,6 +30,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.0-alpha.2": {
+        "en": "Dependencies have been updated",
+        "de": "Abhängigkeiten wurden aktualisiert",
+        "ru": "В зависимости были обновлены",
+        "pt": "As dependências foram atualizadas",
+        "nl": "Afhankelijkheid",
+        "fr": "Les dépendances ont été mises à jour",
+        "it": "Le dipendenze sono state aggiornate",
+        "es": "Se han actualizado las dependencias",
+        "pl": "Zależności zostały zaktualizowane",
+        "uk": "Оновлено залежність",
+        "zh-cn": "已更新了属地"
+      },
       "1.0.0-alpha.1": {
         "en": "Dependencies have been updated",
         "de": "Abhängigkeiten wurden aktualisiert",
@@ -107,19 +120,6 @@
         "pl": "- dodano wsparcie dla powiadomień plex dnia \n- dodano wsparcie dla wszystkich Tautulli wyzwalacze\n- dodano interfejs www adaptera, który pokazuje najnowsze wydarzenia",
         "zh-cn": "- 增加支持复杂的通知\n-增加支持所有Tautulli触发器\n-添加适配器的网络接口，显示最近发生的事件",
         "uk": "- додана підтримка Plex Notifications\n- додана підтримка всіх тригерів Tautulli\n- додано веб-інтерфейс адаптера, який показує останні події"
-      },
-      "0.4.3": {
-        "en": "- Performance improvements\n- added refresh button (to scan library files) to libraries",
-        "de": "- Performance-Verbesserungen\n- Hinzugefügt refresh-button (scan-Bibliothek-Dateien) an Bibliotheken",
-        "ru": "- Улучшения производительности \n- добавлена кнопка Обновить (для сканирования файлы библиотек) для библиотеки",
-        "pt": "- Melhorias de desempenho\n- adicionado botão de atualização (para digitalização de arquivos de biblioteca) para bibliotecas",
-        "nl": "- Performance verbeteringen\nde toegevoegde knop vernieuwen (om te scannen bibliotheek-bestanden) bibliotheken",
-        "fr": "- Améliorations des performances\n- ajout de bouton actualiser (scan des fichiers de la bibliothèque) pour les bibliothèques",
-        "it": "- Miglioramenti delle prestazioni\n- aggiunto il pulsante di aggiornamento (per la scansione di file di libreria) per le biblioteche",
-        "es": "- Mejoras de rendimiento\n- añadido botón de actualización (para escanear los archivos de la biblioteca) a las bibliotecas",
-        "pl": "- Poprawa wydajności \n- dodano przycisk Odśwież (do skanowania pliki bibliotek) dla biblioteki",
-        "zh-cn": "-性能的改进\n-补充刷新键(扫描文件)图书馆",
-        "uk": "— Покращення продуктивності\n- до бібліотек додано кнопку оновлення (для сканування файлів бібліотек)."
       }
     },
     "license": "MIT",

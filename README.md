@@ -124,8 +124,7 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 
 
 ## Changelog
-
-### **WORK IN PROGRESS**
+### 1.0.0-alpha.0 (2023-08-16)
 - (ticaki) changed: common.role/types for mediaplayer added
 - (ticaki) fixed: common.type warnings have been fixed and missing state definitions havew been added
 - (ticaki) fixed: player controls didnt work with https
@@ -228,7 +227,6 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 - (Zefau) get initial data from Plex API
 - (Zefau) receive events from Plex Webhook (Plex Pass only)
 - (Zefau) receive events from Tatulli (if used)
-
 
 ## License
 The MIT License (MIT)

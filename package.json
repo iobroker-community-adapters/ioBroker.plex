@@ -1,6 +1,6 @@
 {
   "name": "iobroker.plex",
-  "version": "0.9.1",
+  "version": "1.0.0-alpha.0",
   "description": "Integration of your Plex Media Server and / or your Tautulli",
   "author": {
     "name": "zefau",

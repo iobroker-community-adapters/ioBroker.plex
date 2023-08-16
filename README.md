@@ -128,14 +128,12 @@ After sucessful advanced setup the following channels will _additionally_ be cre
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 1.0.0-alpha.2 (2023-08-16)
-- (mcm1957) Dependencies have been updated
 
-### 1.0.0-alpha.0 (2023-08-16)
-- (ticaki) changed: common.role/types for mediaplayer added
-- (ticaki) fixed: common.type warnings have been fixed and missing state definitions havew been added
-- (ticaki) fixed: player controls didnt work with https
-- (ticaki) changed: some dependencies have been updated
+### **WORK IN PROGRESS**
+- (ticaki) fix: common.type warnings and add missing state definitions #114 #101 #100
+- (ticaki) fix: player controls only work with http 
+- (ticaki) fix: history page ioBroker/ioBroker.socketio#32
+- (ticaki) fix: #108 
 
 ### 0.9.0 (2020-05-23)
 - (Zefau) added option for webhook IP address in case Plex is running in a Docker environment (see [#53](https://github.com/Zefau/ioBroker.plex/issues/53))

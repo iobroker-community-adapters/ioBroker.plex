@@ -130,9 +130,9 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 -->
 ### 1.0.0-alpha.3 (2023-08-16)
 - (ticaki) fixed: common.type warnings have been fixed and missing state definitions have been added #114 #101 #100
-- (ticaki) fixed: player controls only worked with http 
-- (ticaki) fixed: history page ioBroker/ioBroker.socketio has been fixed #32
-- (ticaki) fixed: trabslation error has been fixed #108
+- (ticaki) fixed: player controls  
+- (ticaki) fixed: history page has been fixed 
+- (ticaki) fixed: translation error has been fixed #108
 
 ### 0.9.0 (2020-05-23)
 - (Zefau) added option for webhook IP address in case Plex is running in a Docker environment (see [#53](https://github.com/Zefau/ioBroker.plex/issues/53))

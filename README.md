@@ -130,10 +130,10 @@ After sucessful advanced setup the following channels will _additionally_ be cre
 -->
 
 ### **WORK IN PROGRESS**
-- (ticaki) fix: common.type warnings and add missing state definitions #114 #101 #100
-- (ticaki) fix: player controls only work with http 
-- (ticaki) fix: history page ioBroker/ioBroker.socketio#32
-- (ticaki) fix: #108 
+- (ticaki) Fixed common.type warnings and added missing state definitions #114 #101 #100
+- (ticaki) Fixed player controls (use http in every case)
+- (ticaki) Fixed history page ioBroker/ioBroker.socketio#32
+- (ticaki) Fixed #108 
 
 ### 0.9.0 (2020-05-23)
 - (Zefau) added option for webhook IP address in case Plex is running in a Docker environment (see [#53](https://github.com/Zefau/ioBroker.plex/issues/53))

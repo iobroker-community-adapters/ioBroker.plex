@@ -567,9 +567,9 @@ function readData(key, data, prefix, properties)
 	if (data === undefined || data === 'undefined')
 		return false;
 	
-	// get node details
-	let node = library.getNode(key.indexOf('_playing') > -1 ? 'playing' + key.substr(key.indexOf('.', '_playing.'.length)) : key, true);
-	
+		// get node details	
+	let node = library.getNode(key.indexOf('_playing') > -1 ? 'playing' + key.substr(key.indexOf('.', prefix.length)) : key, true);
+
 	// loop nested data
 	if (typeof data == 'object')
 	{

@@ -2,6 +2,7 @@
 /.idea
 /tmp
 .vscode
-
+# local data
+.dataTest/
 # ioBroker dev-server
 .dev-server/

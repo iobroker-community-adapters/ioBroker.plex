@@ -14,7 +14,7 @@
 }
 
 #log {
-	background-color: #fff;
+	/*background-color: #fff;*/
 	padding: 0 20px;
 }
 .log.error {color: #a00}

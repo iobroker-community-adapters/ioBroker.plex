@@ -2,7 +2,6 @@
     "common": {
         "name": "plex",
         "version": "1.0.0-alpha.3",
-        "title": "Plex Media Server",
         "titleLang": {
             "en": "Plex Media Server",
             "de": "Plex Media Server",
@@ -126,16 +125,18 @@
         "platform": "Javascript/Node.js",
         "mode": "daemon",
         "icon": "plex.jpg",
-        "extIcon": "https://raw.githubusercontent.com/Zefau/ioBroker.plex/master/admin/plex.jpg",
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
         "keywords": [
             "tautulli",
             "plex",
             "media"
         ],
-        "readme": "https://github.com/Zefau/ioBroker.plex/blob/master/README.md",
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
         "loglevel": "info",
         "materialize": true,
         "compact": true,
+        "connectionType": "local",
+        "dataSource": "push",
         "enabled": true,
         "localLink": "%web_protocol%://%ip%:%web_port%/plex/index.html",
         "messagebox": true,

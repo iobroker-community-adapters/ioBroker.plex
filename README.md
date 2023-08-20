@@ -128,6 +128,9 @@ After sucessful advanced setup the following channels will _additionally_ be cre
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) fixed: several minor issues have been fixed
+
 ### 1.0.0-alpha.3 (2023-08-16)
 - (ticaki) fixed: common.type warnings have been fixed and missing state definitions have been added #114 #101 #100
 - (ticaki) fixed: player controls  

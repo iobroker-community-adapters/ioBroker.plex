@@ -772,6 +772,7 @@ function convertNode(node, data)
 			break;
 		
 		case "ms-min":
+			let duration = data/1000;
 			library.set(
 				{
 					'node': node.key + 'Seconds',
@@ -779,10 +780,9 @@ function convertNode(node, data)
 					'role': 'media.duration',
 					'description': node.description.replace('in minutes', 'in seconds')
 				},
-				Math.floor(data/1000)
+				duration < 1 ? data * 60 : Math.floor(duration)
 			)
-			let duration = data/1000/60;
-			return duration < 1 ? data : Math.floor(duration);
+			return duration < 1 ? data : Math.floor(duration/60);
 			break;
 		case "create-link":
 			let link = data ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + data + '?X-Plex-Token=' + adapter.config.plexToken) : ''

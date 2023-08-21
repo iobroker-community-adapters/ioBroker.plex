@@ -755,14 +755,14 @@ function convertNode(node, data)
 				{
 					'node': node.key + 'human',
 					'type': 'string',
-					'role': 'media.duration.text',
+					'role': 'text',
 					'description': 'Last viewing position'
 				},
 				value
 			)
 			library.set(
 				{
-					'node': node.key + 'Sec',
+					'node': node.key + 'Seconds',
 					'type': 'number',
 					'role': 'media.elapsed',
 					'description': 'Last viewing position in seconds'
@@ -772,6 +772,15 @@ function convertNode(node, data)
 			break;
 		
 		case "ms-min":
+			library.set(
+				{
+					'node': node.key + 'Seconds',
+					'type': 'number',
+					'role': 'media.duration',
+					'description': node.description.replace('in minutes', 'in seconds')
+				},
+				Math.floor(data/1000)
+			)
 			let duration = data/1000/60;
 			return duration < 1 ? data : Math.floor(duration);
 			break;

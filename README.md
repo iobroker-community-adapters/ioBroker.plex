@@ -128,6 +128,10 @@ After sucessful advanced setup the following channels will _additionally_ be cre
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Removed broken infopopup
+- (ticaki) Added links to artworks
+
 ### 1.0.1 (2023-08-21)
 - (ticaki) Xmlparser call fixed
 

@@ -716,7 +716,8 @@ function is(res)
  */
 function convertNode(node, data)
 {
-	switch(node.convert)
+	if (!(node && node.convert)) return data
+	switch(node.convert.func)
 	{
 		case "date-timestamp":
 			
@@ -746,7 +747,7 @@ function convertNode(node, data)
 				date
 			);
 			break;
-			case "seconds-readable":
+		case "seconds-readable":
 			let d = new Date(data)
 			let value = (d.getHours()-1) ? (d.getHours()-1).toString() : '' 
 			value += value ? ':'+('0'+d.getMinutes()).substr(-2) : d.getMinutes().toString() + ':' + ('0'+d.getSeconds()).substr(-2)
@@ -754,16 +755,37 @@ function convertNode(node, data)
 				{
 					'node': node.key + 'human',
 					'type': 'string',
-					'role': 'text',
+					'role': 'media.duration.text',
 					'description': 'Last viewing position'
 				},
 				value
+			)
+			library.set(
+				{
+					'node': node.key + 'Sec',
+					'type': 'number',
+					'role': 'media.elapsed',
+					'description': 'Last viewing position in seconds'
+				},
+				Math.floor(data/1000)
 			)
 			break;
 		
 		case "ms-min":
 			let duration = data/1000/60;
 			return duration < 1 ? data : Math.floor(duration);
+			break;
+		case "create-link":
+			let link = data ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + data + '?X-Plex-Token=' + adapter.config.plexToken) : ''
+			library.set(
+				{
+					'node': node.key + node.convert.key,
+					'type': node.convert.type,
+					'role': node.convert.role,
+					'description': (node.description + ' (link)')
+				},
+				link
+			)
 			break;
 	}
 	

@@ -128,7 +128,7 @@ After sucessful advanced setup the following channels will _additionally_ be cre
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.0.1 (2023-08-21)
 - (ticaki) Xmlparser call fixed
 
 ### 1.0.0 (2023-08-20)

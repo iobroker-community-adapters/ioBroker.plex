@@ -283,6 +283,8 @@ function startAdapter(options)
 					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
 					adapter.log.debug(err);
 				});
+				adapter.log.debug('http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
+					)
 			}
 			else
 				adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
@@ -451,7 +453,7 @@ function init()
  */
 function setEvent(data, source, prefix)
 {
-	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
+	//adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
 	// empty payload
 	if (Object.keys(data).length === 0 || !data['event']) {
@@ -501,14 +503,19 @@ function setEvent(data, source, prefix)
 			library.set({node: '_playing.players', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
 			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
 		}
+
+		// adapt prefix
+		prefix = prefix + '.' + groupBy;
 		
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
+		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){
+			adapter.setState(prefix + '._Controls.playback.play_switch',(['media.play', 'media.resume'].indexOf(data.event) > -1),true)
 		}
 		
-		// adapt prefix
-		prefix = prefix + '.' + groupBy;
+		
+		
 	}
 	
 	// EVENTS
@@ -1133,7 +1140,6 @@ function getPlayers()
 	{
 		let data = res.MediaContainer.Server || [];
 		adapter.log.debug('Retrieved Players from Plex.');
-		
 		data.forEach(player =>
 		{
 			// group by player

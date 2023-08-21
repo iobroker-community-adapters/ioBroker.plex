@@ -129,7 +129,7 @@ After sucessful advanced setup the following channels will _additionally_ be cre
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Removed broken infopopup
+- (ticaki) Added a play/pause switch for mediaplayer
 - (ticaki) Added links to artworks
 
 ### 1.0.1 (2023-08-21)

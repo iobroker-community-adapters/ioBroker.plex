@@ -258,6 +258,8 @@ function startAdapter(options)
 				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
 				
 				let key = _ACTIONS[mode][action].key || action;
+				if (_ACTIONS[mode][action]["true"] !== undefined)
+						key = state.val ? _ACTIONS[mode][action]["true"] : _ACTIONS[mode][action]["false"]
 				let attribute = _ACTIONS[mode][action].attribute;
 				let options = {
 					...REQUEST_OPTIONS,
@@ -274,6 +276,7 @@ function startAdapter(options)
 				_axios(options).then(res =>
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+					adapter.setState(id, state.val, true)
 				})
 				.catch(err =>
 				{

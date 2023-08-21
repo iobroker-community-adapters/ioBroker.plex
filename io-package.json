@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "titleLang": {
       "en": "Plex Media Server",
       "de": "Plex Media Server",
@@ -29,6 +29,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.1": {
+        "en": "Xmlparser call fixed",
+        "de": "Xmlparser Aufruf behoben",
+        "ru": "Xmlparser вызов фиксированный",
+        "pt": "Xmlparser chamada fixa",
+        "nl": "Xmlparser call gerepareerd",
+        "fr": "Appel fixe Xmlparser",
+        "it": "Chiamata Xmlparser fisso",
+        "es": "Llamada Xmlparse fijo",
+        "pl": "Xmlparser call (ang.)",
+        "uk": "Xml Генератор виклик фіксований",
+        "zh-cn": "十mlparser 固定电话"
+      },
       "1.0.0": {
         "en": "fixed: several minor issues have been fixed",
         "de": "behoben: es wurden mehrere kleinere Probleme behoben",
@@ -106,19 +119,6 @@
         "pl": "- dodano opcję adresu IP webhooka w przypadku, gdy Plex działa w środowisku Docker\n- zaktualizowane zależności",
         "uk": "- додана опція для IP-адреси webhook у випадку, якщо Plex працює в середовищі Docker\n- оновлені залежності",
         "zh-cn": "- 添加了 Webhook IP 地址选项，以防 Plex 在 Docker 环境中运行\n- 更新了依赖项"
-      },
-      "0.8.11": {
-        "en": "- fixed error with state retrieval on startup when no states are given\n- updated dependencies",
-        "de": "- Fehler beim Statusabruf beim Start behoben, wenn keine Status angegeben wurden\n- Aktualisierte Abhängigkeiten",
-        "ru": "- исправлена ​​ошибка с получением состояния при запуске, когда состояния не заданы\n- обновлены зависимости",
-        "pt": "- erro corrigido com recuperação de estado na inicialização quando nenhum estado é fornecido\n- dependências atualizadas",
-        "nl": "- opgeloste fout bij het ophalen van de status bij het opstarten wanneer er geen statussen worden gegeven\n- bijgewerkte afhankelijkheden",
-        "fr": "- erreur fixe avec récupération d'état au démarrage lorsqu'aucun état n'est donné\n- dépendances mises à jour",
-        "it": "- risolto errore con il recupero dello stato all'avvio quando non viene fornito alcuno stato\n- dipendenze aggiornate",
-        "es": "- error corregido con recuperación de estado en el inicio cuando no se dan estados\n- dependencias actualizadas",
-        "pl": "- naprawiono błąd z pobieraniem stanu przy starcie, gdy nie podano żadnych stanów\n- zaktualizowane zależności",
-        "uk": "- виправлена ​​помилка з отриманням стану під час запуску, коли стани не задані\n- оновлені залежності",
-        "zh-cn": "- 修复了未给出状态时启动时状态检索的错误\n- 更新了依赖项"
       }
     },
     "license": "MIT",

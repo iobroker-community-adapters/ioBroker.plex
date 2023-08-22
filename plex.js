@@ -261,12 +261,14 @@ function startAdapter(options)
 				if (_ACTIONS[mode][action]["true"] !== undefined)
 						key = state.val ? _ACTIONS[mode][action]["true"] : _ACTIONS[mode][action]["false"]
 				let attribute = _ACTIONS[mode][action].attribute;
+				let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
+				
 				let options = {
 					...REQUEST_OPTIONS,
 					'method': 'POST',
 					// Dont work for me with https:
 					//'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
-					'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
+					'url': url,
 					'headers': {
 						'X-Plex-Token': adapter.config.plexToken,
 						'X-Plex-Target-Client-Identifier': playerIdentifier
@@ -276,6 +278,7 @@ function startAdapter(options)
 				_axios(options).then(res =>
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+					// confirm commands
 					adapter.setState(id, state.val, true)
 				})
 				.catch(err =>
@@ -510,12 +513,11 @@ function setEvent(data, source, prefix)
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
-		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){
+		// update play_switch control (hack)
+		} else if (data.Player.title != '_recent' && library.existsNode(prefix + '._Controls.playback.play_switch') && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){
+			// umgehe die ganze Logik da dieser State als Sonderfall definiert ist und das bestätigen mit tatsächlichen Werten nicht vorgesehen ist.
 			adapter.setState(prefix + '._Controls.playback.play_switch',(['media.play', 'media.resume'].indexOf(data.event) > -1),true)
-		}
-		
-		
-		
+		}	
 	}
 	
 	// EVENTS
@@ -1178,6 +1180,7 @@ function getPlayers()
 						
 						'common': {
 							'write': true,
+							'read': true,
 							'states': _ACTIONS[mode][key].values
 						},
 					}, _ACTIONS[mode][key].default !== undefined ? _ACTIONS[mode][key].default : false);

@@ -183,7 +183,7 @@ All states from the basic setup will be received without Plex Pass or Tautulli.
 ### with either Plex Pass or Tautulli
 The following states will be received when an event is being received by the webhook - either with Plex Pass or with Tautulli being setup.
 
-__Note:__ With Tautulli being setup, the states can be highly customized to basically anything. See the [instructions on how to setup the webhook (step 4)](https://github.com/Zefau/ioBroker.plex#1222-webhook).
+__Note:__ With Tautulli being setup, the states can be highly customized to basically anything. See the [instructions on how to setup the webhook (step 4)](https://github.com/iobroker-community-adapters/ioBroker.plex#1222-webhook).
 
 With the standard Plex Pass or Tautulli setup, the following states will be received and created:
 - \* Indicates that the state is only given when using Plex Plass

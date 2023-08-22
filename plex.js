@@ -279,7 +279,7 @@ function startAdapter(options)
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
 					// confirm commands
-					adapter.setState(id, state.val, true)
+					library.confirmNode({node: id}, state.val)
 				})
 				.catch(err =>
 				{
@@ -513,10 +513,9 @@ function setEvent(data, source, prefix)
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
-		// update play_switch control (hack)
-		} else if (data.Player.title != '_recent' && library.existsNode(prefix + '._Controls.playback.play_switch') && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){
-			// umgehe die ganze Logik da dieser State als Sonderfall definiert ist und das bestätigen mit tatsächlichen Werten nicht vorgesehen ist.
-			adapter.setState(prefix + '._Controls.playback.play_switch',(['media.play', 'media.resume'].indexOf(data.event) > -1),true)
+		// update play_switch control 
+		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
+			library.confirmNode({node: prefix + '._Controls.playback.play_switch'}, (['media.play', 'media.resume'].indexOf(data.event) > -1))
 		}	
 	}
 	

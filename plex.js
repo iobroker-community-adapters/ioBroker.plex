@@ -258,13 +258,17 @@ function startAdapter(options)
 				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
 				
 				let key = _ACTIONS[mode][action].key || action;
+				if (_ACTIONS[mode][action]["true"] !== undefined)
+						key = state.val ? _ACTIONS[mode][action]["true"] : _ACTIONS[mode][action]["false"]
 				let attribute = _ACTIONS[mode][action].attribute;
+				let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
+				
 				let options = {
 					...REQUEST_OPTIONS,
 					'method': 'POST',
 					// Dont work for me with https:
 					//'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
-					'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
+					'url': url,
 					'headers': {
 						'X-Plex-Token': adapter.config.plexToken,
 						'X-Plex-Target-Client-Identifier': playerIdentifier
@@ -274,12 +278,16 @@ function startAdapter(options)
 				_axios(options).then(res =>
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+					// confirm commands
+					library.confirmNode({node: id}, state.val)
 				})
 				.catch(err =>
 				{
 					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
 					adapter.log.debug(err);
 				});
+				adapter.log.debug('http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
+					)
 			}
 			else
 				adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
@@ -448,7 +456,7 @@ function init()
  */
 function setEvent(data, source, prefix)
 {
-	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
+	//adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
 	// empty payload
 	if (Object.keys(data).length === 0 || !data['event']) {
@@ -498,14 +506,17 @@ function setEvent(data, source, prefix)
 			library.set({node: '_playing.players', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
 			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
 		}
+
+		// adapt prefix
+		prefix = prefix + '.' + groupBy;
 		
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
-		}
-		
-		// adapt prefix
-		prefix = prefix + '.' + groupBy;
+		// update play_switch control 
+		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
+			library.confirmNode({node: prefix + '._Controls.playback.play_switch'}, (['media.play', 'media.resume'].indexOf(data.event) > -1))
+		}	
 	}
 	
 	// EVENTS
@@ -716,7 +727,8 @@ function is(res)
  */
 function convertNode(node, data)
 {
-	switch(node.convert)
+	if (!(node && node.convert)) return data
+	switch(node.convert.func)
 	{
 		case "date-timestamp":
 			
@@ -746,7 +758,7 @@ function convertNode(node, data)
 				date
 			);
 			break;
-			case "seconds-readable":
+		case "seconds-readable":
 			let d = new Date(data)
 			let value = (d.getHours()-1) ? (d.getHours()-1).toString() : '' 
 			value += value ? ':'+('0'+d.getMinutes()).substr(-2) : d.getMinutes().toString() + ':' + ('0'+d.getSeconds()).substr(-2)
@@ -759,11 +771,41 @@ function convertNode(node, data)
 				},
 				value
 			)
+			library.set(
+				{
+					'node': node.key + 'Seconds',
+					'type': 'number',
+					'role': 'media.elapsed',
+					'description': 'Last viewing position in seconds'
+				},
+				Math.floor(data/1000)
+			)
 			break;
 		
 		case "ms-min":
-			let duration = data/1000/60;
-			return duration < 1 ? data : Math.floor(duration);
+			let duration = data/1000;
+			library.set(
+				{
+					'node': node.key + 'Seconds',
+					'type': 'number',
+					'role': 'media.duration',
+					'description': node.description.replace('in minutes', 'in seconds')
+				},
+				duration < 1 ? data * 60 : Math.floor(duration)
+			)
+			return duration < 1 ? data : Math.floor(duration/60);
+			break;
+		case "create-link":
+			let link = data ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + data + '?X-Plex-Token=' + adapter.config.plexToken) : ''
+			library.set(
+				{
+					'node': node.key + node.convert.key,
+					'type': node.convert.type,
+					'role': node.convert.role,
+					'description': (node.description + ' (link)')
+				},
+				link
+			)
 			break;
 	}
 	
@@ -1099,7 +1141,6 @@ function getPlayers()
 	{
 		let data = res.MediaContainer.Server || [];
 		adapter.log.debug('Retrieved Players from Plex.');
-		
 		data.forEach(player =>
 		{
 			// group by player
@@ -1138,6 +1179,7 @@ function getPlayers()
 						
 						'common': {
 							'write': true,
+							'read': true,
 							'states': _ACTIONS[mode][key].values
 						},
 					}, _ACTIONS[mode][key].default !== undefined ? _ACTIONS[mode][key].default : false);

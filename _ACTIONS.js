@@ -2,6 +2,7 @@ module.exports =
 {
 	"playback": {
 		"play": {"key": "play", "description": "Start / Resume", "role":"button.play", "type": "boolean"},
+		"play_switch": {"key": "play_switch", "description": "Start / Pause", "role":"media.state", "type": "boolean", "true":"play","false":"pause"},
 		"pause": {"key": "pause", "description": "Pause", "role":"button.pause", "type": "boolean"},
 		"stop": {"key": "stop", "description": "Stop", "role":"button.stop", "type": "boolean"},
 		"skipPrevious": {"key": "skipPrevious", "description": "Skip to previous item"},

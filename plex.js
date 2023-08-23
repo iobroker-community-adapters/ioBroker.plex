@@ -261,6 +261,7 @@ function startAdapter(options)
 			
 			path.splice(-1);
 			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
+			let playerTitle = library.getDeviceState(path.join('.') + '.Player.title');
 			let playerIp = library.getDeviceState(path.join('.') + '.Player.localaddress');
 			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
 			
@@ -468,7 +469,7 @@ function init()
  */
 function setEvent(data, source, prefix)
 {
-	//adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
+	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
 	// empty payload
 	if (Object.keys(data).length === 0 || !data['event']) {

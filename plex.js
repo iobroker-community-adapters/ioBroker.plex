@@ -32,10 +32,21 @@ let retryCycle, refreshCycle;
 
 let encryptionKey;
 let plex, tautulli, data;
-let players = [], playing = [], streams = 0;
+
+
+/**
+ * players: 				maschine-id of players
+ * playing: 				friendly name of running players
+ * streams: 				number of active streams
+ * playingDevice: 			object
+ * playingDevice.prefix: 	state prefix of runnning players
+ * playingDevice.start: 	start date since last update
+ */
+let players = [], playing = [], streams = 0, playingDevice = [];
 let history = [];
 let notifications = {};
 let upload = _multer({ dest: '/tmp/' });
+let refreshInterval = null
 
 let REQUEST_OPTIONS = {};
 const watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
@@ -65,7 +76,7 @@ function startAdapter(options)
 	{
 		library = new Library(adapter, { nodes: _NODES, actions: _ACTIONS, updatesInLog: adapter.config.debug || false });
 		unloaded = false;
-		
+		refreshInterval = setInterval(refreshViewOffset,1000)
 		// Check Node.js Version
 		let version = parseInt(process.version.substr(1, process.version.indexOf('.')-1));
 		if (version <= 6)
@@ -358,6 +369,7 @@ function startAdapter(options)
 			_http.close(() => adapter.log.debug('Server for listener closed.'));
 			clearTimeout(retryCycle);
 			clearTimeout(refreshCycle);
+			clearInterval(refreshInterval)
 			callback();
 		}
 		catch(e)
@@ -489,17 +501,21 @@ function setEvent(data, source, prefix)
 		library.set({node: prefix, role: 'channel', description: 'Plex Players'});
 		library.set({node: prefix + '.' + groupBy, role: 'channel', description: 'Player ' + (data.Player.title || 'unknown')});
 		
+		// adapt prefix
+		prefix = prefix + '.' + groupBy;
 		// index current playing players
 		if (data.event && data.Player && data.Player.title != '_recent')
 		{
 			if (['media.play', 'media.resume'].indexOf(data.event) > -1)
 			{
 				if (playing.indexOf(data.Player.title) == -1) playing.push(data.Player.title);
+				if (playingDevice.findIndex((player) => player.prefix == prefix) == -1) playingDevice.push({"prefix":prefix, "start": Date.now()});
 				streams++;
 			}
 			else if (['media.stop', 'media.pause'].indexOf(data.event) > -1)
 			{
 				playing = playing.filter(player => player !== data.Player.title);
+				playingDevice = playingDevice.filter(player => player.prefix !== prefix);
 				streams > 0 && streams--;
 			}
 			
@@ -507,8 +523,7 @@ function setEvent(data, source, prefix)
 			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
 		}
 
-		// adapt prefix
-		prefix = prefix + '.' + groupBy;
+		
 		
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
@@ -776,7 +791,7 @@ function convertNode(node, data)
 					'node': node.key + 'Seconds',
 					'type': 'number',
 					'role': 'media.elapsed',
-					'description': 'Last viewing position in seconds'
+					'description': 'Last viewing position in seconds(refresh)'
 				},
 				Math.floor(data/1000)
 			)
@@ -1249,6 +1264,29 @@ function startListener()
 	});
 	
 	_http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
+}
+
+/**
+ * Refresh runtime states while media is playing
+ */
+function refreshViewOffset() {
+	if (!unloaded) {
+		playingDevice.forEach((player) => {
+			let state =  player.prefix + '.Metadata.viewOffset' ;		
+			let value = Math.floor((library.getDeviceState(state) + Date.now() - player.start)/1000)
+			state += 'Seconds'
+			//adapter.log.debug(Math.floor((Date.now() - player.start)/1000))
+			library.set(
+				{
+					'node': state,
+					'type': 'number',
+					'role': 'media.elapsed',
+					'description': 'Last viewing position in seconds(refresh)'
+				},
+				value
+			)
+		}) 
+	}
 }
 
 /*

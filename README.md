@@ -133,8 +133,9 @@ This adapter would not have been possible without the great work of @Zefau (http
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Added a play/pause switch for mediaplayer
-- (ticaki) Added links to artworks
+- (ticaki) Added: a play/pause switch for mediaplayer
+- (ticaki) Added: links to artworks (ready to use)
+- (ticaki) Added: state viewOffsetSeconds refresh every second while playing media(internal counter)
 
 ### 1.0.1 (2023-08-21)
 - (ticaki) Xmlparser call fixed

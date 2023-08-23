@@ -503,6 +503,7 @@ function setEvent(data, source, prefix)
 		
 		// adapt prefix
 		prefix = prefix + '.' + groupBy;
+    
 		// index current playing players
 		if (data.event && data.Player && data.Player.title != '_recent')
 		{
@@ -523,8 +524,6 @@ function setEvent(data, source, prefix)
 			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
 		}
 
-		
-		
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
@@ -792,6 +791,7 @@ function convertNode(node, data)
 					'type': 'number',
 					'role': 'media.elapsed',
 					'description': 'Last viewing position in seconds(refresh)'
+
 				},
 				Math.floor(data/1000)
 			)

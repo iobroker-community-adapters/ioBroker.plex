@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "titleLang": {
       "en": "Plex Media Server",
       "de": "Plex Media Server",
@@ -29,6 +29,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.2": {
+        "en": "Added: a play/pause switch for mediaplayer\nAdded: links to artworks (ready to use)\nAdded: state viewOffsetSeconds refresh every second while playing media(internal counter)",
+        "de": "Hinzugefügt: ein Spiel/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Kunstwerken (bereits zu verwenden)\nHinzugefügt: state viewOffsetSeconds erfrischen jede Sekunde beim Spielen von Medien (interner Zähler)",
+        "ru": "Добавлен: переключатель play/pause для mediaplayer\nДобавлено: ссылки на произведения искусства (готово к использованию)\nДобавлена: state viewOffsetSeconds обновляет каждую секунду, играя в СМИ (внутренний счетчик)",
+        "pt": "Adicionado: a play/pause switch for mediaplayer\nAdicionado: links para obras de arte (já para usar)\nAdicionado: state viewOffsetSeconds refrescar cada segundo enquanto jogando mídia (contador interno)",
+        "nl": "Toegevoegd, een speel/pauzeschakelaar voor mediaplayer\nToegevoegd: links naar kunstwerken\nToegevoegd: de staatsbeelden verfrissen elke seconde terwijl ze media spelen",
+        "fr": "Ajouté: un commutateur de lecture/pause pour le lecteur multimédia\nAjouté: liens aux œuvres d'art (prêt à l'emploi)\nAjouté : Aperçu de l'étatOffsetSeconds rafraîchit chaque seconde tout en jouant aux médias(interne)",
+        "it": "Aggiunto: a play/pause switch for mediaplayer\nAggiunto: link a opere d'arte (pronto all'uso)\nAggiunto: stato viewOffsetSeconds rinfrescare ogni secondo mentre giocando media (internal counter)",
+        "es": "Añadido: un interruptor de juego/pausa para mediaplayer\nAñadido: enlaces a obras de arte (listos para usar)\nAñadido: vista del estadoOffsetSeconds refresca cada segundo mientras juega media(contrar interno)",
+        "pl": "Added: a play/pause switch for mediaplayer\nAdded: linki do dzieł sztuki (czytanie do użycia)\nNastępująco: stanowy widok (OffsetSeconds refresh each second) gra na mediach (internal counter)",
+        "uk": "Додано: перемикач відтворення / паузи для медіаплеєра\nДоданий: посилання на твори мистецтва (читати для використання)\nДодано: Державний виглядОффсетСеконс освіжає кожну секунду, граючи медіа (внутрішній лічильник)",
+        "zh-cn": "增 编:对媒体互动作用/转播\n添加:艺术作品的链接(易于使用)\n添加:国家观Offset IIs reresh每秒钟,同时担任媒体(内部反击)。"
+      },
       "1.0.1": {
         "en": "Xmlparser call fixed",
         "de": "Xmlparser Aufruf behoben",
@@ -106,19 +119,6 @@
         "pl": "zmieniono: wspólnerole/typy dla odtwarzacza mediów\nstosowane są następujące ostrzeżenia typu: dodane zostały podstawowe i brakujące definicje stanowe\nzastrzeżenie: kontrola gracza nie pracowała z https\nzmieniono: niektóre zależności zostały zaktualizowane",
         "uk": "змінено: загальний.role/types for mediaplayer додано\nвиправлено: загальний.типові попередження були виправлені та відсутні визначення стану\nвиправлено: контроль гравця не працює з https\nзмінено: оновлено деякі залежності",
         "zh-cn": "变化:媒体观察员共同编目/型号\n固定:共有的原型警告已经确定,并增加了失踪的国家定义。\n固定:行动者控制同网站进行了大量工作\n变化:一些依赖性得到更新"
-      },
-      "0.9.0": {
-        "en": "- added option for webhook IP address in case Plex is running in a Docker environment\n- updated dependencies",
-        "de": "– Option für Webhook-IP-Adresse hinzugefügt, falls Plex in einer Docker-Umgebung ausgeführt wird\n- Aktualisierte Abhängigkeiten",
-        "ru": "- добавлена ​​опция для IP-адреса веб-перехватчика, если Plex работает в среде Docker.\n- обновлены зависимости",
-        "pt": "- opção adicionada para o endereço IP do webhook caso o Plex esteja sendo executado em um ambiente Docker\n- dependências atualizadas",
-        "nl": "- toegevoegde optie voor webhook IP-adres voor het geval Plex in een Docker-omgeving draait\n- bijgewerkte afhankelijkheden",
-        "fr": "- option ajoutée pour l'adresse IP du webhook au cas où Plex s'exécute dans un environnement Docker\n- dépendances mises à jour",
-        "it": "- aggiunta opzione per l'indirizzo IP del webhook nel caso in cui Plex sia in esecuzione in un ambiente Docker\n- dipendenze aggiornate",
-        "es": "- opción agregada para la dirección IP del webhook en caso de que Plex se esté ejecutando en un entorno Docker\n- dependencias actualizadas",
-        "pl": "- dodano opcję adresu IP webhooka w przypadku, gdy Plex działa w środowisku Docker\n- zaktualizowane zależności",
-        "uk": "- додана опція для IP-адреси webhook у випадку, якщо Plex працює в середовищі Docker\n- оновлені залежності",
-        "zh-cn": "- 添加了 Webhook IP 地址选项，以防 Plex 在 Docker 环境中运行\n- 更新了依赖项"
       }
     },
     "license": "MIT",
@@ -138,7 +138,9 @@
     "connectionType": "local",
     "dataSource": "push",
     "enabled": true,
-    "localLinks": { "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html" },
+    "localLinks": {
+      "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
+    },
     "messagebox": true,
     "subscribe": "messagebox",
     "type": "multimedia",

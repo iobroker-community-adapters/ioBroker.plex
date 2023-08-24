@@ -31,7 +31,7 @@
         "news": {
             "1.0.2": {
                 "en": "Added: a play/pause switch for mediaplayer\nAdded: links to artworks (ready to use)\nAdded: state viewOffsetSeconds refresh every second while playing media(internal counter)",
-                "de": "Hinzugefügt: ein Spiel/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Kunstwerken (bereits zu verwenden)\nHinzugefügt: state viewOffsetSeconds erfrischen jede Sekunde beim Spielen von Medien (interner Zähler)",
+                "de": "Hinzugefügt: ein Play/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Coverartworks (bereit für Verwendung)\nHinzugefügt: State viewOffsetSeconds aktualisiert jede Sekunde beim Abspielen von Medien (interner Zähler)",
                 "ru": "Добавлен: переключатель play/pause для mediaplayer\nДобавлено: ссылки на произведения искусства (готово к использованию)\nДобавлена: state viewOffsetSeconds обновляет каждую секунду, играя в СМИ (внутренний счетчик)",
                 "pt": "Adicionado: a play/pause switch for mediaplayer\nAdicionado: links para obras de arte (já para usar)\nAdicionado: state viewOffsetSeconds refrescar cada segundo enquanto jogando mídia (contador interno)",
                 "nl": "Toegevoegd, een speel/pauzeschakelaar voor mediaplayer\nToegevoegd: links naar kunstwerken\nToegevoegd: de staatsbeelden verfrissen elke seconde terwijl ze media spelen",
@@ -163,7 +163,6 @@
         "getStatistics": false,
         "getPlaylists": true,
         "getSettings": true,
-        "getAllItem": false,
         "notifications": [
             {
                 "media": "any",

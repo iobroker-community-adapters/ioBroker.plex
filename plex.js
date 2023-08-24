@@ -565,12 +565,26 @@ function setEvent(data, source, prefix)
 				'caption': replacePlaceholders(message.caption, eventData),
 				'source': data.source
 			}
-			
-			// add event to history
-			history.push(notification);
-			
-			data = Object.assign({}, notification); // copy object
-			data.history = JSON.stringify(history.slice(-1000));
+			// dont add events with same media, account, and event (within 1 sec)
+			let addNotification = true
+			for (let i = history.length-1; i>=0;i--) {
+				let lastItem = history[i]
+				if (lastItem.source != notification.source 
+					&& lastItem.media == notification.media 
+					&& lastItem.account == notification.account) 
+				{
+					addNotification = lastItem.media != notification.media || lastItem.timestamp+1000 <= notification.timestamp
+					break
+				}
+			}
+				
+			if (addNotification) {
+					// add event to history
+				history.push(notification);
+				
+				data = Object.assign({}, notification); // copy object
+				data.history = JSON.stringify(history.slice(-1000));
+			}
 		} else {
 			adapter.log.debug('No message defined for ' + data.media + ' ' + event)
 		}

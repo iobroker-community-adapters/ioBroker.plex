@@ -114,7 +114,7 @@ module.exports =
 	"playing.metadata.titlesort": {"description": "The sorting title of the item", "role": "text", "type": "string"},
 	"playing.metadata.viewoffset": {"description": "Last viewing position in milliseconds", "role": "value", "type": "number", "convert": {"func":"seconds-readable"}},
 	"playing.metadata.viewoffsethuman": {"description": "Last viewing position", "role": "text", "type": "string", "convert": {"func":"seconds-readable"}},
-	"playing.metadata.viewoffsethuman": {"description": "Last viewing position in seconds(refresh)", "role": "media.elapsed", "type": "number", "convert": {"func":"seconds-readable"}},
+	"playing.metadata.viewoffsetSeconds": {"description": "Last viewing position in seconds(refresh)", "role": "media.elapsed", "type": "number", "convert": {"func":"seconds-readable"}},
 	"playing.metadata.type": {"description": "The type of media. (movie, show, season, episode, artist, album, track, clip)", "role": "text", "type": "string"},
 	"playing.metadata.writer": {"description": "Writers as a list", "role": "text", "type": "string"},
 	"playing.metadata.year": {"description": "The release year for the item", "role": "text", "type": "number"},

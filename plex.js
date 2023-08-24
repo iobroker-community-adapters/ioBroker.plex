@@ -12,6 +12,8 @@ const { v1: _uuid } = require('uuid');
 
 const Plex = require('plex-api');
 const Tautulli = require('tautulli-api');
+const xml2js = require('xml2js');
+const xml = new xml2js.Parser()
 
 /*
  * internal libraries
@@ -20,7 +22,7 @@ const Library = require(__dirname + '/lib/library.js');
 const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
 const _NODES = require(__dirname + '/_NODES.js');
 const _ACTIONS = require(__dirname + '/_ACTIONS.js');
-
+const _PLAYERDETAILS = require(__dirname + '/_PLAYERDETAILS.js')
 
 /*
  * constants & variables initiation
@@ -33,7 +35,7 @@ let retryCycle, refreshCycle;
 let encryptionKey;
 let plex, tautulli, data;
 
-
+let detailsCounter = 0
 /**
  * players: 				maschine-id of players
  * playing: 				friendly name of running players
@@ -261,7 +263,6 @@ function startAdapter(options)
 			
 			path.splice(-1);
 			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
-			let playerTitle = library.getDeviceState(path.join('.') + '.Player.title');
 			let playerIp = library.getDeviceState(path.join('.') + '.Player.localaddress');
 			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
 			
@@ -508,10 +509,24 @@ function setEvent(data, source, prefix)
 		// index current playing players
 		if (data.event && data.Player && data.Player.title != '_recent')
 		{
+			let playerIp = library.getDeviceState(prefix + '.Player.localaddress');
+			let playerPort = library.getDeviceState(prefix + '.Player.port');
+
+			
 			if (['media.play', 'media.resume'].indexOf(data.event) > -1)
 			{
 				if (playing.indexOf(data.Player.title) == -1) playing.push(data.Player.title);
-				if (playingDevice.findIndex((player) => player.prefix == prefix) == -1) playingDevice.push({"prefix":prefix, "start": Date.now()});
+				if (playingDevice.findIndex((player) => player.prefix == prefix) == -1) {
+					playingDevice.push({
+						"prefix":prefix, 
+						"title": data.Player.title,
+						"local": data.Player.local,
+						"playerIp": playerIp,
+						"playerPort": playerPort,
+						"playerIdentifier": data.Player.uuid
+					});
+					if (data.Player.local) getCurrentPlayerDetail(playerIp, playerPort, data.Player.uuid ,data.Player.title)
+				}
 				streams++;
 			}
 			else if (['media.stop', 'media.pause'].indexOf(data.event) > -1)
@@ -661,7 +676,7 @@ function readData(key, data, prefix, properties)
 		// convert data
 		node.key = key;
 		data = convertNode(node, data);
-
+	
 		// set data
 		library.set(
 			{
@@ -1272,9 +1287,10 @@ function startListener()
  */
 function refreshViewOffset() {
 	if (!unloaded) {
+		if (detailsCounter++ > 15) detailsCounter = 0
 		playingDevice.forEach((player) => {
 			let state =  player.prefix + '.Metadata.viewOffset' ;		
-			let value = Math.floor((library.getDeviceState(state) + Date.now() - player.start)/1000)
+			let value = library.getDeviceState(state) + 1000
 			state += 'Seconds'
 			//adapter.log.debug(Math.floor((Date.now() - player.start)/1000))
 			library.set(
@@ -1286,8 +1302,69 @@ function refreshViewOffset() {
 				},
 				value
 			)
+			if (detailsCounter > 15 && player.local) {
+				getCurrentPlayerDetail(player.playerIp, player.playerPort, player.playerIdentifier, player.title)
+			}
 		}) 
 	}
+}
+
+/**
+ *Use /player/timeline to get current runtime details about mediastreams (only works with number datapoints so far extend it)
+ * 
+ * @param {string} playerIp 			ip of player client
+ * @param {string} playerPort 			port of player client
+ * @param {string} playerIdentifier 	player plex identifier
+ * @param {string} playerTitle 			player name
+ */
+
+function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTitle) {
+//	let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?wait=0&X-Plex-Client-Identifier='+plexOptions.identifier+'&X-Plex-Device-Name='+ playerTitle  + '&X-Plex-Token=' + adapter.config.plexToken + '&X-Plex-Target-Client-Identifier=' + playerIdentifier
+	let options = {
+		...REQUEST_OPTIONS,
+		'method': 'GET',
+		'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?',
+		'headers': {
+			"wait": 0,
+			"X-Plex-Target-Client-Identifier": playerIdentifier,
+			"X-Plex-Client-Identifier": plexOptions.identifier,
+			"X-Plex-Device-Name": playerTitle,
+			"X-Plex-Token": adapter.config.plexToken			
+		}
+	};
+	
+	_axios(options).then(res =>
+	{
+		xml.parseString(res.data, function (err, result) {
+			adapter.log.debug('Timeline data from '+ library.clean(playerTitle, true) + ' json:' + JSON.stringify(result));
+			//if (err) adapter.log.warn(err)
+			for (let d in result.MediaContainer.Timeline) {
+				let data = result.MediaContainer.Timeline[d].$
+				Object.keys(data).forEach((key) => {
+					let prefix = '_playing.'+ library.clean(playerTitle, true) +'-'+ playerIdentifier
+
+					let node = _PLAYERDETAILS["playerDetails"][key] 
+						&& _PLAYERDETAILS["playerDetails"][key].type === 'action' 
+						&& _PLAYERDETAILS["playerDetails"][key].node
+					
+					if (node) {
+						library.confirmNode({node: prefix + '._Controls.'+node}, Number(data[key]))
+					} 
+					else if (node = _PLAYERDETAILS["playerDetails"][key] 
+									&& _PLAYERDETAILS["playerDetails"][key].type === 'node' 
+									&& _PLAYERDETAILS["playerDetails"][key].node) {
+						readData(prefix + '.' + node, Number(data[key]), prefix);
+					}					
+				})
+			}
+		}).catch((err) => {
+			adapter.log.warn(err)
+		})	
+	})
+	.catch((err, body) =>
+	{
+		adapter.log.debug(JSON.stringify(err));
+	});
 }
 
 /*

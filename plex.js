@@ -22,6 +22,7 @@ const Library = require(__dirname + '/lib/library.js');
 const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
 const _NODES = require(__dirname + '/_NODES.js');
 const _ACTIONS = require(__dirname + '/_ACTIONS.js');
+const _PLAYERDETAILS = require(__dirname + '/_PLAYERDETAILS.js')
 const Player = require(__dirname + '/lib/players.js')
 
 /*
@@ -1112,6 +1113,64 @@ function refreshViewOffset() {
 			
 		}) 
 	}
+}
+
+/**
+ *Use /player/timeline to get current runtime details about mediastreams (only works with number datapoints so far extend it)
+ * 
+ * @param {string} playerIp 			ip of player client
+ * @param {string} playerPort 			port of player client
+ * @param {string} playerIdentifier 	player plex identifier
+ * @param {string} playerTitle 			player name
+ */
+
+function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTitle) {
+//	let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?wait=0&X-Plex-Client-Identifier='+plexOptions.identifier+'&X-Plex-Device-Name='+ playerTitle  + '&X-Plex-Token=' + adapter.config.plexToken + '&X-Plex-Target-Client-Identifier=' + playerIdentifier
+	let options = {
+		...REQUEST_OPTIONS,
+		'method': 'GET',
+		'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?',
+		'headers': {
+			"wait": 0,
+			"X-Plex-Target-Client-Identifier": playerIdentifier,
+			"X-Plex-Client-Identifier": plexOptions.identifier,
+			"X-Plex-Device-Name": playerTitle,
+			"X-Plex-Token": adapter.config.plexToken			
+		}
+	};
+	
+	_axios(options).then(res =>
+	{
+		xml.parseString(res.data, function (err, result) {
+			adapter.log.debug('Timeline data from '+ library.clean(playerTitle, true) + ' json:' + JSON.stringify(result));
+			//if (err) adapter.log.warn(err)
+			for (let d in result.MediaContainer.Timeline) {
+				let data = result.MediaContainer.Timeline[d].$
+				Object.keys(data).forEach((key) => {
+					let prefix = '_playing.'+ library.clean(playerTitle, true) +'-'+ playerIdentifier
+
+					let node = _PLAYERDETAILS["playerDetails"][key] 
+						&& _PLAYERDETAILS["playerDetails"][key].type === 'action' 
+						&& _PLAYERDETAILS["playerDetails"][key].node
+					
+					if (node) {
+						library.confirmNode({node: prefix + '._Controls.'+node}, Number(data[key]))
+					} 
+					else if (node = _PLAYERDETAILS["playerDetails"][key] 
+									&& _PLAYERDETAILS["playerDetails"][key].type === 'node' 
+									&& _PLAYERDETAILS["playerDetails"][key].node) {
+						readData(prefix + '.' + node, Number(data[key]), prefix);
+					}					
+				})
+			}
+		}).catch((err) => {
+			adapter.log.warn(err)
+		})	
+	})
+	.catch((err, body) =>
+	{
+		adapter.log.debug(JSON.stringify(err));
+	});
 }
 
 /*

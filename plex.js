@@ -547,29 +547,33 @@ function setEvent(data, source, prefix)
 						notifications['any'] && notifications['any'][event] ||
 						notifications[data.media] && notifications[data.media]['any'] ||
 						notifications['any'] && notifications['any']['any'] ||
-						{ 'message': '', 'caption': '', 'thumb': '' };
+						{ 'message': '', 'caption': '', 'thumb': '', 'notExist':true };
 		
-		// structure event
-		let eventData = JSON.parse(JSON.stringify(data));
-		let notification = {
-			'id': _uuid(),
-			'timestamp': data.timestamp,
-			'datetime': data.datetime,
-			'account': data.account,
-			'player': data.player,
-			'media': data.media,
-			'event': event,
-			'thumb': message.thumb ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
-			'message': replacePlaceholders(message.message, eventData),
-			'caption': replacePlaceholders(message.caption, eventData),
-			'source': data.source
+		if (!message.notExist) {
+			// structure event
+			let eventData = JSON.parse(JSON.stringify(data));
+			let notification = {
+				'id': _uuid(),
+				'timestamp': data.timestamp,
+				'datetime': data.datetime,
+				'account': data.account,
+				'player': data.player,
+				'media': data.media,
+				'event': event,
+				'thumb': message.thumb ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
+				'message': replacePlaceholders(message.message, eventData),
+				'caption': replacePlaceholders(message.caption, eventData),
+				'source': data.source
+			}
+			
+			// add event to history
+			history.push(notification);
+			
+			data = Object.assign({}, notification); // copy object
+			data.history = JSON.stringify(history.slice(-1000));
+		} else {
+			adapter.log.debug('No message defined for ' + data.media + ' ' + event)
 		}
-		
-		// add event to history
-		history.push(notification);
-		
-		data = Object.assign({}, notification); // copy object
-		data.history = JSON.stringify(history.slice(-1000));
 	}
 	
 	// write states
@@ -1226,6 +1230,7 @@ function startListener()
 		let payload;
 		try
 		{
+			adapter.log.debug('Incoming data from plex with ip: ' + req.ip.replace('::ffff:', ''))
 			payload = JSON.parse(req.body.payload);
 			res.sendStatus(200);
 			res.end();
@@ -1248,6 +1253,7 @@ function startListener()
 		let payload;
 		try
 		{
+			adapter.log.debug('Incoming data from tautulli with ip: ' + req.ip.replace('::ffff:', ''))
 			payload = req.body;
 			res.sendStatus(200);
 			res.end();

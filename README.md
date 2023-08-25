@@ -144,6 +144,9 @@ This adapter would not have been possible without the great work of @Zefau (http
 - Add: admin configuration for refresh of metadata and clientdata
 
 
+### 1.0.3 (2023-08-25)
+- (ticaki) Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)
+- (ticaki) Fixed: prevent the creation of duplicate history entries in most cases
 
 ### 1.0.2 (2023-08-23)
 - (ticaki) Added: a play/pause switch for mediaplayer

@@ -32,6 +32,9 @@ let library;
 let unloaded;
 let retryCycle, refreshCycle;
 
+// Temp Json only for new Data
+let newConstantJson 
+
 let encryptionKey;
 let plex, tautulli, data;
 
@@ -482,7 +485,7 @@ function init()
  */
 function setEvent(data, source, prefix)
 {
-	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
+	//adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
 	
 	// empty payload
 	if (Object.keys(data).length === 0 || !data['event']) {
@@ -558,7 +561,9 @@ function setEvent(data, source, prefix)
 		// update play_switch control 
 		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
 			library.confirmNode({node: prefix + '._Controls.playback.play_switch'}, (['media.play', 'media.resume'].indexOf(data.event) > -1))
-		}	
+		}
+		// get library details plex.0._playing.ipad-10A88133-3762-4948-AF10-9503A37517AC.Metadata.key
+		if (adapter.config.getAllItem && data.Player.title != '_recent') getItemDetails(data.Metadata && data.Metadata.key, prefix)	
 	}
 	
 	// EVENTS
@@ -604,6 +609,7 @@ function setEvent(data, source, prefix)
 		readData(prefix + '.' + key, data[key], prefix);
 	}
 	
+	
 	// cleanup old states when playing something new
 	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play') {
 		library.runGarbageCollector(prefix, false, 30, ['_Controls']);
@@ -614,20 +620,37 @@ function setEvent(data, source, prefix)
  * Read and write data received from event
  *
  */
-function readData(key, data, prefix, properties)
+function readData(key, data, prefix, properties, expandNestedData)
 {
 	// only proceed if data is given
 	if (data === undefined || data === 'undefined')
 		return false;
 	
-		// get node details	
-	let node = library.getNode(key.indexOf('_playing') > -1 ? 'playing' + key.substr(key.indexOf('.', prefix.length)) : key, true);
+	// get node details
+	let nodeKey = key
+	nodeKey = nodeKey.replace(/\.[0-9]{3}\./gi,'.')	
+	nodeKey = nodeKey.search(/\.[0-9]{3}/gi) != -1 && nodeKey.replace(/\.[0-9]{3}/gi,'') + '.list' || nodeKey
+	
+	nodeKey = nodeKey.indexOf('_playing') > -1 ? 'playing' + nodeKey.substr(nodeKey.indexOf('.', prefix.length)) : nodeKey
+	
+	let node = library.getNode(nodeKey, true);
 
+	if (newConstantJson !== undefined && node.notExist) {
+		newConstantJson[nodeKey.toLowerCase()] = {
+			...node,
+			type: typeof data == 'object' ? 'channel' : typeof data,
+			notExist: undefined,
+			description: nodeKey.endsWith('.key') ? "Media url" : nodeKey.split('.').slice(-2).join('.').replace(".", " "),
+			convert: nodeKey.endsWith('.key') ? {"func":"create-link", "type":"string", "role":"media.url","key":"_link"} : undefined,
+			role: typeof data == 'object' ? undefined : ''
+		}
+		
+	}
 	// loop nested data
 	if (typeof data == 'object')
 	{
 		// flatten nested data in one state
- 		if (Array.isArray(data))
+ 		if (Array.isArray(data) && !expandNestedData)
 		{
 			if (data.length)
 			{
@@ -676,7 +699,7 @@ function readData(key, data, prefix, properties)
 							'description': 'Data of this folder in JSON format'}, JSON.stringify(data[nestedKey]), properties);
 					}
 					
-					readData(key + '.' + indexKey, data[nestedKey], prefix);
+					readData(key + '.' + indexKey, data[nestedKey], prefix, undefined, expandNestedData);
 				}
 			}
 		}
@@ -1238,6 +1261,49 @@ function getPlayers()
 		adapter.log.debug('Could not retrieve Players from Plex!');
 		adapter.log.debug(err);
 	});
+}
+
+function getItemDetails(item, prefix){//"/library/metadata/34679"
+	
+	if (!item || typeof item !== 'string') return
+	
+	adapter.log.debug(`Retrieved Libary details for ${item} from Plex.`)
+	
+	plex.query(item).then(function (result) {
+		if (!result || !result.MediaContainer||!result.MediaContainer.Metadata || !result.MediaContainer.Metadata[0].Media ) return
+		newConstantJson = newConstantJson || {}
+		let data = {"Media": result.MediaContainer.Metadata[0].Media}
+
+		// remove unwanted data
+		delete data.guid
+		for (const d in data) if (typeof data[d] !== 'object') delete data[d]
+
+		readData(prefix+'.Metadata', data, prefix, undefined, true)
+		//adapter.log.debug(JSON.stringify(newConstantJson))
+		
+	}, function (err) {
+		console.error("Could not connect to server", err);
+	});
+}
+function readSpecialData(key, data, lastData, result = {}) {
+	if (typeof data === 'object') {
+		if (Array.isArray(data)) {
+			for (const a in data) {
+				result = readSpecialData(key, data[a], data, result )
+			}
+		} else {
+			for (const a in data) {
+				result = readSpecialData(key && key +'.'+a || a, data[a], data, result)
+			}
+		}
+	} else {
+		if (key === 'Metadata.Media.Part.Stream.streamType' && data == 4) { 
+			key = key.split('.').slice(0,-1).join('.')
+			result[key] = result[key] || []
+			result = {...result, [key]:[...result[key], lastData]}
+		}
+	}
+	return result
 }
 
 /**

@@ -31,6 +31,7 @@
     "event": "Benachrichtigungstyp",
     "events": "Aktuelle Wiedergabe / Ereignisse empfangen (Konfiguration des Webhook)",
     "eventsInfo": "Der Webhook kann genutzt werden, um die aktuelle Wiedergabe bzw. die Ereignisse von Plex oder Tautulli zu empfangen.",
+    "getAllItem": "Rufen Sie alle aktuellen Streaming-Informationen ab",
     "getAllItems": "alle Elemente der Bibliothek(en) abrufen",
     "getLibraries": "Bibliotheken abrufen",
     "getPlaylists": "Playlists abrufen",

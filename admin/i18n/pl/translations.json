@@ -31,6 +31,7 @@
     "event": "Typ zdarzenia ",
     "events": "Subskrybuj / słuchać zdarzeń (konfiguracja strony-pościgowa)",
     "eventsInfo": "Nasłuchiwanie zdarzeń pozwala odbierać zdarzenia z plexus lub Tautulli.",
+    "getAllItem": "Pobierz wszystkie aktualne informacje o transmisji strumieniowej",
     "getAllItems": "Zobacz wszystkie przedmioty w bibliotece",
     "getLibraries": "Przywrócić biblioteki",
     "getPlaylists": "Otrzymywać listy odtwarzania",

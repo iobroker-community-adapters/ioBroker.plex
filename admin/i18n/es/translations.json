@@ -31,6 +31,7 @@
     "event": "Tipo de evento",
     "events": "Suscribirse / escuchar a los eventos (Configuración de la webhook)",
     "eventsInfo": "Escuchar eventos le permite recibir los eventos de ambos Plex o Tautulli.",
+    "getAllItem": "Recuperar toda la información de transmisión actual",
     "getAllItems": "Recuperar todos los elementos dentro de una biblioteca",
     "getLibraries": "Recuperar las bibliotecas",
     "getPlaylists": "Recuperar listas de reproducción",

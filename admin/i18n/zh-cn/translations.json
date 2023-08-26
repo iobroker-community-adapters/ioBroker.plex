@@ -31,6 +31,7 @@
     "event": "事件类型",
     "events": "订阅/听到的事件(配置两者)",
     "eventsInfo": "听到事件可以让你得到事件，从这两个丛或Tautulli的。",
+    "getAllItem": "检索当前所有流媒体信息",
     "getAllItems": "检索的所有项目在图书馆",
     "getLibraries": "检索图书馆",
     "getPlaylists": "检索的播放列表",

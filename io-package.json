@@ -1,346 +1,347 @@
 {
-  "common": {
-    "name": "plex",
-    "version": "1.0.2",
-    "titleLang": {
-      "en": "Plex Media Server",
-      "de": "Plex Media Server",
-      "ru": "Plex Media Server",
-      "pt": "Plex Media Server",
-      "nl": "Plex Media Server",
-      "fr": "Plex Media Server",
-      "it": "Plex Media Server",
-      "es": "Plex Media Server",
-      "pl": "Plex Media Server",
-      "zh-cn": "Plex Media Server",
-      "uk": "Медіасервер Plex"
+    "common": {
+        "name": "plex",
+        "version": "1.0.2",
+        "titleLang": {
+            "en": "Plex Media Server",
+            "de": "Plex Media Server",
+            "ru": "Plex Media Server",
+            "pt": "Plex Media Server",
+            "nl": "Plex Media Server",
+            "fr": "Plex Media Server",
+            "it": "Plex Media Server",
+            "es": "Plex Media Server",
+            "pl": "Plex Media Server",
+            "zh-cn": "Plex Media Server",
+            "uk": "Медіасервер Plex"
+        },
+        "desc": {
+            "en": "Integration of your Plex Media Server and your Tautulli",
+            "de": "Integration des Plex Media Servers und Tautulli",
+            "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
+            "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
+            "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
+            "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
+            "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
+            "es": "La integración de su Plex Media Server y / o su Tautulli",
+            "pl": "Integracja Plex media serwer i / lub Tautulli",
+            "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli",
+            "uk": "Інтеграція медіасервера Plex і Tautulli"
+        },
+        "news": {
+            "1.0.2": {
+                "en": "Added: a play/pause switch for mediaplayer\nAdded: links to artworks (ready to use)\nAdded: state viewOffsetSeconds refresh every second while playing media(internal counter)",
+                "de": "Hinzugefügt: ein Spiel/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Kunstwerken (bereits zu verwenden)\nHinzugefügt: state viewOffsetSeconds erfrischen jede Sekunde beim Spielen von Medien (interner Zähler)",
+                "ru": "Добавлен: переключатель play/pause для mediaplayer\nДобавлено: ссылки на произведения искусства (готово к использованию)\nДобавлена: state viewOffsetSeconds обновляет каждую секунду, играя в СМИ (внутренний счетчик)",
+                "pt": "Adicionado: a play/pause switch for mediaplayer\nAdicionado: links para obras de arte (já para usar)\nAdicionado: state viewOffsetSeconds refrescar cada segundo enquanto jogando mídia (contador interno)",
+                "nl": "Toegevoegd, een speel/pauzeschakelaar voor mediaplayer\nToegevoegd: links naar kunstwerken\nToegevoegd: de staatsbeelden verfrissen elke seconde terwijl ze media spelen",
+                "fr": "Ajouté: un commutateur de lecture/pause pour le lecteur multimédia\nAjouté: liens aux œuvres d'art (prêt à l'emploi)\nAjouté : Aperçu de l'étatOffsetSeconds rafraîchit chaque seconde tout en jouant aux médias(interne)",
+                "it": "Aggiunto: a play/pause switch for mediaplayer\nAggiunto: link a opere d'arte (pronto all'uso)\nAggiunto: stato viewOffsetSeconds rinfrescare ogni secondo mentre giocando media (internal counter)",
+                "es": "Añadido: un interruptor de juego/pausa para mediaplayer\nAñadido: enlaces a obras de arte (listos para usar)\nAñadido: vista del estadoOffsetSeconds refresca cada segundo mientras juega media(contrar interno)",
+                "pl": "Added: a play/pause switch for mediaplayer\nAdded: linki do dzieł sztuki (czytanie do użycia)\nNastępująco: stanowy widok (OffsetSeconds refresh each second) gra na mediach (internal counter)",
+                "uk": "Додано: перемикач відтворення / паузи для медіаплеєра\nДоданий: посилання на твори мистецтва (читати для використання)\nДодано: Державний виглядОффсетСеконс освіжає кожну секунду, граючи медіа (внутрішній лічильник)",
+                "zh-cn": "增 编:对媒体互动作用/转播\n添加:艺术作品的链接(易于使用)\n添加:国家观Offset IIs reresh每秒钟,同时担任媒体(内部反击)。"
+            },
+            "1.0.1": {
+                "en": "Xmlparser call fixed",
+                "de": "Xmlparser Aufruf behoben",
+                "ru": "Xmlparser вызов фиксированный",
+                "pt": "Xmlparser chamada fixa",
+                "nl": "Xmlparser call gerepareerd",
+                "fr": "Appel fixe Xmlparser",
+                "it": "Chiamata Xmlparser fisso",
+                "es": "Llamada Xmlparse fijo",
+                "pl": "Xmlparser call (ang.)",
+                "uk": "Xml Генератор виклик фіксований",
+                "zh-cn": "十mlparser 固定电话"
+            },
+            "1.0.0": {
+                "en": "fixed: several minor issues have been fixed",
+                "de": "behoben: es wurden mehrere kleinere Probleme behoben",
+                "ru": "исправлено: исправлено несколько мелких вопросов",
+                "pt": "corrigido: várias questões menores foram corrigidas",
+                "nl": "er zijn meerdere kleine kwesties opgelost",
+                "fr": "fixe: plusieurs questions mineures ont été corrigées",
+                "it": "fisso: sono stati fissati diversi problemi minori",
+                "es": "fijo: se han resuelto varias cuestiones menores",
+                "pl": "ustalono kilka drobnych problemów",
+                "uk": "виправлено: виправлено кілька незначних питань",
+                "zh-cn": "固定:几个小问题已经确定。"
+            },
+            "1.0.0-alpha.3": {
+                "en": "fixed: common.type warnings have been fixed and missing state definitions have been added #114 #101 #100\nfixed: player controls only worked with http \nfixed: history page ioBroker/ioBroker.socketio has been fixed #32\nfixed: translation error has been fixed #108",
+                "de": "behoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt #114 #101 #100\nbehoben: Spielerkontrollen funktionierten nur mit http\nbehoben: ioBroker/ioBroker.socketio Fehler #32 wurde behoben\nbehoben: Übersetzungsfehler wurde #108 behoben",
+                "ru": "исправлено: common.type предупреждения были исправлены и отсутствуют государственные определения были добавлены #114 #101 #100\nфиксированный: игрок контролирует только работу с http\nисправлено: страница истории ioBroker/ioBroker. socketio был исправлен #32\nисправлено: ошибка трабсляции была исправлена #108",
+                "pt": "corrigido: avisos comuns.tipo foram corrigidos e as definições de estado em falta foram adicionadas #114 #101 #100\nfixo: controles do jogador só trabalhou com http\ncorrigido: página de história ioBroker/ioBroker. socketio foi corrigido #32\ncorrigido: erro de trabslation foi corrigido #108",
+                "nl": "vertaling:\nde speler controleerde alleen met htp\ngeschiedenispagina ioBroker/ioBroker. Socketio is gerepareerd 32\nvertaling:",
+                "fr": "fixe: les avertissements de type commun ont été corrigés et les définitions d'état manquantes ont été ajoutées #114 #101 #100\nfixe: les commandes de lecteur seulement travaillé avec http\ncorrigé: page d'histoire ioBroker/ioBroker. socketio a été corrigé #32\ncorrigé: erreur de trabslation a été corrigée #108",
+                "it": "fisso: common.type avvisi sono stati fissati e le definizioni di stato mancanti sono state aggiunte #114 #101 #100\nfisso: i controlli dei giocatori hanno lavorato solo con http\nfisso: pagina di storia ioBroker/ioBroker. socketio è stato fissato #32\nfisso: errore di trabslation è stato fissato #108",
+                "es": "fijos: las advertencias de tipo común han sido fijadas y las definiciones de estado desaparecidas se han añadido #114 #101 #100\nfijo: los controles del jugador solo funcionan con http\nfijo: página de historia ioBroker/ioBroker. socketio ha sido fijado #32\nfijo: error de trabslación se ha fijado #108",
+                "pl": "ustalono następujące ostrzeżenia: ustalane są i brakujące definicje państwowe o numerze #114 #100\nzastosowanie: kontrola gracza działała tylko z http\noficjalna strona internetowa ioBroker/ioBroker Został ustalony numer #32\nuruchomiono błędy w przeliczeniu #108",
+                "uk": "виправлено: загальний.типові попередження були виправлені та відсутні державні визначення #114 #101 #100\nфіксована: контроль гравця тільки працює з http://\nфіксована: історія сторінки ioBroker/ioBroker. бензофіксовано #32\nвиправлено: виправлено помилку перетягування #108",
+                "zh-cn": "固定:共有的原型警告已经确定,并增添了第114 号第101号 #100\n固定:角色控制只与网站合作。\n固定:生物Broker/ioBroker的历史页。 零件已固定在编号32 #32\n固定:trabsl错误已定为第108号。"
+            },
+            "1.0.0-alpha.2": {
+                "en": "Dependencies have been updated",
+                "de": "Abhängigkeiten wurden aktualisiert",
+                "ru": "В зависимости были обновлены",
+                "pt": "As dependências foram atualizadas",
+                "nl": "Afhankelijkheid",
+                "fr": "Les dépendances ont été mises à jour",
+                "it": "Le dipendenze sono state aggiornate",
+                "es": "Se han actualizado las dependencias",
+                "pl": "Zależności zostały zaktualizowane",
+                "uk": "Оновлено залежність",
+                "zh-cn": "已更新了属地"
+            },
+            "1.0.0-alpha.1": {
+                "en": "Dependencies have been updated",
+                "de": "Abhängigkeiten wurden aktualisiert",
+                "ru": "В зависимости были обновлены",
+                "pt": "As dependências foram atualizadas",
+                "nl": "Afhankelijkheid",
+                "fr": "Les dépendances ont été mises à jour",
+                "it": "Le dipendenze sono state aggiornate",
+                "es": "Se han actualizado las dependencias",
+                "pl": "Zależności zostały zaktualizowane",
+                "uk": "Оновлено залежність",
+                "zh-cn": "已更新了属地"
+            },
+            "1.0.0-alpha.0": {
+                "en": "changed: common.role/types for mediaplayer added\nfixed: common.type warnings have been fixed and missing state definitions havew been added\nfixed: player controls didnt work with https\nchanged: some dependencies have been updated",
+                "de": "geändert: common.role/typen für Mediaplayer hinzugefügt\nbehoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt\nbehoben: Steuerungen funktionierte nicht mit https\ngeändert: einige Abhängigkeiten wurden aktualisiert",
+                "ru": "изменено: common.role/types для mediaplayer добавлен\nисправлено: common.type предупреждения были исправлены и отсутствуют государственные определения были добавлены\nисправлено: игрок контролирует не работает с https\nизменено: некоторые зависимости были обновлены",
+                "pt": "alterado: common.role/types para mediaplayer adicionado\ncorrigido: avisos comuns do tipo foram corrigidos e as definições do estado em falta foram adicionadas\nfixo: controles do jogador não funcionou com https\nalterado: algumas dependências foram atualizadas",
+                "nl": "verandering:\nvertaling:\nbeheersing werkte niet met htp's\nsommige afhankelijkheid is geüpload",
+                "fr": "changé: common.role/types pour le lecteur multimédia ajouté\nfixe: les avertissements de type commun ont été corrigés et les définitions d'état manquantes ont été ajoutées\ncorrigé: les commandes de lecteur n'ont pas fonctionné avec https\nchangé: certaines dépendances ont été mises à jour",
+                "it": "cambiato: common.role/types per mediaplayer aggiunto\nfissi: common.type avvisi sono stati fissati e le definizioni mancanti dello stato sono state aggiunte\nfisso: i controlli dei giocatori non hanno funzionato con https\nmodificato: alcune dipendenze sono state aggiornate",
+                "es": "cambiado: común.role/tipos para mediaplayer añadido\nfijo: las advertencias de tipo común han sido fijadas y se han añadido definiciones de estado desaparecidas\nfijo: los controles del jugador no funcionaron con https\ncambios: se han actualizado algunas dependencias",
+                "pl": "zmieniono: wspólnerole/typy dla odtwarzacza mediów\nstosowane są następujące ostrzeżenia typu: dodane zostały podstawowe i brakujące definicje stanowe\nzastrzeżenie: kontrola gracza nie pracowała z https\nzmieniono: niektóre zależności zostały zaktualizowane",
+                "uk": "змінено: загальний.role/types for mediaplayer додано\nвиправлено: загальний.типові попередження були виправлені та відсутні визначення стану\nвиправлено: контроль гравця не працює з https\nзмінено: оновлено деякі залежності",
+                "zh-cn": "变化:媒体观察员共同编目/型号\n固定:共有的原型警告已经确定,并增加了失踪的国家定义。\n固定:行动者控制同网站进行了大量工作\n变化:一些依赖性得到更新"
+            }
+        },
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "icon": "plex.jpg",
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
+        "keywords": [
+            "tautulli",
+            "plex",
+            "media"
+        ],
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
+        "loglevel": "info",
+        "materialize": true,
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "push",
+        "enabled": true,
+        "localLinks": {
+            "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
+        },
+        "messagebox": true,
+        "subscribe": "messagebox",
+        "type": "multimedia",
+        "authors": [
+            {
+                "name": "Zefau",
+                "email": "zefau@mailbox.org"
+            },
+            {
+                "name": "ticaki",
+                "email": "ticaki@renopoint.de"
+            }
+        ]
     },
-    "desc": {
-      "en": "Integration of your Plex Media Server and your Tautulli",
-      "de": "Integration des Plex Media Servers und Tautulli",
-      "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
-      "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
-      "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
-      "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
-      "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
-      "es": "La integración de su Plex Media Server y / o su Tautulli",
-      "pl": "Integracja Plex media serwer i / lub Tautulli",
-      "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli",
-      "uk": "Інтеграція медіасервера Plex і Tautulli"
+    "native": {
+        "getServers": true,
+        "getLibraries": true,
+        "getAllItems": false,
+        "getUsers": false,
+        "getStatistics": false,
+        "getPlaylists": true,
+        "getSettings": true,
+        "getAllItem": false,
+        "notifications": [
+            {
+                "media": "any",
+                "event": "any",
+                "message": "No Message defined for media %Metadata.type% and event %event%",
+                "caption": "",
+                "thumb": ""
+            },
+            {
+                "media": "any",
+                "event": "media.play",
+                "message": "%Metadata.title% (%Metadata.year%) playing",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "media": "any",
+                "event": "media.pause",
+                "message": "%Metadata.title% (%Metadata.year%) paused",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "media": "any",
+                "event": "media.stop",
+                "message": "%Metadata.title% (%Metadata.year%) stopped",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "media": "any",
+                "event": "media.resume",
+                "message": "%Metadata.title% (%Metadata.year%) resumed",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "media": "any",
+                "event": "media.rate",
+                "message": "%Metadata.title% (%Metadata.year%) rated",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "media": "any",
+                "event": "media.watched",
+                "message": "%Metadata.title% (%Metadata.year%) watched",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "media": "episode",
+                "event": "media.play",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "media": "episode",
+                "event": "media.pause",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "media": "episode",
+                "event": "media.stop",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "media": "episode",
+                "event": "media.resume",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "media": "episode",
+                "event": "media.rate",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "media": "episode",
+                "event": "media.watched",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "media": "track",
+                "event": "media.play",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": ""
+            },
+            {
+                "media": "track",
+                "event": "media.pause",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": ""
+            },
+            {
+                "media": "track",
+                "event": "media.stop",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": ""
+            },
+            {
+                "media": "track",
+                "event": "media.resume",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": ""
+            },
+            {
+                "media": "track",
+                "event": "media.rate",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": ""
+            },
+            {
+                "media": "track",
+                "event": "media.watched",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
+                "caption": "Played by %Account.title% on %Player.title%",
+                "thumb": ""
+            },
+            {
+                "media": "system",
+                "event": "library.on.deck",
+                "message": "A new item is added that appears in the user’s On Deck.",
+                "caption": "",
+                "thumb": ""
+            },
+            {
+                "media": "system",
+                "event": "library.new",
+                "message": "A new item is added to a library.",
+                "caption": "",
+                "thumb": ""
+            },
+            {
+                "media": "system",
+                "event": "admin.database.backup",
+                "message": "A database backup is completed successfully via scheduled tasks.",
+                "caption": "",
+                "thumb": ""
+            },
+            {
+                "media": "system",
+                "event": "admin.database.corrupted",
+                "message": "Corruption is detected in the server database.",
+                "caption": "",
+                "thumb": ""
+            },
+            {
+                "media": "system",
+                "event": "device.new",
+                "message": "A new device is using the Plex Media Server.",
+                "caption": "",
+                "thumb": ""
+            },
+            {
+                "media": "system",
+                "event": "playback.started",
+                "message": "Playback is started by a shared user.",
+                "caption": "",
+                "thumb": ""
+            }
+        ]
     },
-    "news": {
-      "1.0.2": {
-        "en": "Added: a play/pause switch for mediaplayer\nAdded: links to artworks (ready to use)\nAdded: state viewOffsetSeconds refresh every second while playing media(internal counter)",
-        "de": "Hinzugefügt: ein Spiel/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Kunstwerken (bereits zu verwenden)\nHinzugefügt: state viewOffsetSeconds erfrischen jede Sekunde beim Spielen von Medien (interner Zähler)",
-        "ru": "Добавлен: переключатель play/pause для mediaplayer\nДобавлено: ссылки на произведения искусства (готово к использованию)\nДобавлена: state viewOffsetSeconds обновляет каждую секунду, играя в СМИ (внутренний счетчик)",
-        "pt": "Adicionado: a play/pause switch for mediaplayer\nAdicionado: links para obras de arte (já para usar)\nAdicionado: state viewOffsetSeconds refrescar cada segundo enquanto jogando mídia (contador interno)",
-        "nl": "Toegevoegd, een speel/pauzeschakelaar voor mediaplayer\nToegevoegd: links naar kunstwerken\nToegevoegd: de staatsbeelden verfrissen elke seconde terwijl ze media spelen",
-        "fr": "Ajouté: un commutateur de lecture/pause pour le lecteur multimédia\nAjouté: liens aux œuvres d'art (prêt à l'emploi)\nAjouté : Aperçu de l'étatOffsetSeconds rafraîchit chaque seconde tout en jouant aux médias(interne)",
-        "it": "Aggiunto: a play/pause switch for mediaplayer\nAggiunto: link a opere d'arte (pronto all'uso)\nAggiunto: stato viewOffsetSeconds rinfrescare ogni secondo mentre giocando media (internal counter)",
-        "es": "Añadido: un interruptor de juego/pausa para mediaplayer\nAñadido: enlaces a obras de arte (listos para usar)\nAñadido: vista del estadoOffsetSeconds refresca cada segundo mientras juega media(contrar interno)",
-        "pl": "Added: a play/pause switch for mediaplayer\nAdded: linki do dzieł sztuki (czytanie do użycia)\nNastępująco: stanowy widok (OffsetSeconds refresh each second) gra na mediach (internal counter)",
-        "uk": "Додано: перемикач відтворення / паузи для медіаплеєра\nДоданий: посилання на твори мистецтва (читати для використання)\nДодано: Державний виглядОффсетСеконс освіжає кожну секунду, граючи медіа (внутрішній лічильник)",
-        "zh-cn": "增 编:对媒体互动作用/转播\n添加:艺术作品的链接(易于使用)\n添加:国家观Offset IIs reresh每秒钟,同时担任媒体(内部反击)。"
-      },
-      "1.0.1": {
-        "en": "Xmlparser call fixed",
-        "de": "Xmlparser Aufruf behoben",
-        "ru": "Xmlparser вызов фиксированный",
-        "pt": "Xmlparser chamada fixa",
-        "nl": "Xmlparser call gerepareerd",
-        "fr": "Appel fixe Xmlparser",
-        "it": "Chiamata Xmlparser fisso",
-        "es": "Llamada Xmlparse fijo",
-        "pl": "Xmlparser call (ang.)",
-        "uk": "Xml Генератор виклик фіксований",
-        "zh-cn": "十mlparser 固定电话"
-      },
-      "1.0.0": {
-        "en": "fixed: several minor issues have been fixed",
-        "de": "behoben: es wurden mehrere kleinere Probleme behoben",
-        "ru": "исправлено: исправлено несколько мелких вопросов",
-        "pt": "corrigido: várias questões menores foram corrigidas",
-        "nl": "er zijn meerdere kleine kwesties opgelost",
-        "fr": "fixe: plusieurs questions mineures ont été corrigées",
-        "it": "fisso: sono stati fissati diversi problemi minori",
-        "es": "fijo: se han resuelto varias cuestiones menores",
-        "pl": "ustalono kilka drobnych problemów",
-        "uk": "виправлено: виправлено кілька незначних питань",
-        "zh-cn": "固定:几个小问题已经确定。"
-      },
-      "1.0.0-alpha.3": {
-        "en": "fixed: common.type warnings have been fixed and missing state definitions have been added #114 #101 #100\nfixed: player controls only worked with http \nfixed: history page ioBroker/ioBroker.socketio has been fixed #32\nfixed: translation error has been fixed #108",
-        "de": "behoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt #114 #101 #100\nbehoben: Spielerkontrollen funktionierten nur mit http\nbehoben: ioBroker/ioBroker.socketio Fehler #32 wurde behoben\nbehoben: Übersetzungsfehler wurde #108 behoben",
-        "ru": "исправлено: common.type предупреждения были исправлены и отсутствуют государственные определения были добавлены #114 #101 #100\nфиксированный: игрок контролирует только работу с http\nисправлено: страница истории ioBroker/ioBroker. socketio был исправлен #32\nисправлено: ошибка трабсляции была исправлена #108",
-        "pt": "corrigido: avisos comuns.tipo foram corrigidos e as definições de estado em falta foram adicionadas #114 #101 #100\nfixo: controles do jogador só trabalhou com http\ncorrigido: página de história ioBroker/ioBroker. socketio foi corrigido #32\ncorrigido: erro de trabslation foi corrigido #108",
-        "nl": "vertaling:\nde speler controleerde alleen met htp\ngeschiedenispagina ioBroker/ioBroker. Socketio is gerepareerd 32\nvertaling:",
-        "fr": "fixe: les avertissements de type commun ont été corrigés et les définitions d'état manquantes ont été ajoutées #114 #101 #100\nfixe: les commandes de lecteur seulement travaillé avec http\ncorrigé: page d'histoire ioBroker/ioBroker. socketio a été corrigé #32\ncorrigé: erreur de trabslation a été corrigée #108",
-        "it": "fisso: common.type avvisi sono stati fissati e le definizioni di stato mancanti sono state aggiunte #114 #101 #100\nfisso: i controlli dei giocatori hanno lavorato solo con http\nfisso: pagina di storia ioBroker/ioBroker. socketio è stato fissato #32\nfisso: errore di trabslation è stato fissato #108",
-        "es": "fijos: las advertencias de tipo común han sido fijadas y las definiciones de estado desaparecidas se han añadido #114 #101 #100\nfijo: los controles del jugador solo funcionan con http\nfijo: página de historia ioBroker/ioBroker. socketio ha sido fijado #32\nfijo: error de trabslación se ha fijado #108",
-        "pl": "ustalono następujące ostrzeżenia: ustalane są i brakujące definicje państwowe o numerze #114 #100\nzastosowanie: kontrola gracza działała tylko z http\noficjalna strona internetowa ioBroker/ioBroker Został ustalony numer #32\nuruchomiono błędy w przeliczeniu #108",
-        "uk": "виправлено: загальний.типові попередження були виправлені та відсутні державні визначення #114 #101 #100\nфіксована: контроль гравця тільки працює з http://\nфіксована: історія сторінки ioBroker/ioBroker. бензофіксовано #32\nвиправлено: виправлено помилку перетягування #108",
-        "zh-cn": "固定:共有的原型警告已经确定,并增添了第114 号第101号 #100\n固定:角色控制只与网站合作。\n固定:生物Broker/ioBroker的历史页。 零件已固定在编号32 #32\n固定:trabsl错误已定为第108号。"
-      },
-      "1.0.0-alpha.2": {
-        "en": "Dependencies have been updated",
-        "de": "Abhängigkeiten wurden aktualisiert",
-        "ru": "В зависимости были обновлены",
-        "pt": "As dependências foram atualizadas",
-        "nl": "Afhankelijkheid",
-        "fr": "Les dépendances ont été mises à jour",
-        "it": "Le dipendenze sono state aggiornate",
-        "es": "Se han actualizado las dependencias",
-        "pl": "Zależności zostały zaktualizowane",
-        "uk": "Оновлено залежність",
-        "zh-cn": "已更新了属地"
-      },
-      "1.0.0-alpha.1": {
-        "en": "Dependencies have been updated",
-        "de": "Abhängigkeiten wurden aktualisiert",
-        "ru": "В зависимости были обновлены",
-        "pt": "As dependências foram atualizadas",
-        "nl": "Afhankelijkheid",
-        "fr": "Les dépendances ont été mises à jour",
-        "it": "Le dipendenze sono state aggiornate",
-        "es": "Se han actualizado las dependencias",
-        "pl": "Zależności zostały zaktualizowane",
-        "uk": "Оновлено залежність",
-        "zh-cn": "已更新了属地"
-      },
-      "1.0.0-alpha.0": {
-        "en": "changed: common.role/types for mediaplayer added\nfixed: common.type warnings have been fixed and missing state definitions havew been added\nfixed: player controls didnt work with https\nchanged: some dependencies have been updated",
-        "de": "geändert: common.role/typen für Mediaplayer hinzugefügt\nbehoben: common.type Warnungen wurden behoben und fehlende Zustandsdefinitionen wurden hinzugefügt\nbehoben: Steuerungen funktionierte nicht mit https\ngeändert: einige Abhängigkeiten wurden aktualisiert",
-        "ru": "изменено: common.role/types для mediaplayer добавлен\nисправлено: common.type предупреждения были исправлены и отсутствуют государственные определения были добавлены\nисправлено: игрок контролирует не работает с https\nизменено: некоторые зависимости были обновлены",
-        "pt": "alterado: common.role/types para mediaplayer adicionado\ncorrigido: avisos comuns do tipo foram corrigidos e as definições do estado em falta foram adicionadas\nfixo: controles do jogador não funcionou com https\nalterado: algumas dependências foram atualizadas",
-        "nl": "verandering:\nvertaling:\nbeheersing werkte niet met htp's\nsommige afhankelijkheid is geüpload",
-        "fr": "changé: common.role/types pour le lecteur multimédia ajouté\nfixe: les avertissements de type commun ont été corrigés et les définitions d'état manquantes ont été ajoutées\ncorrigé: les commandes de lecteur n'ont pas fonctionné avec https\nchangé: certaines dépendances ont été mises à jour",
-        "it": "cambiato: common.role/types per mediaplayer aggiunto\nfissi: common.type avvisi sono stati fissati e le definizioni mancanti dello stato sono state aggiunte\nfisso: i controlli dei giocatori non hanno funzionato con https\nmodificato: alcune dipendenze sono state aggiornate",
-        "es": "cambiado: común.role/tipos para mediaplayer añadido\nfijo: las advertencias de tipo común han sido fijadas y se han añadido definiciones de estado desaparecidas\nfijo: los controles del jugador no funcionaron con https\ncambios: se han actualizado algunas dependencias",
-        "pl": "zmieniono: wspólnerole/typy dla odtwarzacza mediów\nstosowane są następujące ostrzeżenia typu: dodane zostały podstawowe i brakujące definicje stanowe\nzastrzeżenie: kontrola gracza nie pracowała z https\nzmieniono: niektóre zależności zostały zaktualizowane",
-        "uk": "змінено: загальний.role/types for mediaplayer додано\nвиправлено: загальний.типові попередження були виправлені та відсутні визначення стану\nвиправлено: контроль гравця не працює з https\nзмінено: оновлено деякі залежності",
-        "zh-cn": "变化:媒体观察员共同编目/型号\n固定:共有的原型警告已经确定,并增加了失踪的国家定义。\n固定:行动者控制同网站进行了大量工作\n变化:一些依赖性得到更新"
-      }
-    },
-    "license": "MIT",
-    "platform": "Javascript/Node.js",
-    "mode": "daemon",
-    "icon": "plex.jpg",
-    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
-    "keywords": [
-      "tautulli",
-      "plex",
-      "media"
-    ],
-    "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
-    "loglevel": "info",
-    "materialize": true,
-    "compact": true,
-    "connectionType": "local",
-    "dataSource": "push",
-    "enabled": true,
-    "localLinks": {
-      "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
-    },
-    "messagebox": true,
-    "subscribe": "messagebox",
-    "type": "multimedia",
-    "authors": [
-      {
-        "name": "Zefau",
-        "email": "zefau@mailbox.org"
-      },
-      {
-        "name": "ticaki",
-        "email": "ticaki@renopoint.de"
-      }
-    ]
-  },
-  "native": {
-    "getServers": true,
-    "getLibraries": true,
-    "getAllItems": false,
-    "getUsers": false,
-    "getStatistics": false,
-    "getPlaylists": true,
-    "getSettings": true,
-    "notifications": [
-      {
-        "media": "any",
-        "event": "any",
-        "message": "No Message defined for media %Metadata.type% and event %event%",
-        "caption": "",
-        "thumb": ""
-      },
-      {
-        "media": "any",
-        "event": "media.play",
-        "message": "%Metadata.title% (%Metadata.year%) playing",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "media": "any",
-        "event": "media.pause",
-        "message": "%Metadata.title% (%Metadata.year%) paused",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "media": "any",
-        "event": "media.stop",
-        "message": "%Metadata.title% (%Metadata.year%) stopped",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "media": "any",
-        "event": "media.resume",
-        "message": "%Metadata.title% (%Metadata.year%) resumed",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "media": "any",
-        "event": "media.rate",
-        "message": "%Metadata.title% (%Metadata.year%) rated",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "media": "any",
-        "event": "media.watched",
-        "message": "%Metadata.title% (%Metadata.year%) watched",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "media": "episode",
-        "event": "media.play",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "media": "episode",
-        "event": "media.pause",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "media": "episode",
-        "event": "media.stop",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "media": "episode",
-        "event": "media.resume",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "media": "episode",
-        "event": "media.rate",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "media": "episode",
-        "event": "media.watched",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "media": "track",
-        "event": "media.play",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": ""
-      },
-      {
-        "media": "track",
-        "event": "media.pause",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": ""
-      },
-      {
-        "media": "track",
-        "event": "media.stop",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": ""
-      },
-      {
-        "media": "track",
-        "event": "media.resume",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": ""
-      },
-      {
-        "media": "track",
-        "event": "media.rate",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": ""
-      },
-      {
-        "media": "track",
-        "event": "media.watched",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
-        "caption": "Played by %Account.title% on %Player.title%",
-        "thumb": ""
-      },
-      {
-        "media": "system",
-        "event": "library.on.deck",
-        "message": "A new item is added that appears in the user’s On Deck.",
-        "caption": "",
-        "thumb": ""
-      },
-      {
-        "media": "system",
-        "event": "library.new",
-        "message": "A new item is added to a library.",
-        "caption": "",
-        "thumb": ""
-      },
-      {
-        "media": "system",
-        "event": "admin.database.backup",
-        "message": "A database backup is completed successfully via scheduled tasks.",
-        "caption": "",
-        "thumb": ""
-      },
-      {
-        "media": "system",
-        "event": "admin.database.corrupted",
-        "message": "Corruption is detected in the server database.",
-        "caption": "",
-        "thumb": ""
-      },
-      {
-        "media": "system",
-        "event": "device.new",
-        "message": "A new device is using the Plex Media Server.",
-        "caption": "",
-        "thumb": ""
-      },
-      {
-        "media": "system",
-        "event": "playback.started",
-        "message": "Playback is started by a shared user.",
-        "caption": "",
-        "thumb": ""
-      }
-    ]
-  },
-  "objects": [],
-  "instanceObjects": []
+    "objects": [],
+    "instanceObjects": []
 }

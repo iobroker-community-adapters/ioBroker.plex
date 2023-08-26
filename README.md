@@ -132,6 +132,10 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added: Optional retrieve information about streams
+- (ticaki) Added: get status informations from local clients
+
 ### 1.0.2 (2023-08-23)
 - (ticaki) Added: a play/pause switch for mediaplayer
 - (ticaki) Added: links to artworks (ready to use)

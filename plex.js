@@ -82,7 +82,7 @@ function startAdapter(options)
 	{
 		library = new Library(adapter, { nodes: _NODES, actions: _ACTIONS, updatesInLog: adapter.config.debug || false });
 		unloaded = false;
-		refreshInterval = setInterval(refreshViewOffset,1000)
+		refreshInterval = adapter.setInterval(refreshViewOffset,1000)
 		
 		// set encryption key
 		if (adapter.config.encryptionKey === undefined || adapter.config.encryptionKey === '')
@@ -172,7 +172,7 @@ function startAdapter(options)
 		library._plex = plex
 
 		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
-		adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) => {
+		adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) => {
 			library.set(Library.CONNECTION, true);
 			
 			// set current states from objects
@@ -214,8 +214,8 @@ function startAdapter(options)
 	{
 		if (!state || state.ack === true) return;
 		
-		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
-		let action = id.substr(id.lastIndexOf('.')+1);
+		adapter.log.debug(`State of ${id} has changed ${JSON.stringify(state)}.`);
+		let action = id.slice(id.lastIndexOf('.')+1);
 		let val = state.val;
 		
 		// Cloud / iot Adapter
@@ -249,12 +249,12 @@ function startAdapter(options)
 			
 			_axios(options).then(res =>
 			{
-				adapter.log.info('Successfully triggered refresh on library with ID ' + libId + '.');
+				adapter.log.info(`Successfully triggered refresh on library with ID ${libId}.`);
 				adapter.log.debug(JSON.stringify(res));
 			})
 			.catch(err =>
 			{
-				adapter.log.warn('Error triggering refresh on library with ID ' + libId + '! See debug log for details.');
+				adapter.log.warn(`Error triggering refresh on library with ID ${libId}! See debug log for details.`);
 				adapter.log.debug(err);
 			});
 		}
@@ -262,7 +262,7 @@ function startAdapter(options)
 		// Player Controls
 		else
 		{
-			let path = id.replace(adapter.name + '.' + adapter.instance + '.', '').split('.');
+			let path = id.replace(`${adapter.name}.${adapter.instance}.`, '').split('.');
 			action = path.pop();
 			let mode = path.pop();
 			
@@ -330,16 +330,16 @@ function startAdapter(options)
 	{
 		try
 		{
-			adapter.log.info('Plex Adapter stopped und unloaded.');
+			adapter.log.info(`Plex Adapter stopped und unloaded.`);
 			
 			unloaded = true;
 			
 			Player.deletePlayers(this.plexOptions.identifier)
 
 			_http.close(() => adapter.log.debug('Server for listener closed.'));
-			clearTimeout(retryCycle);
-			clearTimeout(refreshCycle);
-			clearInterval(refreshInterval)
+			adapter.clearTimeout(retryCycle);
+			adapter.clearTimeout(refreshCycle);
+			adapter.clearInterval(refreshInterval)
 			callback();
 		}
 		catch(e)
@@ -363,12 +363,12 @@ function init()
 			library.set(Library.CONNECTION, true);
 			
 			// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
-			adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) =>
+			adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) =>
 			{
 				if (err || !states) return;
 				
 				for (let state in states)
-					library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+					library.setDeviceState(state.replace(`${adapter.name}.${adapter.instance}.`, ''), states[state] && states[state].val);
 				
 				playing = library.getDeviceState('_playing.players') && library.getDeviceState('_playing.players').split(',') || [];
 				streams = library.getDeviceState('_playing.streams') || 0;
@@ -377,7 +377,7 @@ function init()
 			// verify Tautulli settings
 			if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
 			{
-				adapter.log.debug('Tautulli IP or API token missing!');
+				adapter.log.info(`Tautulli ${!adapter.config.tautulliIp ? ' IP/ ' : ''}${!adapter.config.tautulliToken ?'API token ':''}missing!`);
 				tautulli = { get: () => Promise.reject('Not connected!') }
 			}
 			
@@ -401,11 +401,11 @@ function init()
 				adapter.config.refresh = 10;
 			}
 			
-			refreshCycle = setTimeout(function updater()
+			refreshCycle = adapter.setTimeout(function updater()
 			{
 				retrieveData();
 				if (adapter.config.refresh > 0 && !unloaded)
-					refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+					refreshCycle = adapter.setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
 				
 			}, 1000);
 			
@@ -422,10 +422,10 @@ function init()
 			if (err.message.indexOf('EHOSTUNREACH') > -1)
 			{
 				adapter.config.retry = 60;
-				adapter.log.info('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
+				adapter.log.info(`Plex Media Server(${adapter.config.plexIp}:${adapter.config.plexPort}) not reachable! Will try again in ${adapter.config.retry} minutes...`);
 				
 				library.set(Library.CONNECTION, false);
-				retryCycle = setTimeout(init, adapter.config.retry*60*1000);
+				retryCycle = adapter.setTimeout(init, adapter.config.retry*60*1000);
 			}
 			else
 				library.terminate(err.message);
@@ -438,7 +438,7 @@ function init()
  */
 function setEvent(data, source, prefix)
 {
-	//adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
+	adapter.log.debug(`Received ${prefix} playload - ${(data['event'] || 'unknown')} - from ${source}: ${JSON.stringify(data)}`);
 	
 	// empty payload
 	if (Object.keys(data).length === 0 || !data['event']) {
@@ -613,8 +613,8 @@ function replacePlaceholders(message, data)
 		{
 			try
 			{
-				index = path.substr(0, path.indexOf('.'));
-				path = path.substr(path.indexOf('.')+1);
+				index = path.slice(0, path.indexOf('.'));
+				path = path.slice(path.indexOf('.')+1);
 				tmp = tmp[index];
 			}
 			catch(err) {adapter.log.debug(err.message)}
@@ -1081,7 +1081,7 @@ function startListener()
 			setEvent(payload, 'tautulli', 'events');
 		}
 		catch(e) {
-			adapter.log.warn('Tautulli notification ' + e.message + ' - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571 ');
+			adapter.log.warn(`Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`);
 			//res.sendStatus(500);
 		}
 	});

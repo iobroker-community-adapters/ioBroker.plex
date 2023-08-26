@@ -21,7 +21,6 @@ const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
 const _NODES = require(__dirname + '/_NODES.js');
 const _ACTIONS = require(__dirname + '/_ACTIONS.js');
 
-
 /*
  * constants & variables initiation
  */
@@ -76,11 +75,7 @@ function startAdapter(options)
 	{
 		library = new Library(adapter, { nodes: _NODES, actions: _ACTIONS, updatesInLog: adapter.config.debug || false });
 		unloaded = false;
-		refreshInterval = setInterval(refreshViewOffset,1000)
-		// Check Node.js Version
-		let version = parseInt(process.version.substr(1, process.version.indexOf('.')-1));
-		if (version <= 6)
-			return library.terminate('This Adapter is not compatible with your Node.js Version ' + process.version + ' (must be >= Node.js v7).', true);
+		refreshInterval = adapter.setInterval(refreshViewOffset,1000)
 		
 		// set encryption key
 		if (adapter.config.encryptionKey === undefined || adapter.config.encryptionKey === '')
@@ -168,16 +163,16 @@ function startAdapter(options)
 		});
 		
 		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
-		adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) => {
+		adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) => {
 			library.set(Library.CONNECTION, true);
 			
 			// set current states from objects
 			for (let state in states) {
 				//Reset own states common.type and common.role
 				library.extendState(state)
-
+				
 				if (states[state] !== null) {
-					library.setDeviceState(state.replace(adapter.name + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+					library.setDeviceState(state.replace(`${adapter.name}.${adapter.instance}.`, ''), states[state] && states[state].val);
 				
 					// set history
 					if (state.indexOf('events.history') > -1) {
@@ -207,8 +202,8 @@ function startAdapter(options)
 	{
 		if (!state || state.ack === true) return;
 		
-		adapter.log.debug('State of ' + id + ' has changed ' + JSON.stringify(state) + '.');
-		let action = id.substr(id.lastIndexOf('.')+1);
+		adapter.log.debug(`State of ${id} has changed ${JSON.stringify(state)}.`);
+		let action = id.slice(id.lastIndexOf('.')+1);
 		let val = state.val;
 		
 		// Cloud / iot Adapter
@@ -242,12 +237,12 @@ function startAdapter(options)
 			
 			_axios(options).then(res =>
 			{
-				adapter.log.info('Successfully triggered refresh on library with ID ' + libId + '.');
+				adapter.log.info(`Successfully triggered refresh on library with ID ${libId}.`);
 				adapter.log.debug(JSON.stringify(res));
 			})
 			.catch(err =>
 			{
-				adapter.log.warn('Error triggering refresh on library with ID ' + libId + '! See debug log for details.');
+				adapter.log.warn(`Error triggering refresh on library with ID ${libId}! See debug log for details.`);
 				adapter.log.debug(err);
 			});
 		}
@@ -255,7 +250,7 @@ function startAdapter(options)
 		// Player Controls
 		else
 		{
-			let path = id.replace(adapter.name + '.' + adapter.instance + '.', '').split('.');
+			let path = id.replace(`${adapter.name}.${adapter.instance}.`, '').split('.');
 			action = path.pop();
 			let mode = path.pop();
 			
@@ -267,13 +262,13 @@ function startAdapter(options)
 			
 			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
 			{
-				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
+				adapter.log.debug(`Triggered action -${action}- on player ${playerIp}.`);
 				
 				let key = _ACTIONS[mode][action].key || action;
 				if (_ACTIONS[mode][action]["true"] !== undefined)
 						key = state.val ? _ACTIONS[mode][action]["true"] : _ACTIONS[mode][action]["false"]
 				let attribute = _ACTIONS[mode][action].attribute;
-				let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
+				let url = `http://${playerIp}:${playerPort}/player/${mode}/${key}?${(attribute != undefined ? `${attribute}=${val}&` : '')}`
 				
 				let options = {
 					...REQUEST_OPTIONS,
@@ -289,13 +284,13 @@ function startAdapter(options)
 
 				_axios(options).then(res =>
 				{
-					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
+					adapter.log.debug(`Successfully triggered ${mode} action -${action}- on player ${playerIp}.`);
 					// confirm commands
 					library.confirmNode({node: id}, state.val)
 				})
 				.catch(err =>
 				{
-					adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! See debug log for details.');
+					adapter.log.warn(`Error triggering ${mode} action -${action}- on player ${playerIp}! See debug log for details.`);
 					adapter.log.debug(err);
 				});
 				adapter.log.debug('http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
@@ -363,14 +358,14 @@ function startAdapter(options)
 	{
 		try
 		{
-			adapter.log.info('Plex Adapter stopped und unloaded.');
+			adapter.log.info(`Plex Adapter stopped und unloaded.`);
 			
 			unloaded = true;
 			
 			_http.close(() => adapter.log.debug('Server for listener closed.'));
-			clearTimeout(retryCycle);
-			clearTimeout(refreshCycle);
-			clearInterval(refreshInterval)
+			adapter.clearTimeout(retryCycle);
+			adapter.clearTimeout(refreshCycle);
+			adapter.clearInterval(refreshInterval)
 			callback();
 		}
 		catch(e)
@@ -394,12 +389,12 @@ function init()
 			library.set(Library.CONNECTION, true);
 			
 			// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
-			adapter.getStates(adapterName + '.' + adapter.instance + '.*', (err, states) =>
+			adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) =>
 			{
 				if (err || !states) return;
 				
 				for (let state in states)
-					library.setDeviceState(state.replace(adapterName + '.' + adapter.instance + '.', ''), states[state] && states[state].val);
+					library.setDeviceState(state.replace(`${adapter.name}.${adapter.instance}.`, ''), states[state] && states[state].val);
 				
 				playing = library.getDeviceState('_playing.players') && library.getDeviceState('_playing.players').split(',') || [];
 				streams = library.getDeviceState('_playing.streams') || 0;
@@ -408,7 +403,7 @@ function init()
 			// verify Tautulli settings
 			if (!adapter.config.tautulliIp || !adapter.config.tautulliToken)
 			{
-				adapter.log.debug('Tautulli IP or API token missing!');
+				adapter.log.info(`Tautulli ${!adapter.config.tautulliIp ? ' IP/ ' : ''}${!adapter.config.tautulliToken ?'API token ':''}missing!`);
 				tautulli = { get: () => Promise.reject('Not connected!') }
 			}
 			
@@ -432,11 +427,11 @@ function init()
 				adapter.config.refresh = 10;
 			}
 			
-			refreshCycle = setTimeout(function updater()
+			refreshCycle = adapter.setTimeout(function updater()
 			{
 				retrieveData();
 				if (adapter.config.refresh > 0 && !unloaded)
-					refreshCycle = setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+					refreshCycle = adapter.setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
 				
 			}, 1000);
 			
@@ -453,10 +448,10 @@ function init()
 			if (err.message.indexOf('EHOSTUNREACH') > -1)
 			{
 				adapter.config.retry = 60;
-				adapter.log.info('Plex Media Server not reachable! Will try again in ' + adapter.config.retry + ' minutes..');
+				adapter.log.info(`Plex Media Server(${adapter.config.plexIp}:${adapter.config.plexPort}) not reachable! Will try again in ${adapter.config.retry} minutes...`);
 				
 				library.set(Library.CONNECTION, false);
-				retryCycle = setTimeout(init, adapter.config.retry*60*1000);
+				retryCycle = adapter.setTimeout(init, adapter.config.retry*60*1000);
 			}
 			else
 				library.terminate(err.message);
@@ -469,7 +464,7 @@ function init()
  */
 function setEvent(data, source, prefix)
 {
-	adapter.log.debug('Received ' + prefix + ' playload -' + (data['event'] || 'unknown') + '- from ' + source + ': ' + JSON.stringify(data));
+	adapter.log.debug(`Received ${prefix} playload - ${(data['event'] || 'unknown')} - from ${source}: ${JSON.stringify(data)}`);
 	
 	// empty payload
 	if (Object.keys(data).length === 0 || !data['event']) {
@@ -612,7 +607,7 @@ function readData(key, data, prefix, properties)
 		return false;
 	
 		// get node details	
-	let node = library.getNode(key.indexOf('_playing') > -1 ? 'playing' + key.substr(key.indexOf('.', prefix.length)) : key, true);
+	let node = library.getNode(key.indexOf('_playing') > -1 ? 'playing' + key.slice(key.indexOf('.', prefix.length)) : key, true);
 
 	// loop nested data
 	if (typeof data == 'object')
@@ -645,7 +640,7 @@ function readData(key, data, prefix, properties)
 				{
 					'node': key,
 					'role': 'channel',
-					'description': RegExp('\.[0-9]{3}$').test(key.substr(-4)) ? 'Index ' + key.substr(key.lastIndexOf('.')+1) : library.ucFirst(key.substr(key.lastIndexOf('.')+1).replace('Tree', '')) + ' Information'
+					'description': RegExp('\.[0-9]{3}$').test(key.slice(-4)) ? 'Index ' + key.slice(key.lastIndexOf('.')+1) : library.ucFirst(key.slice(key.lastIndexOf('.')+1).replace('Tree', '')) + ' Information'
 				},
 				undefined,
 				properties
@@ -714,8 +709,8 @@ function replacePlaceholders(message, data)
 		{
 			try
 			{
-				index = path.substr(0, path.indexOf('.'));
-				path = path.substr(path.indexOf('.')+1);
+				index = path.slice(0, path.indexOf('.'));
+				path = path.slice(path.indexOf('.')+1);
 				tmp = tmp[index];
 			}
 			catch(err) {adapter.log.debug(err.message)}
@@ -777,7 +772,7 @@ function convertNode(node, data)
 			else
 			{
 				let ts = new Date(data*1000);
-				date = ts.getFullYear() + '-' + ('0'+ts.getMonth()).substr(-2) + '-' + ('0'+ts.getDate()).substr(-2);
+				date = ts.getFullYear() + '-' + ('0'+ts.getMonth()).slice(-2) + '-' + ('0'+ts.getDate()).slice(-2);
 			}
 			
 			// set date
@@ -794,7 +789,7 @@ function convertNode(node, data)
 		case "seconds-readable":
 			let d = new Date(data)
 			let value = (d.getHours()-1) ? (d.getHours()-1).toString() : '' 
-			value += value ? ':'+('0'+d.getMinutes()).substr(-2) : d.getMinutes().toString() + ':' + ('0'+d.getSeconds()).substr(-2)
+			value += value ? ':'+('0'+d.getMinutes()).slice(-2) : d.getMinutes().toString() + ':' + ('0'+d.getSeconds()).slice(-2)
 			library.set(
 				{
 					'node': node.key + 'human',
@@ -1279,7 +1274,7 @@ function startListener()
 			setEvent(payload, 'tautulli', 'events');
 		}
 		catch(e) {
-			adapter.log.warn('Tautulli notification ' + e.message + ' - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571 ');
+			adapter.log.warn(`Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`);
 			//res.sendStatus(500);
 		}
 	});

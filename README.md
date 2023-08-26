@@ -146,6 +146,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ### **WORK IN PROGRESS**
 - (ticaki) Fixed: #184
+- (ticaki) Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)
 
 ### 1.0.3 (2023-08-25)
 - (ticaki) Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)

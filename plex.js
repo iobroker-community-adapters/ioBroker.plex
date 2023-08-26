@@ -199,6 +199,9 @@ function startAdapter(options)
 			// test connection
 			init();
 		});
+		library.subscribeNode('metadata.viewoffset',(state, prefix, val, oldval) => {
+			library.confirmNode({node:prefix+'_Control.seekTo'})
+		})
 	});
 
 	/*
@@ -270,11 +273,20 @@ function startAdapter(options)
 			{
 				adapter.log.info('Triggered action -' + action + '- on player ' + playerIp + '.');
 				
+				let newVal = val
 				let key = _ACTIONS[mode][action].key || action;
 				if (_ACTIONS[mode][action]["true"] !== undefined)
 						key = state.val ? _ACTIONS[mode][action]["true"] : _ACTIONS[mode][action]["false"]
+				if (_ACTIONS[mode][action]["convert"] !== undefined) {
+					switch(_ACTIONS[mode][action]["convert"]) {
+						case "percent":
+							newVal = library.getDeviceState(path+'.Metadata.durationSeconds') * newVal * 10
+						break 
+					}
+
+				}
 				let attribute = _ACTIONS[mode][action].attribute;
-				let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
+				let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + newVal + '&' : '')
 				
 				let options = {
 					...REQUEST_OPTIONS,
@@ -292,7 +304,7 @@ function startAdapter(options)
 				{
 					adapter.log.info('Successfully triggered ' + mode + ' action -' + action + '- on player ' + playerIp + '.');
 					// confirm commands
-					library.confirmNode({node: id}, state.val)
+					library.confirmNode({node: id}, val)
 				})
 				.catch(err =>
 				{
@@ -1200,7 +1212,7 @@ function getPlayers()
 				for (let key in _ACTIONS[mode])
 				{
 					button = typeof _ACTIONS[mode][key] == 'string' ? { "key": key, "description": _ACTIONS[mode][key] } : _ACTIONS[mode][key];
-					
+					let common = _ACTIONS[mode][key].common || {}
 					library.set({
 						'node': controls + '.' + mode + '.' + key,
 						'description': 'Playback ' + library.ucFirst(button.description),
@@ -1209,6 +1221,7 @@ function getPlayers()
 						'type': _ACTIONS[mode][key].type !== undefined ? _ACTIONS[mode][key].type : (_ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'number' : 'string') : 'boolean'),
 						
 						'common': {
+							...common,
 							'write': true,
 							'read': true,
 							'states': _ACTIONS[mode][key].values
@@ -1319,52 +1332,54 @@ function refreshViewOffset() {
  */
 
 function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTitle) {
-//	let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?wait=0&X-Plex-Client-Identifier='+plexOptions.identifier+'&X-Plex-Device-Name='+ playerTitle  + '&X-Plex-Token=' + adapter.config.plexToken + '&X-Plex-Target-Client-Identifier=' + playerIdentifier
-	let options = {
-		...REQUEST_OPTIONS,
-		'method': 'GET',
-		'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?',
-		'headers': {
-			"wait": 0,
-			"X-Plex-Target-Client-Identifier": playerIdentifier,
-			"X-Plex-Client-Identifier": plexOptions.identifier,
-			"X-Plex-Device-Name": playerTitle,
-			"X-Plex-Token": adapter.config.plexToken			
-		}
-	};
-	
-	_axios(options).then(res =>
-	{
-		xml.parseString(res.data, function (err, result) {
-			adapter.log.debug('Timeline data from '+ library.clean(playerTitle, true) + ' json:' + JSON.stringify(result));
-			//if (err) adapter.log.warn(err)
-			for (let d in result.MediaContainer.Timeline) {
-				let data = result.MediaContainer.Timeline[d].$
-				Object.keys(data).forEach((key) => {
-					let prefix = '_playing.'+ library.clean(playerTitle, true) +'-'+ playerIdentifier
-
-					let node = _PLAYERDETAILS["playerDetails"][key] 
-						&& _PLAYERDETAILS["playerDetails"][key].type === 'action' 
-						&& _PLAYERDETAILS["playerDetails"][key].node
-					
-					if (node) {
-						library.confirmNode({node: prefix + '._Controls.'+node}, Number(data[key]))
-					} 
-					else if (node = _PLAYERDETAILS["playerDetails"][key] 
-									&& _PLAYERDETAILS["playerDetails"][key].type === 'node' 
-									&& _PLAYERDETAILS["playerDetails"][key].node) {
-						readData(prefix + '.' + node, Number(data[key]), prefix);
-					}					
-				})
+	if (playerIp && playerPort && playerIdentifier && playerTitle) {
+	//	let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?wait=0&X-Plex-Client-Identifier='+plexOptions.identifier+'&X-Plex-Device-Name='+ playerTitle  + '&X-Plex-Token=' + adapter.config.plexToken + '&X-Plex-Target-Client-Identifier=' + playerIdentifier
+		let options = {
+			...REQUEST_OPTIONS,
+			'method': 'GET',
+			'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?',
+			'headers': {
+				"wait": 0,
+				"X-Plex-Target-Client-Identifier": playerIdentifier,
+				"X-Plex-Client-Identifier": plexOptions.identifier,
+				"X-Plex-Device-Name": playerTitle,
+				"X-Plex-Token": adapter.config.plexToken			
 			}
-		}).catch((err) => {
-			adapter.log.warn(err)
-		})	
-	})
-	.catch((err, body) =>
-	{
-		adapter.log.debug(JSON.stringify(err));
-	});
+		};
+	
+		_axios(options).then(res =>
+		{
+			xml.parseString(res.data, function (err, result) {
+				adapter.log.debug('Timeline data from '+ library.clean(playerTitle, true) + ' json:' + JSON.stringify(result));
+				//if (err) adapter.log.warn(err)
+				for (let d in result.MediaContainer.Timeline) {
+					let data = result.MediaContainer.Timeline[d].$
+					Object.keys(data).forEach((key) => {
+						let prefix = '_playing.'+ library.clean(playerTitle, true) +'-'+ playerIdentifier
+
+						let node = _PLAYERDETAILS["playerDetails"][key] 
+							&& _PLAYERDETAILS["playerDetails"][key].type === 'action' 
+							&& _PLAYERDETAILS["playerDetails"][key].node
+						
+						if (node) {
+							library.confirmNode({node: prefix + '._Controls.'+node}, Number(data[key]))
+						} 
+						else if (node = _PLAYERDETAILS["playerDetails"][key] 
+										&& _PLAYERDETAILS["playerDetails"][key].type === 'node' 
+										&& _PLAYERDETAILS["playerDetails"][key].node) {
+							readData(prefix + '.' + node, Number(data[key]), prefix);
+						}					
+					})
+				}
+			}).catch((err) => {
+				adapter.log.warn(err)
+			})	
+		})
+		.catch((err, body) =>
+		{
+			adapter.log.debug(JSON.stringify(err));
+		});
+	}
 }
 
 /*

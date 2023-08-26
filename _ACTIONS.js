@@ -9,10 +9,11 @@ module.exports =
 		"skipNext": {"key": "skipNext", "description": "Skip to next item"},
 		"stepBack": {"key": "stepBack", "description": "seeks back 15 seconds (or the expected platform value)", "role":"button.next", "type": "boolean"},
 		"stepForward": {"key": "stepForward", "description": "seeks forward 30 seconds (or the expected platform value)", "role":"button.prev", "type": "boolean"},
-		"setVolume": {"key": "setParameters", "attribute": "volume", "default": 0, "description": "set Volume", "role":"level.volume", "type": "number"},
-		"setShuffle": {"key": "setParameters", "attribute": "shuffle", "default": 0, "values": {"0": "off", "1": "on"}, "description": "set Shuffle"},
-		"setRepeat": {"key": "setParameters", "attribute": "repeat", "default": 0, "values": {"0": "off", "1": "item", "2": "all"}, "description": "set Repeat"},
-		"seekTo": {"attribute": "offset", "default": 0, "description": "set Offset (in milliseconds)"}
+		"setVolume": {"key": "setParameters", "attribute": "volume", "default": 0, "description": "set Volume", "role":"level.volume", "type": "number", "common":{"unit":'%',"min":0,"max":100}},
+		"setShuffle": {"key": "setParameters", "attribute": "shuffle", "default": 0, "common":{"states": {"0": "off", "1": "on"}}, "description": "set Shuffle"},
+		"setRepeat": {"key": "setParameters", "attribute": "repeat", "default": 0, "common":{"states": {"0": "off", "1": "item", "2": "all"}}, "description": "set Repeat"},
+		"seekTo": {"attribute": "offset", "default": 0, "description": "set Offset (in milliseconds)"},
+		"seekToSeconds": {"attribute": "offset", "default": 0, "role":"button.seek", "description": "set Offset for vis mediaplayer (in Seconds)", "convert": 'percent', "common":{"unit":'%',"min":0,"max":100}}
 	},
 	
 	"navigation": {

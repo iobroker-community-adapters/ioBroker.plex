@@ -144,8 +144,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 - Add: admin configuration for refresh of metadata and clientdata
 
 
-### **WORK IN PROGRESS**
-- (ticaki) Fixed: #184
+### 1.0.4 (2023-08-27)
 - (ticaki) Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)
 
 ### 1.0.3 (2023-08-25)

@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "titleLang": {
       "en": "Plex Media Server",
       "de": "Plex Media Server",
@@ -29,6 +29,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.4": {
+        "en": "Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "de": "Behoben: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "ru": "Исправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "pt": "Corrigido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "nl": "Quality over Quantity (QoQ) Releases Vertaling:",
+        "fr": "Correction : #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "it": "Fisso: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "es": "Corregido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "pl": "Fixed: #184 (https:/github.com/iobroker-community-adapters/ioBrokerplex/issues/184) (ang.)",
+        "uk": "Виправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/products/184)",
+        "zh-cn": "固定:第[184]号(http://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)"
+      },
       "1.0.3": {
         "en": "Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFixed: prevent the creation of duplicate history entries in most cases",
         "de": "Behoben: Fügen keine leeren Benachrichtigungen zur History hinzu #[183](https://github.com/iobroker-community-adapter/ioBroker.plex/issues/183) \nBehoben: Verhindere die Erstellung doppelter Histroyeinträge in den meisten Fällen",
@@ -95,19 +108,6 @@
         "zh-cn": "固定:共有的原型警告已经确定,并增添了第114 号第101号 #100\n固定:角色控制只与网站合作。\n固定:生物Broker/ioBroker的历史页。 零件已固定在编号32 #32\n固定:trabsl错误已定为第108号。"
       },
       "1.0.0-alpha.2": {
-        "en": "Dependencies have been updated",
-        "de": "Abhängigkeiten wurden aktualisiert",
-        "ru": "В зависимости были обновлены",
-        "pt": "As dependências foram atualizadas",
-        "nl": "Afhankelijkheid",
-        "fr": "Les dépendances ont été mises à jour",
-        "it": "Le dipendenze sono state aggiornate",
-        "es": "Se han actualizado las dependencias",
-        "pl": "Zależności zostały zaktualizowane",
-        "uk": "Оновлено залежність",
-        "zh-cn": "已更新了属地"
-      },
-      "1.0.0-alpha.1": {
         "en": "Dependencies have been updated",
         "de": "Abhängigkeiten wurden aktualisiert",
         "ru": "В зависимости были обновлены",

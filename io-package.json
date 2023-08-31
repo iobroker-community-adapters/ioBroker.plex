@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "titleLang": {
       "en": "Plex Media Server",
       "de": "Plex Media Server",
@@ -29,6 +29,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.0.5": {
+        "en": "Fixed: Controls didn't work with Plexamp.\nsome minor improvements.",
+        "de": "Behoben: Controls funktionierten nicht mit Plexamp.\neinige kleinere verbesserungen.",
+        "ru": "Исправлено: Контроль не работал с Plexamp.\nнекоторые незначительные улучшения.",
+        "pt": "Fixo: Control não funcionou com Plexamp.\nalgumas pequenas melhorias.",
+        "nl": "Control werkte niet met Plexamp.\nwat kleine verbetering.",
+        "fr": "Correction : Le contrôle n'a pas fonctionné avec Plexamp.\nquelques améliorations mineures.",
+        "it": "Fisso: il controllo non ha funzionato con Plexamp.\nalcuni piccoli miglioramenti.",
+        "es": "Fijo: El control no funcionó con Plexamp.\nalgunas mejoras menores.",
+        "pl": "Fixed: Kontrola nie pracowała z Plexampem.\nniektóre drobne poprawy.",
+        "uk": "Виправлено: Контроль не працює з Plexamp.\nдеякі незначні поліпшення.",
+        "zh-cn": "固定:控制没有与Plexamp合作。.\n略有改进。."
+      },
       "1.0.4": {
         "en": "Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
         "de": "Behoben: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
@@ -106,19 +119,6 @@
         "pl": "ustalono następujące ostrzeżenia: ustalane są i brakujące definicje państwowe o numerze #114 #100\nzastosowanie: kontrola gracza działała tylko z http\noficjalna strona internetowa ioBroker/ioBroker Został ustalony numer #32\nuruchomiono błędy w przeliczeniu #108",
         "uk": "виправлено: загальний.типові попередження були виправлені та відсутні державні визначення #114 #101 #100\nфіксована: контроль гравця тільки працює з http://\nфіксована: історія сторінки ioBroker/ioBroker. бензофіксовано #32\nвиправлено: виправлено помилку перетягування #108",
         "zh-cn": "固定:共有的原型警告已经确定,并增添了第114 号第101号 #100\n固定:角色控制只与网站合作。\n固定:生物Broker/ioBroker的历史页。 零件已固定在编号32 #32\n固定:trabsl错误已定为第108号。"
-      },
-      "1.0.0-alpha.2": {
-        "en": "Dependencies have been updated",
-        "de": "Abhängigkeiten wurden aktualisiert",
-        "ru": "В зависимости были обновлены",
-        "pt": "As dependências foram atualizadas",
-        "nl": "Afhankelijkheid",
-        "fr": "Les dépendances ont été mises à jour",
-        "it": "Le dipendenze sono state aggiornate",
-        "es": "Se han actualizado las dependencias",
-        "pl": "Zależności zostały zaktualizowane",
-        "uk": "Оновлено залежність",
-        "zh-cn": "已更新了属地"
       }
     },
     "license": "MIT",

@@ -592,7 +592,7 @@ function setEvent(data, source, prefix)
 	
 	// cleanup old states when playing something new
 	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play') {
-		library.runGarbageCollector(prefix, false, 30, ['_Controls']);
+		library.runGarbageCollector(prefix, false, 30, [...Library.garbageExcluded, '_Controls']);
 	}
 }
 

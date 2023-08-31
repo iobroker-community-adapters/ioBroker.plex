@@ -132,7 +132,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.0.5 (2023-08-31)
 - (ticaki) Fixed: Control did not work with Plexamp.
 - (ticaki) some minor improvements.
 

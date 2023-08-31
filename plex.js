@@ -257,7 +257,7 @@ function startAdapter(options)
 			path.splice(-1);
 			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
 			let playerTitle = library.getDeviceState(path.join('.') + '.Player.title');
-			let playerIp = library.getDeviceState(path.join('.') + '.Player.localaddress');
+			let playerIp = library.getDeviceState(path.join('.') + '.Player.localAddress');
 			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
 			
 			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
@@ -1181,7 +1181,7 @@ function getPlayers()
 			library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + player.name});
 			
 			// add player controls
-			library.set({'node': '_playing.' + groupBy + '.Player.localaddress', ...library.getNode('playing.player.localaddress') }, player.address);
+			library.set({'node': '_playing.' + groupBy + '.Player.localAddress', ...library.getNode('playing.player.localaddress') }, player.address);
 			library.set({'node': '_playing.' + groupBy + '.Player.port', ...library.getNode('playing.player.port') }, player.port);
 			
 			let controls = '_playing.' + groupBy + '._Controls';

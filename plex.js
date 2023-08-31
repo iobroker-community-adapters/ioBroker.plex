@@ -272,7 +272,7 @@ function startAdapter(options)
 				
 				let options = {
 					...REQUEST_OPTIONS,
-					'method': 'POST',
+					'method': 'GET',
 					// Dont work for me with https:
 					//'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
 					'url': url,

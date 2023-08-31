@@ -132,6 +132,10 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Fixed: Control did not work with Plexamp.
+- (ticaki) some minor improvements.
+
 ### 1.0.4 (2023-08-27)
 - (ticaki) Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)
 

@@ -267,7 +267,7 @@ function startAdapter(options)
 			let mode = path.pop();
 			
 			path.splice(-1);
-			let p = Player.existPlayer(path.join('.'))
+			let p = Player.existPlayer("", path.join('.'))
 			if (p) p.action({"mode": mode, "action": action, "val": val, "id":id})
 			
 		}

@@ -14,7 +14,11 @@ module.exports =
             },
             "time": {
                 "node": "playback.seekTo",
-                "type": "number"        
+                "type": "number",        
+            },
+            "percent": {
+                "node": "playback.seekToPercent",
+                "type": "number",        
             }
         }
     }, 

@@ -269,8 +269,7 @@ function startAdapter(options)
 			
 			path.splice(-1);
 			let p = Player.existPlayer("", path.join('.'))
-			if (p) p.action({"mode": mode, "action": action, "val": val, "id":id})
-			
+			if (p) p.action({"mode": mode, "action": action, "val": val, "id":path.join('.') + '._Controls'})		
 		}
 	});
 	
@@ -552,7 +551,7 @@ function setEvent(data, source, prefix)
 				'player': data.player,
 				'media': data.media,
 				'event': event,
-				'thumb': message.thumb ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
+				'thumb': message.thumb ? (library.AXIOS_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
 				'message': replacePlaceholders(message.message, eventData),
 				'caption': replacePlaceholders(message.caption, eventData),
 				'source': data.source
@@ -1074,17 +1073,18 @@ function startListener()
 			payload = req.body;
 			res.sendStatus(200);
 			res.end();
-			
+		}
+			catch(e) {
+				adapter.log.warn(`Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`);
+				//res.sendStatus(500);
+			}	
 			// write payload to states
 			if (['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(payload.event) > -1)
 				setEvent(payload, 'tautulli', '_playing');
 			
 			setEvent(payload, 'tautulli', 'events');
-		}
-		catch(e) {
-			adapter.log.warn(`Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`);
-			//res.sendStatus(500);
-		}
+		
+		
 	});
 	
 	_http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
@@ -1128,7 +1128,7 @@ function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTi
 	if (playerIp && playerPort && playerIdentifier && playerTitle) {
 	//	let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?wait=0&X-Plex-Client-Identifier='+plexOptions.identifier+'&X-Plex-Device-Name='+ playerTitle  + '&X-Plex-Token=' + adapter.config.plexToken + '&X-Plex-Target-Client-Identifier=' + playerIdentifier
 		let options = {
-			...REQUEST_OPTIONS,
+			...library.AXIOS_OPTIONS,
 			'method': 'GET',
 			'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?',
 			'headers': {

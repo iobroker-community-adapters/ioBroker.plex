@@ -2009,7 +2009,7 @@ module.exports =
     },
     "playing.player.details.music": {
         "description": "Details of currently playing music",
-        "type": "object"
+        "role": "channel"
     },
     "playing.player.details.music.state": {
         "description": "Current music state",

@@ -13,7 +13,7 @@ module.exports =
 		"setShuffle": {"key": "setParameters", "attribute": "shuffle", "default": 0, "common":{"states": {"0": "off", "1": "on"}}, "description": "set Shuffle"},
 		"setRepeat": {"key": "setParameters", "attribute": "repeat", "default": 0, "common":{"states": {"0": "off", "1": "item", "2": "all"}}, "description": "set Repeat"},
 		"seekTo": {"attribute": "offset", "default": 0, "description": "set Offset (in milliseconds)"},
-		"seekToSeconds": {"attribute": "offset", "default": 0, "role":"button.seek", "description": "set Offset for vis mediaplayer (in Seconds)", "convert": 'percent', "common":{"unit":'%',"min":0,"max":100}}
+		"seekToPercent": {"attribute": "offset", "default": 0, "role":"media.seek", "type": "number", "description": "set Offset (in %)", "convert": 'percent', "common":{"unit":'%',"min":0,"max":100}}
 	},
 	
 	"navigation": {

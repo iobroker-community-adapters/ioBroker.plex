@@ -1,14 +1,40 @@
 module.exports = 
 {
     "playerDetails": {
-        "time": {
-            "node": "Metadata.viewOffset",
-            "type": "node"
-            
+        "node":{
+            "time": {
+                "node": "Metadata.viewOffset",
+                "type": "number"        
+            }
         },
-        "volume": {
-            "type": "action",
-            "node": "playback.setVolume"
+        "action": {
+            "volume": {
+                "node": "playback.setVolume",
+                "type": "number"
+            },
+            "time": {
+                "node": "playback.seekTo",
+                "type": "number"        
+            }
         }
+    }, 
+    "deepVal":{
+        "Metadata.Media.Part.Stream.streamType": [{
+            // nodes: gehe einen Datenpunkt höher und lese dort die daten von key in node
+            "nodes":[{"node":".url", "key":"key"},{"node":".codec", "key":"codec"}],
+            // mache nur weiter wenn value == datenwert ist
+            "value": 4,
+            // wenn nodes nicht definert ist lade daten in diesen datenpunkt
+            "node": "Metadata.Music.Lyric"
+        }],
+        "Metadata.type": [{
+            "call":{"Metadata.Media.Part.key": [{"node": ".Media", "app": ".mediaurl",}],
+                    "Metadata.Media.Part.codec": [{"node": ".Media", "app": ".codec",}]},
+            
+            // Benutze Value als key z.B. Metadata.key
+            "valueAsKey": true,
+            // wenn nodes nicht definert ist lade daten in diesen datenpunkt
+            "node": "Metadata"
+        }]
     }
 }

@@ -133,8 +133,17 @@ This adapter would not have been possible without the great work of @Zefau (http
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Added: Optional retrieve information about streams
-- (ticaki) Added: get status informations from local clients
+- (ticaki) Added: Retrieve a bit more information about streams 
+- (ticaki) Added: Retrieve status informations from local clients (webhook needed)
+- (ticaki) Added: Update local client data while not stopped (video/music) every second (webhook needed)
+- (ticaki) Added: Update metadata on local client playing target change 
+- (ticaki) Added: alot more states
+
+- todo:
+- sort ALOT more states :)
+- Add: admin configuration for refresh of metadata and clientdata
+
+
 
 ### 1.0.2 (2023-08-23)
 - (ticaki) Added: a play/pause switch for mediaplayer

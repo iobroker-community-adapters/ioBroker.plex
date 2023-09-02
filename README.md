@@ -142,8 +142,9 @@ This adapter would not have been possible without the great work of @Zefau (http
 - todo:
 - sort ALOT more states :)
 - Add: admin configuration for refresh of metadata and clientdata
-- (ticaki) Added: Optional retrieve information about streams
-- (ticaki) Added: get status informations from local clients
+
+
+
 
 ### 1.0.5 (2023-08-31)
 - (ticaki) Fixed: Control did not work with Plexamp.

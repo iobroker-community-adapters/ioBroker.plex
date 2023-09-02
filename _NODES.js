@@ -284,7 +284,7 @@ module.exports =
     },
     "playing.metadata.audio": {
         "description": "Metadata audio",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.audio.audio_bitrate": {
         "description": "The audio bitrate of the original media.",
@@ -436,7 +436,7 @@ module.exports =
     },
     "playing.metadata.file": {
         "description": "Metadata file",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.file.name": {
         "description": "The file name of the item",
@@ -601,7 +601,7 @@ module.exports =
     },
     "playing.metadata.media": {
         "description": "Metadata Media",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.media.aspectratio": {
         "description": "Media aspectRatio",
@@ -655,7 +655,7 @@ module.exports =
     },
     "playing.metadata.media.list": {
         "description": "Media list",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.media.optimizedforstreaming": {
         "description": "Media optimizedForStreaming",
@@ -664,7 +664,7 @@ module.exports =
     },
     "playing.metadata.media.part": {
         "description": "Media Part",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.media.part.audioprofile": {
         "description": "Part audioProfile",
@@ -719,7 +719,7 @@ module.exports =
     },
     "playing.metadata.media.part.list": {
         "description": "Part list",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.media.part.optimizedforstreaming": {
         "description": "Part optimizedForStreaming",
@@ -733,7 +733,7 @@ module.exports =
     },
     "playing.metadata.media.part.stream": {
         "description": "Part Stream",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.media.part.stream.albumgain": {
         "description": "Stream albumGain",
@@ -903,7 +903,7 @@ module.exports =
     },
     "playing.metadata.media.part.stream.list": {
         "description": "Stream list",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.media.part.stream.loudness": {
         "description": "Stream loudness",
@@ -1211,7 +1211,7 @@ module.exports =
     },
     "playing.metadata.stream": {
         "description": "Metadata stream",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.stream.live": {
         "description": "If the stream is live TV. (0 or 1)",
@@ -1230,7 +1230,7 @@ module.exports =
     },
     "playing.metadata.stream.player": {
         "description": "stream player",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.stream.player.device": {
         "description": "The type of client device being used for playback.",
@@ -1294,7 +1294,7 @@ module.exports =
     },
     "playing.metadata.stream.stream_audio": {
         "description": "stream stream_audio",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.stream.stream_audio.stream_audio_bitrate": {
         "description": "stream_audio stream_audio_bitrate",
@@ -1408,7 +1408,7 @@ module.exports =
     },
     "playing.metadata.stream.stream_subtitle": {
         "description": "stream stream_subtitle",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.stream.stream_subtitle.stream_subtitle_codec": {
         "description": "stream_subtitle stream_subtitle_codec",
@@ -1487,7 +1487,7 @@ module.exports =
     },
     "playing.metadata.stream.stream_video": {
         "description": "stream stream_video",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.stream.stream_video.stream_video_bit_depth": {
         "description": "stream_video stream_video_bit_depth",
@@ -1606,7 +1606,7 @@ module.exports =
     },
     "playing.metadata.stream.user": {
         "description": "stream user",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.stream.user.email": {
         "description": "The email address of the person streaming.",
@@ -1640,7 +1640,7 @@ module.exports =
     },
     "playing.metadata.subtitles": {
         "description": "Metadata subtitles",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.subtitles.subtitle_codec": {
         "description": "The subtitle codec of the original media.",
@@ -1726,7 +1726,7 @@ module.exports =
     },
     "playing.metadata.transcoding": {
         "description": "Metadata transcoding",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.transcoding.audio_decision": {
         "description": "The audio transcode decisions of the stream.",
@@ -1842,7 +1842,7 @@ module.exports =
     },
     "playing.metadata.video": {
         "description": "Metadata video",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.metadata.video.aspect_ratio": {
         "description": "The aspect ratio of the original media.",
@@ -1995,7 +1995,7 @@ module.exports =
     },
     "playing.player.details": {
         "description": "Details from and for Player",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.player.details.duration": {
         "description": "Duration of currently playing media",
@@ -2018,7 +2018,7 @@ module.exports =
     },
     "playing.player.details.photo": {
         "description": "Details of currently playing photo",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.player.details.photo.autoplay": {
         "description": "Photo autoplay",
@@ -2128,7 +2128,7 @@ module.exports =
     },
     "playing.player.details.video": {
         "description": "Details of currently playing video",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.player.details.video.audiostreamid": {
         "description": "audioStreamID",
@@ -2302,7 +2302,7 @@ module.exports =
     },
     "playing.server": {
         "description": "playing Server",
-        "type": "channel"
+        "role": "channel"
     },
     "playing.server.title": {
         "description": "Name of Plex Server",
@@ -2535,7 +2535,7 @@ module.exports =
         "description": "Metadata Media",
         "role": "state",
         "type": "string",
-        "type": "channel"
+        "role": "channel"
     },
     "statistics": {
         "description": "Plex Watch Statistics",

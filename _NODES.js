@@ -2016,6 +2016,15 @@ module.exports =
         "role": "value",
         "type": "string"
     },
+    "playing.player.details.percent": {
+        "description": "View offset of media in %",
+        "type": "number",
+        "role": "value",
+        "common": {
+            "unit": "%",
+            "write": false
+        }
+    },
     "playing.player.details.photo": {
         "description": "Details of currently playing photo",
         "type": "channel"

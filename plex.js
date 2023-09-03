@@ -23,13 +23,14 @@ const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
 const _NODES = require(__dirname + '/_NODES.js');
 const _ACTIONS = require(__dirname + '/_ACTIONS.js');
 const _PLAYERDETAILS = require(__dirname + '/_PLAYERDETAILS.js')
-const Player = require(__dirname + '/lib/players.js')
+const { Controller } = require(__dirname + '/lib/players.js')
 
 /*
  * constants & variables initiation
  */
 let adapter;
 let library;
+let controller;
 let unloaded;
 let retryCycle, refreshCycle;
 
@@ -82,6 +83,7 @@ function startAdapter(options)
 	adapter.on('ready', function ready()
 	{
 		library = new Library(adapter, { nodes: _NODES, actions: _ACTIONS, updatesInLog: adapter.config.debug || false });
+		
 		unloaded = false;
 		refreshInterval = adapter.setInterval(refreshViewOffset,1000)
 		
@@ -171,6 +173,15 @@ function startAdapter(options)
 		});
 		
 		library._plex = plex
+		
+		controller = new Controller(adapter, {
+			"controllerIdentifier":plexOptions.identifier,
+			"plexToken": plexOptions.plexToken,
+			"actions":_ACTIONS,
+			"nodes":_NODES
+		}, library)
+		
+
 
 		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
 		adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) => {
@@ -268,7 +279,7 @@ function startAdapter(options)
 			let mode = path.pop();
 			
 			path.splice(-1);
-			let p = Player.existPlayer("", path.join('.'))
+			let p = controller.existPlayer(path.join('.'))
 			if (p) p.action({"mode": mode, "action": action, "val": val, "id":path.join('.') + '._Controls'})		
 		}
 	});
@@ -334,7 +345,7 @@ function startAdapter(options)
 			
 			unloaded = true;
 			
-			Player.deletePlayers(this.plexOptions.identifier)
+			controller.delete()
 
 			_http.close(() => adapter.log.debug('Server for listener closed.'));
 			adapter.clearTimeout(retryCycle);
@@ -473,20 +484,21 @@ function setEvent(data, source, prefix)
 		
 		// adapt prefix
 		prefix = prefix + '.' + groupBy;
-    
+		let playerTemp
 		// index current playing players
 		if (data.event && data.Player && data.Player.title != '_recent')
 		{
 			let playerIp = library.getDeviceState(prefix + '.Player.localAddress');
 			let playerPort = library.getDeviceState(prefix + '.Player.port');
-			let playerTemp = Player.createPlayerIfNotExist(adapter, {
-					"config": {title: data.Player.title, uuid: data.Player.uuid},
-					"controllerIdentifier":plexOptions.identifier,
-					"plexToken": plexOptions.plexToken,
-					"actions":_ACTIONS,
-					"nodes":_NODES				
-				}, library)
-			playerTemp.setNotificationData(data)
+			playerTemp = controller.createPlayerIfNotExist({
+				"address": playerIp,
+				"port":	playerPort,
+				"config": {
+					title: data.Player.title, 
+					uuid: data.Player.uuid
+				}
+			})
+			
 			
 			if (['media.play', 'media.resume'].indexOf(data.event) > -1)
 			{
@@ -518,11 +530,16 @@ function setEvent(data, source, prefix)
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
 		// update play_switch control 
-		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
+		} else if (data.Player && data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
 			library.confirmNode({node: prefix + '._Controls.playback.play_switch'}, (['media.play', 'media.resume'].indexOf(data.event) > -1))
 		}
 		// get library details plex.0._playing.ipad-10A88133-3762-4948-AF10-9503A37517AC.Metadata.key
-		//if (adapter.config.getAllItem && data.Player.title != '_recent') getItemDetails(data.Metadata && data.Metadata.key, prefix)	
+		//if (adapter.config.getAllItem && data.Player.title != '_recent') getItemDetails(data.Metadata && data.Metadata.key, prefix)
+		if (data.event && data.Player && data.Player.title != '_recent' && playerTemp) {
+			playerTemp.setNotificationData(JSON.parse(JSON.stringify(data))),100
+			data = {}
+		}
+			
 	}
 	
 	// EVENTS
@@ -589,7 +606,7 @@ function setEvent(data, source, prefix)
 	
 	// cleanup old states when playing something new
 	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play') {
-		library.runGarbageCollector(prefix, false, 30000, [...Player.garbageExcluded, '_Controls']);
+		library.runGarbageCollector(prefix, false, 30000, [...Controller.garbageExcluded, '_Controls']);
 	}
 }
 
@@ -617,7 +634,7 @@ function replacePlaceholders(message, data)
 				path = path.slice(path.indexOf('.')+1);
 				tmp = tmp[index];
 			}
-			catch(err) {adapter.log.debug(err.message)}
+			catch(err) {adapter.log.debug('catch: 30 ' + err.message)}
 		}
 		
 		// check value
@@ -640,7 +657,7 @@ function is(res)
 	if (res === undefined || res.response === undefined || res.response.result === undefined || res.response.result !== 'success')
 	{
 		adapter.log.warn('API response invalid!');
-		adapter.log.debug(JSON.stringify(res));
+		adapter.log.debug('debug 23 ' + JSON.stringify(res));
 		return false;
 	}
 	else if (res.response.message === 'Invalid apikey')
@@ -987,18 +1004,16 @@ function getPlayers()
 		{
 			// group by player
 			players.push(player.machineIdentifier);
-			let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
+			//let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
 			
 			// create player
+			let playerTemp = controller.createPlayerIfNotExist({
+				"config": {
+					title: player.name, 
+					uuid: player.machineIdentifier
+				}
+			})
 			
-			let playerTemp = Player.createPlayerIfNotExist(adapter, {
-					"config":{"title": player.name, "uuid":player.machineIdentifier},
-					"controllerIdentifier":plexOptions.identifier,
-					"plexToken": plexOptions.plexToken,
-					"actions":_ACTIONS,
-					"nodes":_NODES
-					
-				}, library)
 			playerTemp.setClientData(player)
 		});
 	})
@@ -1052,15 +1067,16 @@ function startListener()
 			res.end();
 			
 			// write payload to states
-			if (['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(payload.event) > -1)
+			
+		}
+		catch(e) {
+			adapter.log.warn('startListener: ' + e.message);
+			//res.sendStatus(500);
+		}
+		if (['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(payload.event) > -1)
 				setEvent(payload, 'plex', '_playing');
 			
 			setEvent(payload, 'plex', 'events');
-		}
-		catch(e) {
-			adapter.log.warn(e.message);
-			//res.sendStatus(500);
-		}
 	});
 	
 	// listen to events from Tautulli
@@ -1170,7 +1186,7 @@ function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTi
 		})
 		.catch((err, body) =>
 		{
-			adapter.log.debug(JSON.stringify(err));
+			adapter.log.debug('catch() 31 ' + JSON.stringify(err));
 		});
 	}
 }

@@ -18,8 +18,15 @@ module.exports =
             },
             "percent": {
                 "node": "playback.seekToPercent",
-                "type": "number",        
-            }
+                "type": "number",
+                "notDetails": true         
+            },
+            "state": {
+                "node": "playback.play_switch",
+                "type": "boolean",
+                "values": ['playing'],
+                "notDetails": true        
+            },
         }
     }, 
     "deepVal":{

@@ -10,7 +10,7 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 [![Downloads](https://img.shields.io/npm/dm/iobroker.plex.svg)](https://www.npmjs.com/package/iobroker.plex)
 
 [![NPM](https://nodei.co/npm/iobroker.plex.png?downloads=true)](https://nodei.co/npm/iobroker.plex/) 
-
+[![Translation status](https://weblate.iobroker.net/widgets/adapters/-/plex/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
 
 **Table of contents**
 1. [Features](#1-features)

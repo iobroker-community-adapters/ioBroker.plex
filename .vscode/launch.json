@@ -1,0 +1,31 @@
+{
+    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to remote",
+            "restart": true,
+            "port": 9229,
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/.dev-server/default/node_modules/**/*.js"
+            ]
+        },
+        { // node --inspect=0.0.0.0:9229 .dev-server/default/node_modules/iobroker.plex/ --logs --force
+            "type": "node",
+            "request": "attach",
+            "name": "attach to ioBroker-Adapter",
+            "address": "127.0.0.1",
+            "port": 9229,
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "${workspaceFolder}/.dev-server/default/node_modules/iobroker.plex",
+            "smartStep": true,
+            "skipFiles": [
+              "<node_internals>/**"
+            ]
+          }
+    ]
+}

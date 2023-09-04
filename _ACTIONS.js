@@ -10,8 +10,9 @@ module.exports =
 		"stepBack": { "key": "stepBack", "description": "seeks back 15 seconds (or the expected platform value)", "role": "button.next", "type": "boolean" },
 		"stepForward": { "key": "stepForward", "description": "seeks forward 30 seconds (or the expected platform value)", "role": "button.prev", "type": "boolean" },
 		"setVolume": { "key": "setParameters", "attribute": "volume", "default": 0, "description": "set Volume", "role": "level.volume", "type": "number", "common": { "unit": '%', "min": 0, "max": 100 } },
-		"setShuffle": { "key": "setParameters", "attribute": "shuffle", "default": 0, "common": { "states": { "0": "off", "1": "on" } }, "description": "set Shuffle" },
-		"setRepeat": { "key": "setParameters", "attribute": "repeat", "default": 0, "common": { "states": { "0": "off", "1": "item", "2": "all" } }, "description": "set Repeat" },
+		"setShuffle": { "key": "setParameters", "attribute": "shuffle", "type":"boolean", "role":"media.mode.shuffle", "default": false, "fromPlex": { "0": false, "1": true }, "description": "set Shuffle" },
+		"setRepeat": { "key": "setParameters", "role":"media.mode.repeat", "type":"number", "attribute": "repeat", "default": 0, "common": { "states": { "0": "off", "1": "item", "2": "all" } }, "description": "set Repeat" },
+		"setRepeatAll": { "key": "setParameters", "role":"indicator", "type":"boolean", "attribute": "repeat", "default": false, "fromPlex": { "0": false, "2": true}, "description": "set Repeat All" },
 		"seekTo": { "attribute": "offset", "default": 0, "description": "set Offset (in milliseconds)" },
 		"seekToPercent": { "attribute": "offset", "default": 0, "role": "media.seek", "type": "number", "description": "set Offset (in %)", "convert": 'percent', "common": { "unit": '%', "min": 0, "max": 100 } }
 	},

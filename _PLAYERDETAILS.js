@@ -27,6 +27,14 @@ module.exports =
                 "values": ['playing'],
                 "notDetails": true        
             },
+            "shuffle": {
+                "node": "playback.setShuffle",
+                "type": "boolean"               
+            },
+            "repeat": {
+                "node": "playback.setRepeat",
+                "type": "number"
+            },
         }
     }, 
     "deepVal":{

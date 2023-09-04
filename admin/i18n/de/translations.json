@@ -75,7 +75,7 @@
     "resetMediaInfo": "Zurücksetzen / löschen aller Objekte innerhalb des Objektbaums '._playing' bei Adapter-Start.",
     "secureConnection": "Benutze sichere Verbindung zum Plex Media Server (https)",
     "tab_alexa": "Alexa Integration",
-    "tab_config": "Konfiguration",
+    "tab_config": "Einstellungen",
     "tab_donate": "Spenden",
     "tab_info": "Informationen",
     "tautulliAuth": "Die Verbindungseinstellungen der Tautulli Instanz",

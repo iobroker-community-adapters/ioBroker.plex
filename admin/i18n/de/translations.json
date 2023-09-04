@@ -68,7 +68,7 @@
     "plexSecure": "Sichere Verbindung (https)",
     "plexToken": "Plex Token",
     "plexUser": "Plex Benutzer",
-    "refresh": "Refresh (in Sekunden)",
+    "refresh": "Aktualisierung (in Sekunden)",
     "refreshInfo": "Intervall zur Aktualisierung aller Einstellungen / Daten (in Sekunden). Wenn auf 0 gesetzt werden die Einstellungen nur beim Adapter-Start aktualisiert.",
     "resetMedia": "Zurücksetzen der '._playing' Objekte",
     "resetMediaInfo": "Zurücksetzen / löschen aller Objekte innerhalb des Objektbaums '._playing' bei Adapter-Start.",

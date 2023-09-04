@@ -383,6 +383,44 @@ function init()
 				
 				playing = library.getDeviceState('_playing.players') && library.getDeviceState('_playing.players').split(',') || [];
 				streams = library.getDeviceState('_playing.streams') || 0;
+
+				//create all controllable players
+				let playerConfig = {}
+				for (let state in states) {
+					for (let end of [
+						{"text":".Player.localAddress", "key":"address"},
+						{"text":".Player.port", "key":"port"},
+						{"text":".Player.protocolCapabilities", "key":"protocolCapabilities"},
+						{"text":".Player.uuid", "key":"uuid"},
+						{"text":".Player.title", "key":"title"}
+					]) {
+						if (state.endsWith(end.text)) {
+							let prefix = state.replace(`${adapter.name}.${adapter.instance}.`, '').replace(end.text, '');
+							playerConfig[prefix] = playerConfig[prefix] || {};
+							playerConfig[prefix][end.key] = states[state].val;
+						}		
+					}		
+				}
+				for(let prefix in playerConfig) {
+					let c = playerConfig[prefix]
+					if (c 								!== undefined
+						&& c.protocolCapabilities 		!== undefined 
+						&& c.protocolCapabilities.split(',').indexOf('timeline') 
+						&& c.port 						!== undefined
+						&& c.address 					!== undefined
+						&& c.uuid 						!== undefined
+						&& c.title						!== undefined) {
+							if (`_playing.${library.clean(c.title, true)}-${c.uuid}`!==prefix) continue
+						controller.createPlayerIfNotExist({
+							"address": c.address,
+							"port":	c.port,
+							"config": {
+								title: c.title, 
+								uuid: c.uuid
+							}
+						})
+					}
+				}
 			});
 			
 			// verify Tautulli settings
@@ -416,7 +454,7 @@ function init()
 			{
 				retrieveData();
 				if (adapter.config.refresh > 0 && !unloaded)
-					refreshCycle = adapter.setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+					refreshCycle = adapter.setTimeout(updater, Math.floor(parseInt(adapter.config.refresh)*1000));
 				
 			}, 1000);
 			
@@ -707,8 +745,9 @@ function getItems(path, key, node)
 function retrieveData()
 {
 	// GET SERVERS
-	if (adapter.config.getServers)
+	if (adapter.config.getServers) {
 		getServers();
+	}
 	
 	// GET LIBRARIES
 	if (adapter.config.getLibraries)
@@ -736,9 +775,14 @@ function retrieveData()
  */
 function getServers()
 {
+	
 	plex.query('/servers').then(res =>
+	//plex.query('/:/timeline').then(res =>
 	{
 		adapter.log.debug('Retrieved Servers from Plex.');
+		/*adapter.log.debug(JSON.stringify(res.MediaContainer))
+		adapter.log.debug(JSON.stringify(res))
+		return*/
 		library.set({node: 'servers', role: library.getNode('servers').role, description: library.getNode('servers').description});
 		
 		let data = res.MediaContainer.Server || [];
@@ -746,7 +790,6 @@ function getServers()
 		{
 			let serverId = entry['name'].toLowerCase();
 			library.set({node: 'servers.' + serverId, role: library.getNode('server').role, description: library.getNode('server').description.replace(/%server%/gi, entry['name'])});
-			
 			// index all keys as states
 			for (let key in entry)
 			{

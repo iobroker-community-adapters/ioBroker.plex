@@ -14,7 +14,9 @@ module.exports =
 		"setRepeat": { "key": "setParameters", "role":"media.mode.repeat", "type":"number", "attribute": "repeat", "default": 0, "common": { "states": { "0": "off", "1": "item", "2": "all" } }, "description": "set Repeat" },
 		"setRepeatAll": { "key": "setParameters", "role":"indicator", "type":"boolean", "attribute": "repeat", "default": false, "fromPlex": { "0": false, "2": true}, "description": "set Repeat All" },
 		"seekTo": { "attribute": "offset", "default": 0, "description": "set Offset (in milliseconds)" },
-		"seekToPercent": { "attribute": "offset", "default": 0, "role": "media.seek", "type": "number", "description": "set Offset (in %)", "convert": 'percent', "common": { "unit": '%', "min": 0, "max": 100 } }
+		"seekToPercent": { "attribute": "offset", "default": 0, "role": "media.seek", "type": "number", "description": "set Offset (in %)", "convert": 'percent', "common": { "unit": '%', "min": 0, "max": 100 } },
+		"playLast": { "key": "playMedia", "description": "Start / Resume last played media", "role": "button.play", "type": "boolean", "convert": 'lastPlayed'},
+		"playKey": { "key": "playMedia", "default":"", "description": "Start / Resume media by key#offset", "role": "text", "type": "string", "convert": 'playKey'},
 	},
 
 	"navigation": {

@@ -460,7 +460,19 @@ function init()
 			
 			// listen to events from Plex
 			startListener();
-			
+			// connection is ok get server id
+			plex.query('/')
+				.then(res =>
+				{
+					if (res && res.MediaContainer && res.MediaContainer.machineIdentifier) {
+						controller.setServerId(res.MediaContainer.machineIdentifier);
+					}
+				})
+				.catch(err =>
+					{
+						adapter.log.debug('ups');
+				})
+
 		})
 		.catch(err =>
 		{

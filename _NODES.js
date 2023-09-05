@@ -1000,6 +1000,11 @@ module.exports =
         "role": "",
         "type": "number"
     },
+    "playing.metadata.mood": {
+        "description": "mood of media",
+        "role": "value",
+        "type": "string"
+    },
     "playing.metadata.music.lyric.codec": {
         "description": "Codec for this Lyric",
         "role": "value",

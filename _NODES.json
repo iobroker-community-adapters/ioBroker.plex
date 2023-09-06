@@ -6440,7 +6440,7 @@
             "uk": "Плеєр підключається за допомогою адаптера plex",
             "zh-cn": "播放器已连接 plex 适配器"
         },
-        "role": "value",
+        "role": "indicator.reachable",
         "type": "boolean"
     },
     "playing.player.controllable": {
@@ -7295,6 +7295,16 @@
             "ru": "Класс устройства проигрывателя",
             "uk": "Клас пристрою плеєра",
             "zh-cn": "播放器的设备类别"
+        },
+        "role": "value",
+        "type": "string"
+    },
+    "playing.player.device": {
+        "description": {
+            "de": "Gerätename des Players",
+            "en": "Device Name of Player",
+            "fr": "Nom de l'appareil du joueur",
+            "es": "Nombre del dispositivo de la reproductor"
         },
         "role": "value",
         "type": "string"

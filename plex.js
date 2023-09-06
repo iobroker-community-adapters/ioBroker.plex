@@ -1140,7 +1140,7 @@ function getItemDetails(item, prefix){//"/library/metadata/34679"
 		delete data.guid
 		for (const d in data) if (typeof data[d] !== 'object') delete data[d]
 
-		library.readData(prefix+'.Metadata', data, prefix, undefined, true)
+		library.readData(prefix+'.Metadata', data, prefix, undefined)
 		//adapter.log.debug(JSON.stringify(newConstantJson))
 		
 	}, function (err) {

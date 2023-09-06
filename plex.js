@@ -20,9 +20,9 @@ const xml = new xml2js.Parser()
  */
 const Library = require(__dirname + '/lib/library.js');
 const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
-const _NODES = require(__dirname + '/_NODES.js');
-const _ACTIONS = require(__dirname + '/_ACTIONS.js');
-const _PLAYERDETAILS = require(__dirname + '/_PLAYERDETAILS.js')
+const _NODES = JSON.parse(_fs.readFileSync('./_NODES.json'));
+const _ACTIONS = JSON.parse(_fs.readFileSync('./_ACTIONS.json'));
+const _PLAYERDETAILS = JSON.parse(_fs.readFileSync('./_PLAYERDETAILS.json'));
 const { Controller } = require(__dirname + '/lib/players.js')
 
 /*
@@ -178,7 +178,8 @@ function startAdapter(options)
 			"controllerIdentifier":plexOptions.identifier,
 			"plexToken": plexOptions.plexToken,
 			"actions":_ACTIONS,
-			"nodes":_NODES
+			"nodes":_NODES,
+			"playerdetails":_PLAYERDETAILS
 		}, library)
 		
 
@@ -216,6 +217,7 @@ function startAdapter(options)
 		library.subscribeNode('metadata.viewoffset',(state, prefix, val, oldval) => {
 			library.confirmNode({node:prefix+'_Control.seekTo'})
 		})
+		internalConvert(_NODES);
 	});
 
 	/*
@@ -529,8 +531,8 @@ function setEvent(data, source, prefix)
 		let groupBy = data.Player.title && data.Player.uuid !== undefined ? library.clean(data.Player.title, true) + '-' + data.Player.uuid : 'unknown';
 		
 		// channel by player
-		library.set({node: prefix, role: 'channel', description: 'Plex Players'});
-		library.set({node: prefix + '.' + groupBy, role: 'channel', description: 'Player ' + (data.Player.title || 'unknown')});
+		library.set({node: prefix, role: library.getNode('plexplayers', true).role, description: library.getNode('plexplayers', true).description});
+		library.set({node: prefix + '.' + groupBy, role: 'channel', description: library.appendToDescription(library.getNode('plex.player', true).description ,' '+ (data.Player.title || library.getNode('plex.player.unknown', true).description))});
 		
 		// adapt prefix
 		prefix = prefix + '.' + groupBy;
@@ -572,8 +574,24 @@ function setEvent(data, source, prefix)
 				streams > 0 && streams--;
 			}
 			
-			library.set({node: '_playing.players', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
-			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
+			library.set(
+				{
+					node: '_playing.players', 
+					role: library.getNode('playing.players', true).role, 
+					type: library.getNode('playing.players', true).type, 
+					description: library.getNode('playing.players', true).description
+				}, 
+				playing.join(',')
+			);
+			library.set(
+				{
+					node: '_playing.streams', 
+					role: library.getNode('playing.streams', true).role, 
+					type: library.getNode('playing.streams', true).type, 
+					description: library.getNode('plex.player', true).description
+				}, 
+				streams
+			);
 		}
 
 		// add player controls
@@ -596,7 +614,14 @@ function setEvent(data, source, prefix)
 	else if (prefix == 'events')
 	{
 		// channel
-		library.set({node: prefix, role: 'channel', description: 'Plex Events'});
+		library.set(
+			{
+				node: prefix, 
+				role: library.getNode('plex.events', true).role, 
+				description: library.getNode('plex.events', true).description
+			},
+			undefined
+		);
 		
 		// replace placeholders in notification message
 		let event = data.event && data.event.replace('media.', '');
@@ -795,13 +820,27 @@ function getServers()
 		/*adapter.log.debug(JSON.stringify(res.MediaContainer))
 		adapter.log.debug(JSON.stringify(res))
 		return*/
-		library.set({node: 'servers', role: library.getNode('servers').role, description: library.getNode('servers').description});
+		library.set(
+			{
+				node: 'servers', 
+				role: library.getNode('servers').role, 
+				description: library.getNode('servers').description
+			},
+			undefined
+		);
 		
 		let data = res.MediaContainer.Server || [];
 		data.forEach(entry =>
 		{
 			let serverId = entry['name'].toLowerCase();
-			library.set({node: 'servers.' + serverId, role: library.getNode('server').role, description: library.getNode('server').description.replace(/%server%/gi, entry['name'])});
+			library.set(
+				{
+					node: 'servers.' + serverId, 
+					role: library.getNode('server').role, 
+					description: library.replaceDescription(library.getNode('server').description,'%server%', entry['name'])
+				},
+				undefined
+			);
 			// index all keys as states
 			for (let key in entry)
 			{
@@ -839,15 +878,22 @@ function getLibraries()
 		data.forEach(entry =>
 		{
 			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
-			library.set({node: 'libraries.' + libId, role: library.getNode('library').role, description: library.getNode('library').description.replace(/%library%/gi, entry['title'])});
+			library.set(
+				{
+					node: 'libraries.' + libId, 
+					role: library.getNode('library').role, 
+					description: library.replaceDescription(library.getNode('library').description,'%library%', entry['title'])
+				},
+				undefined
+			);
 			
 			// refresh button
 			library.set(
 				{
 					'node': 'libraries.' + libId + '._refresh',
-					'type': 'boolean', 
-					'role': 'button',
-					'description': 'Scan Library Files'
+					'type': library.getNode('plex.events', true).type, 
+					'role': library.getNode('plex.events', true).role,
+					'description': library.getNode('plex.events', true).description 
 				},
 				false
 			);
@@ -880,8 +926,8 @@ function getLibraries()
 					adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
 					
 					library.set({node: 'statistics', role: library.getNode('statistics').role, description: library.getNode('statistics').description});
-					library.set({node: 'statistics.libraries', role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, '')});
-					library.set({node: 'statistics.libraries.' + libId, role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, entry['title'])});
+					library.set({node: 'statistics.libraries', role: library.getNode('statistics.libraries').role, description: library.replaceDescription(library.getNode('statistics.libraries').description, '%library%', '')});
+					library.set({node: 'statistics.libraries.' + libId, role: library.getNode('statistics.libraries').role, description: library.replaceDescription(library.getNode('statistics.libraries').description, '%library%', entry['title'])});
 					
 					data.forEach((entry, i) =>
 					{
@@ -922,7 +968,7 @@ function getUsers()
 			let userId = library.clean(userName, true).replace(/\./g, '');
 			if (userId === 'local') return;
 			
-			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, userName)});
+			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.replaceDescription(library.getNode('user').description, '%user%', userName)});
 			
 			// index all keys as states
 			for (let key in entry)
@@ -941,8 +987,8 @@ function getUsers()
 					if (!is(res)) return; else data = res.response.data || [];
 					adapter.log.debug('Retrieved Watch Statistics for User ' + userName + ' from Tautulli.');
 					
-					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, '')});
-					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, userName)});
+					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.replaceDescription(library.getNode('statistics.users').description, '%user%', '')});
+					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.replaceDescription(library.getNode('statistics.users').description, '%user%', userName)});
 					
 					data.forEach((entry, i) =>
 					{
@@ -1245,7 +1291,51 @@ function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTi
 		});
 	}
 }
+// some functions to translate states and write them into folder - always deactivated in commits
+function writeNodes(name,json) {
+	let source = {}
+	for (let key in json) {
+		let node = json[key]
+		if (typeof node.description !== 'object') {
+			source[key] = node.description;
+		} else {
+			source[key] = node.description['en']
+		}
+	}
+	writeJsonToFile(name , source)
+}
+async function covertI18n(name, json) {
+	let language = ['en','de','ru','pt','nl','fr','it','es','pl','uk','zh-cn'];
+	let translations = {}
+	for (let n in language) translations[language[n]] = await readJsonFromFile(name, language[n])
+	for (let key in json) {
+		json[key].description = {}
+		for (let n in language) json[key].description[language[n]] = translations[language[n]][key]	
+	}
+	writeJsonToFile(name, json, true)
+}
 
+async function writeJsonToFile(name, json, isFile = false) {//.dataTest/admin
+	let file = isFile ? "./.dataTest/"+name+'.json' : "./.dataTest/"+name+"/admin/i18n/en/translations.json"
+
+	await _fs.writeFile(file , JSON.stringify(json), function(err) {
+		if(err) {
+			return adapter.log.error(err);
+		}
+		adapter.log.debug("The file was saved!");
+	}); 
+}
+async function readJsonFromFile(name, dir) {
+	return JSON.parse(await _fs.readFileSync(`./.dataTest/${name}/admin/i18n/${dir}/translations.json`));
+}
+// npm run translate -- -a ./.dataTest/Nodes/admin
+function internalConvert(json) {
+	if (_fs.existsSync('./.dataTest')) {
+		//writeNodes('Nodes', json);
+		//covertI18n('Nodes', json);
+	}
+	return;
+}
 /*
  * COMPACT MODE
  * If started as allInOne/compact mode => return function to create instance

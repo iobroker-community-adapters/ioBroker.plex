@@ -517,7 +517,7 @@ function setEvent(data, source, prefix)
 	data.timestamp = Math.floor(Date.now()/1000);
 	data.datetime = library.getDateTime(Date.now());
 	data.playing = data.event.indexOf('play') > -1 || data.event.indexOf('resume') > -1;
-	
+	if (!adapter.config.getMetadataTrees && data.Metadata) delete data.Metadata.Media
 	// PLAYING
 	if (prefix == '_playing')
 	{
@@ -1061,7 +1061,7 @@ function getPlaylists()
 		{
 			let playlistId = library.clean(entry['title'], true);
 			library.set({node: 'playlists.' + playlistId, role: 'channel', description: 'Playlist ' + entry['title']});
-			
+			//if (adapter.config.getPlaylistsDetails) getPlaylistsDetails(entry.key, 'playlists.' + playlistId)
 			// index all keys as states
 			for (let key in entry)
 			{
@@ -1090,6 +1090,49 @@ function getPlaylists()
 		adapter.log.debug(err);
 	});
 }
+/*
+function getPlaylistsDetails(key, prefix) {
+	plex.query('/playlists').then(res =>
+		{
+			if (!res || !res.MediaContainer || !res.MediaContainer.Metadata) return;
+			let data = res.MediaContainer.Metadata || [];
+			prefix += '.Items'
+			adapter.log.debug('Retrieved Playlists Details from Plex.');
+			library.set({node: prefix, role: library.getNode('playlists.items').role , description: library.getNode('playlists.items').description});
+			data.forEach(entry =>
+			{
+				let itemsId = library.clean(entry['title'], true);
+				library.set({node: prefix + itemsId, role: 'channel', description: 'Item ' + entry['title']});
+				let result = {}
+				if ()
+				// index all keys as states
+				for (let key in entry)
+				{
+					let node = library.getNode('playlists.' + key.toLowerCase());
+					node.key = 'playlists.' + playlistId + '.' + key;
+					entry[key] = library.convertNode(node, entry[key]);
+					
+					library.set(
+						{
+							'node': 'playlists.' + playlistId + '.' + key,
+							'type': node.type,
+							'role': node.role,
+							'description': node.description
+						},
+						entry[key]
+					);
+				}
+				
+				// get playlist content
+				getItems(entry['key'], 'playlists', 'playlists.' + playlistId);
+			});
+		})
+		.catch(err =>
+		{
+			adapter.log.debug('Could not retrieve Playlists from Plex!');
+			adapter.log.debug(err);
+		});
+}*/
 
 /**
  * Retrieve Players from Plex

@@ -163,6 +163,8 @@
         "getStatistics": false,
         "getPlaylists": true,
         "getSettings": true,
+        "getMetadataTrees": false,
+        "getPlaylistsDetails": false,
         "notifications": [
             {
                 "media": "any",

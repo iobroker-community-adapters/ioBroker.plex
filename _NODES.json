@@ -3463,7 +3463,31 @@
             "zh-cn": "元数据海报缩略图"
         },
         "role": "",
+        "type": "string",
+        "convert": {
+            "func": "create-link",
+            "key": "_link",
+            "role": "media.cover",
+            "type": "string"
+        }
+    },
+    "playing.metadata.posterthumb_link": {
+        "description": {
+            "en": "Metadata poster thumbnail (url)",
+            "de": "Miniaturansicht des Metadaten-Posters (url)",
+            "ru": "Metadata poster thumbnail (url)",
+            "pt": "Miniatura do pôster de metadados (url)",
+            "nl": "Miniatuur van metadataposter (url)",
+            "fr": "Miniature de l'affiche des métadonnées (url)",
+            "it": "Miniatura del poster dei metadati (url)",
+            "es": "Miniatura del póster de metadatos (url)",
+            "pl": "Miniaturka plakatu z metadanymi (url)",
+            "uk": "Ескіз плаката метаданих (url)",
+            "zh-cn": "元数据海报缩略图 (url)"
+        },
+        "role": "media.cover",
         "type": "string"
+        
     },
     "playing.metadata.primaryextrakey": {
         "description": {

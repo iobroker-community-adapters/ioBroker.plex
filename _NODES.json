@@ -3240,7 +3240,9 @@
             "uk": "URL-адреса файлу пісні",
             "zh-cn": "歌词文件的 URL"
         },
-        "func": "convert-link-only",
+        "convert": {
+            "func": "create-link-only"
+        },
         "role": "url",
         "type": "string"
     },
@@ -3258,7 +3260,9 @@
             "uk": "URL пісні",
             "zh-cn": "歌曲网址"
         },
-        "func": "convert-link-only",
+        "convert": {
+            "func": "create-link-only"
+        },
         "role": "media.url",
         "type": "string"
     },
@@ -7610,7 +7614,9 @@
             "uk": "Поточна активна URL-адреса медіа",
             "zh-cn": "当前活动媒体网址"
         },
-        "func": "convert-link-only",
+        "convert": {
+            "func": "create-link-only"
+        },
         "role": "url",
         "type": "string"
     },

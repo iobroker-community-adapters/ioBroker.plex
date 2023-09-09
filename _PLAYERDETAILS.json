@@ -1,0 +1,53 @@
+{
+    "playerDetails": {
+        "node":{
+            "time": {
+                "node": "Metadata.viewOffset",
+                "type": "number"        
+            }
+        },
+        "action": {
+            "volume": {
+                "node": "playback.setVolume",
+                "type": "number"
+            },
+            "time": {
+                "node": "playback.seekTo",
+                "type": "number"        
+            },
+            "percent": {
+                "node": "playback.seekToPercent",
+                "type": "number",
+                "notDetails": true         
+            },
+            "state": {
+                "node": "playback.play_switch",
+                "type": "boolean",
+                "values": ["playing"],
+                "notDetails": true        
+            },
+            "shuffle": {
+                "node": "playback.setShuffle",
+                "type": "boolean"               
+            },
+            "repeat": {
+                "node": "playback.setRepeat",
+                "type": "number"
+            }
+        }
+    }, 
+    "deepVal":{
+        "Metadata.Media.Part.Stream.streamType": [{
+            "nodes":[{"node":".url", "key":"key"},{"node":".codec", "key":"codec"}],
+            "value": 4,
+            "node": "Metadata.Music.Lyric"
+        }],
+        "Metadata.type": [{
+            "call":{"Metadata.Media.Part.key": [{"node": ".Media", "app": ".mediaurl"}],
+                    "Metadata.Media.Part.codec": [{"node": ".Media", "app": ".codec"}]},
+            
+            "valueAsKey": true,
+            "node": "Metadata"
+        }]
+    }
+}

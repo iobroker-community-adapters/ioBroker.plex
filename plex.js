@@ -12,27 +12,35 @@ const { v1: _uuid } = require('uuid');
 
 const Plex = require('plex-api');
 const Tautulli = require('tautulli-api');
+const xml2js = require('xml2js');
+const xml = new xml2js.Parser()
 
 /*
  * internal libraries
  */
 const Library = require(__dirname + '/lib/library.js');
 const PlexPinAuth = require(__dirname + '/lib/plexPinAuth.js');
-const _NODES = require(__dirname + '/_NODES.js');
-const _ACTIONS = require(__dirname + '/_ACTIONS.js');
+const _NODES = JSON.parse(_fs.readFileSync('./_NODES.json'));
+const _ACTIONS = JSON.parse(_fs.readFileSync('./_ACTIONS.json'));
+const _PLAYERDETAILS = JSON.parse(_fs.readFileSync('./_PLAYERDETAILS.json'));
+const { Controller } = require(__dirname + '/lib/players.js')
 
 /*
  * constants & variables initiation
  */
 let adapter;
 let library;
+let controller;
 let unloaded;
 let retryCycle, refreshCycle;
+
+// Temp Json only for new Data
+let newConstantJson 
 
 let encryptionKey;
 let plex, tautulli, data;
 
-
+let detailsCounter = 0
 /**
  * players: 				maschine-id of players
  * playing: 				friendly name of running players
@@ -42,12 +50,13 @@ let plex, tautulli, data;
  * playingDevice.start: 	start date since last update
  */
 let players = [], playing = [], streams = 0, playingDevice = [];
+let getaNewNamePlayers = []
 let history = [];
 let notifications = {};
 let upload = _multer({ dest: '/tmp/' });
 let refreshInterval = null
 
-let REQUEST_OPTIONS = {};
+
 const watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
 const plexOptions = {
 	identifier: '5cc42810-6dc0-44b1-8c70-747152d4f7f9',
@@ -74,6 +83,7 @@ function startAdapter(options)
 	adapter.on('ready', function ready()
 	{
 		library = new Library(adapter, { nodes: _NODES, actions: _ACTIONS, updatesInLog: adapter.config.debug || false });
+		
 		unloaded = false;
 		refreshInterval = adapter.setInterval(refreshViewOffset,1000)
 		
@@ -96,9 +106,9 @@ function startAdapter(options)
 			encryptionKey = adapter.config.encryptionKey;
 		
 		// Secure connection
-		REQUEST_OPTIONS.secureConnection = false;
-		REQUEST_OPTIONS._protocol = 'http:';
-		REQUEST_OPTIONS.timeout = 1000;
+		library.AXIOS_OPTIONS.secureConnection = false;
+		library.AXIOS_OPTIONS._protocol = 'http:';
+		library.AXIOS_OPTIONS.timeout = 1000;
 
 		if (adapter.config.secureConnection && adapter.config.certPublicVal && adapter.config.certPrivateVal)
 		{
@@ -106,8 +116,8 @@ function startAdapter(options)
 			
 			try
 			{
-				REQUEST_OPTIONS = {
-					...REQUEST_OPTIONS,
+				library.AXIOS_OPTIONS = {
+					...library.AXIOS_OPTIONS,
 					'cert': adapter.config.certPublicVal.indexOf('.') === -1 ? adapter.config.certPublicVal : _fs.readFileSync(adapter.config.certPublicVal),
 					'key': adapter.config.certPrivateVal.indexOf('.') === -1 ? adapter.config.certPrivateVal : _fs.readFileSync(adapter.config.certPrivateVal),
 					'rejectUnauthorized': false,
@@ -116,11 +126,11 @@ function startAdapter(options)
 				};
 				
 				if (adapter.config.certChainedVal) {
-					REQUEST_OPTIONS.ca = adapter.config.certChainedVal.indexOf('.') === -1 ? adapter.config.certChainedVal : _fs.readFileSync(adapter.config.certChainedVal);
+					library.AXIOS_OPTIONS.ca = adapter.config.certChainedVal.indexOf('.') === -1 ? adapter.config.certChainedVal : _fs.readFileSync(adapter.config.certChainedVal);
 				}
 				
-				if (REQUEST_OPTIONS.key.indexOf('ENCRYPTED') > -1) {
-					REQUEST_OPTIONS.passphrase = adapter.config.passphrase;
+				if (library.AXIOS_OPTIONS.key.indexOf('ENCRYPTED') > -1) {
+					library.AXIOS_OPTIONS.passphrase = adapter.config.passphrase;
 				}
 			}
 			catch(err)
@@ -128,8 +138,8 @@ function startAdapter(options)
 				adapter.log.warn('Failed loading certificates! Falling back to insecure connection to Plex Media Server...');
 				adapter.log.debug(err.message);
 				
-				REQUEST_OPTIONS.secureConnection = false;
-				REQUEST_OPTIONS._protocol = 'http:';
+				library.AXIOS_OPTIONS.secureConnection = false;
+				library.AXIOS_OPTIONS._protocol = 'http:';
 			}
 		}
 		else
@@ -156,12 +166,24 @@ function startAdapter(options)
 		plex = new Plex({
 			'hostname': adapter.config.plexIp,
 			'port': adapter.config.plexPort,
-			'https': REQUEST_OPTIONS.secureConnection,
+			'https': library.AXIOS_OPTIONS.secureConnection,
 			'token': adapter.config.plexToken,
-			'requestOptions': REQUEST_OPTIONS,
+			'requestOptions': library.AXIOS_OPTIONS,
 			'options': plexOptions
 		});
 		
+		library._plex = plex
+		
+		controller = new Controller(adapter, {
+			"controllerIdentifier":plexOptions.identifier,
+			"plexToken": plexOptions.plexToken,
+			"actions":_ACTIONS,
+			"nodes":_NODES,
+			"playerdetails":_PLAYERDETAILS
+		}, library)
+		
+
+
 		// retrieve all values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
 		adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) => {
 			library.set(Library.CONNECTION, true);
@@ -170,9 +192,9 @@ function startAdapter(options)
 			for (let state in states) {
 				//Reset own states common.type and common.role
 				library.extendState(state)
-				
-				if (states[state] !== null) {
-					library.setDeviceState(state.replace(`${adapter.name}.${adapter.instance}.`, ''), states[state] && states[state].val);
+
+				if (states[state] !== null && states[state] !== undefined) {
+					library.setDeviceState(state.replace(adapter.name + '.' + adapter.instance + '.', ''), states[state].val);
 				
 					// set history
 					if (state.indexOf('events.history') > -1) {
@@ -192,6 +214,10 @@ function startAdapter(options)
 			// test connection
 			init();
 		});
+		library.subscribeNode('metadata.viewoffset',(state, prefix, val, oldval) => {
+			library.confirmNode({node:prefix+'_Control.seekTo'})
+		})
+		internalConvert(_NODES);
 	});
 
 	/*
@@ -227,8 +253,8 @@ function startAdapter(options)
 		{
 			let libId = id.substring(id.indexOf('libraries.')+10, id.indexOf('-'));
 			let options = {
-				...REQUEST_OPTIONS,
-				'url': REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1',
+				...library.AXIOS_OPTIONS,
+				'url': library.AXIOS_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '/library/sections/' + libId + '/refresh?force=1',
 				'method': 'POST',
 				'headers': {
 					'X-Plex-Token': adapter.config.plexToken
@@ -255,49 +281,8 @@ function startAdapter(options)
 			let mode = path.pop();
 			
 			path.splice(-1);
-			let playerIdentifier = library.getDeviceState(path.join('.') + '.Player.uuid');
-			let playerTitle = library.getDeviceState(path.join('.') + '.Player.title');
-			let playerIp = library.getDeviceState(path.join('.') + '.Player.localAddress');
-			let playerPort = library.getDeviceState(path.join('.') + '.Player.port');
-			
-			if (_ACTIONS[mode] !== undefined && _ACTIONS[mode][action] !== undefined)
-			{
-				adapter.log.debug(`Triggered action -${action}- on player ${playerIp}.`);
-				
-				let key = _ACTIONS[mode][action].key || action;
-				if (_ACTIONS[mode][action]["true"] !== undefined)
-						key = state.val ? _ACTIONS[mode][action]["true"] : _ACTIONS[mode][action]["false"]
-				let attribute = _ACTIONS[mode][action].attribute;
-				let url = `http://${playerIp}:${playerPort}/player/${mode}/${key}?${(attribute != undefined ? `${attribute}=${val}&` : '')}`
-				
-				let options = {
-					...REQUEST_OPTIONS,
-					'method': 'GET',
-					// Dont work for me with https:
-					//'url': REQUEST_OPTIONS._protocol + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : ''),
-					'url': url,
-					'headers': {
-						'X-Plex-Token': adapter.config.plexToken,
-						'X-Plex-Target-Client-Identifier': playerIdentifier
-					}
-				};
-
-				_axios(options).then(res =>
-				{
-					adapter.log.debug(`Successfully triggered ${mode} action -${action}- on player ${playerIp}.`);
-					// confirm commands
-					library.confirmNode({node: id}, state.val)
-				})
-				.catch(err =>
-				{
-					adapter.log.warn(`Error triggering ${mode} action -${action}- on player ${playerIp}! See debug log for details.`);
-					adapter.log.debug(err);
-				});
-				adapter.log.debug('http:' + '//' + playerIp + ':' + playerPort + '/player/' + mode + '/' + key + '?' + (attribute != undefined ? attribute + '=' + val + '&' : '')
-					)
-			}
-			else
-				adapter.log.warn('Error triggering ' + mode + ' action -' + action + '- on player ' + playerIp + '! Action not supported!');
+			let p = controller.existPlayer(path.join('.'))
+			if (p) p.action({"mode": mode, "action": action, "val": val, "id":path.join('.') + '._Controls'})		
 		}
 	});
 	
@@ -362,6 +347,8 @@ function startAdapter(options)
 			
 			unloaded = true;
 			
+			controller.delete()
+
 			_http.close(() => adapter.log.debug('Server for listener closed.'));
 			adapter.clearTimeout(retryCycle);
 			adapter.clearTimeout(refreshCycle);
@@ -398,6 +385,44 @@ function init()
 				
 				playing = library.getDeviceState('_playing.players') && library.getDeviceState('_playing.players').split(',') || [];
 				streams = library.getDeviceState('_playing.streams') || 0;
+
+				//create all controllable players
+				let playerConfig = {}
+				for (let state in states) {
+					for (let end of [
+						{"text":".Player.localAddress", "key":"address"},
+						{"text":".Player.port", "key":"port"},
+						{"text":".Player.protocolCapabilities", "key":"protocolCapabilities"},
+						{"text":".Player.uuid", "key":"uuid"},
+						{"text":".Player.title", "key":"title"}
+					]) {
+						if (state.endsWith(end.text)) {
+							let prefix = state.replace(`${adapter.name}.${adapter.instance}.`, '').replace(end.text, '');
+							playerConfig[prefix] = playerConfig[prefix] || {};
+							playerConfig[prefix][end.key] = states[state].val;
+						}		
+					}		
+				}
+				for(let prefix in playerConfig) {
+					let c = playerConfig[prefix]
+					if (c 								!== undefined
+						&& c.protocolCapabilities 		!== undefined 
+						&& c.protocolCapabilities.split(',').indexOf('timeline') 
+						&& c.port 						!== undefined
+						&& c.address 					!== undefined
+						&& c.uuid 						!== undefined
+						&& c.title						!== undefined) {
+							if (`_playing.${library.clean(c.title, true)}-${c.uuid}`!==prefix) continue
+						controller.createPlayerIfNotExist({
+							"address": c.address,
+							"port":	c.port,
+							"config": {
+								title: c.title, 
+								uuid: c.uuid
+							}
+						})
+					}
+				}
 			});
 			
 			// verify Tautulli settings
@@ -431,18 +456,30 @@ function init()
 			{
 				retrieveData();
 				if (adapter.config.refresh > 0 && !unloaded)
-					refreshCycle = adapter.setTimeout(updater, Math.round(parseInt(adapter.config.refresh)*1000));
+					refreshCycle = adapter.setTimeout(updater, Math.floor(parseInt(adapter.config.refresh)*1000));
 				
 			}, 1000);
 			
 			// listen to events from Plex
 			startListener();
-			
+			// connection is ok get server id
+			plex.query('/')
+				.then(res =>
+				{
+					if (res && res.MediaContainer && res.MediaContainer.machineIdentifier) {
+						controller.setServerId(res.MediaContainer.machineIdentifier);
+					}
+				})
+				.catch(err =>
+					{
+						adapter.log.debug('ups');
+				})
+
 		})
 		.catch(err =>
 		{
 			adapter.log.debug('Configuration: ' + JSON.stringify(adapter.config));
-			adapter.log.debug('Request-Options: ' + JSON.stringify(REQUEST_OPTIONS));
+			adapter.log.debug('Request-Options: ' + JSON.stringify(library.AXIOS_OPTIONS));
 			adapter.log.debug('Stack-Trace: ' + JSON.stringify(err.stack));
 			
 			if (err.message.indexOf('EHOSTUNREACH') > -1)
@@ -494,19 +531,40 @@ function setEvent(data, source, prefix)
 		let groupBy = data.Player.title && data.Player.uuid !== undefined ? library.clean(data.Player.title, true) + '-' + data.Player.uuid : 'unknown';
 		
 		// channel by player
-		library.set({node: prefix, role: 'channel', description: 'Plex Players'});
-		library.set({node: prefix + '.' + groupBy, role: 'channel', description: 'Player ' + (data.Player.title || 'unknown')});
+		library.set({node: prefix, role: library.getNode('plexplayers', true).role, description: library.getNode('plexplayers', true).description});
+		library.set({node: prefix + '.' + groupBy, role: 'channel', description: library.appendToDescription(library.getNode('plex.player', true).description ,' '+ (data.Player.title || library.getNode('plex.player.unknown', true).description))});
 		
 		// adapt prefix
 		prefix = prefix + '.' + groupBy;
-    
+		let playerTemp
 		// index current playing players
 		if (data.event && data.Player && data.Player.title != '_recent')
 		{
+			let playerIp = library.getDeviceState(prefix + '.Player.localAddress');
+			let playerPort = library.getDeviceState(prefix + '.Player.port');
+			playerTemp = controller.createPlayerIfNotExist({
+				"address": playerIp,
+				"port":	playerPort,
+				"config": {
+					title: data.Player.title, 
+					uuid: data.Player.uuid
+				}
+			})
+			
+			
 			if (['media.play', 'media.resume'].indexOf(data.event) > -1)
 			{
 				if (playing.indexOf(data.Player.title) == -1) playing.push(data.Player.title);
-				if (playingDevice.findIndex((player) => player.prefix == prefix) == -1) playingDevice.push({"prefix":prefix, "start": Date.now()});
+				if (playingDevice.findIndex((player) => player.prefix == prefix) == -1) {
+					playingDevice.push({
+						"prefix":prefix, 
+						"title": data.Player.title,
+						"local": data.Player.local,
+						"playerIp": playerIp,
+						"playerPort": playerPort,
+						"playerIdentifier": data.Player.uuid
+					});
+				}
 				streams++;
 			}
 			else if (['media.stop', 'media.pause'].indexOf(data.event) > -1)
@@ -516,24 +574,54 @@ function setEvent(data, source, prefix)
 				streams > 0 && streams--;
 			}
 			
-			library.set({node: '_playing.players', role: 'text', type: 'string', description: 'Players currently playing'}, playing.join(','));
-			library.set({node: '_playing.streams', role: 'value', type: 'number', description: 'Number of players currently playing'}, streams);
+			library.set(
+				{
+					node: '_playing.players', 
+					role: library.getNode('playing.players', true).role, 
+					type: library.getNode('playing.players', true).type, 
+					description: library.getNode('playing.players', true).description
+				}, 
+				playing.join(',')
+			);
+			library.set(
+				{
+					node: '_playing.streams', 
+					role: library.getNode('playing.streams', true).role, 
+					type: library.getNode('playing.streams', true).type, 
+					description: library.getNode('plex.player', true).description
+				}, 
+				streams
+			);
 		}
 
 		// add player controls
 		if (data.Player && data.Player.uuid && players.indexOf(data.Player.uuid) == -1 && data.Player.title != '_recent') {
 			getPlayers();
 		// update play_switch control 
-		} else if (data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
+		} else if (data.Player && data.Player.title != '_recent' && ['media.play', 'media.resume', 'media.stop', 'media.pause'].indexOf(data.event) > -1){	
 			library.confirmNode({node: prefix + '._Controls.playback.play_switch'}, (['media.play', 'media.resume'].indexOf(data.event) > -1))
-		}	
+		}
+		// get library details plex.0._playing.ipad-10A88133-3762-4948-AF10-9503A37517AC.Metadata.key
+		//if (adapter.config.getAllItem && data.Player.title != '_recent') getItemDetails(data.Metadata && data.Metadata.key, prefix)
+		if (data.event && data.Player && data.Player.title != '_recent' && playerTemp) {
+			playerTemp.setNotificationData(JSON.parse(JSON.stringify(data))),100
+			data = {}
+		}
+			
 	}
 	
 	// EVENTS
 	else if (prefix == 'events')
 	{
 		// channel
-		library.set({node: prefix, role: 'channel', description: 'Plex Events'});
+		library.set(
+			{
+				node: prefix, 
+				role: library.getNode('plex.events', true).role, 
+				description: library.getNode('plex.events', true).description
+			},
+			undefined
+		);
 		
 		// replace placeholders in notification message
 		let event = data.event && data.event.replace('media.', '');
@@ -555,7 +643,7 @@ function setEvent(data, source, prefix)
 				'player': data.player,
 				'media': data.media,
 				'event': event,
-				'thumb': message.thumb ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
+				'thumb': message.thumb ? (library.AXIOS_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + replacePlaceholders(message.thumb, eventData) + '?X-Plex-Token=' + adapter.config.plexToken) : '',
 				'message': replacePlaceholders(message.message, eventData),
 				'caption': replacePlaceholders(message.caption, eventData),
 				'source': data.source
@@ -587,105 +675,13 @@ function setEvent(data, source, prefix)
 	
 	// write states
 	for (let key in data) {
-		readData(prefix + '.' + key, data[key], prefix);
+		library.readData(prefix + '.' + key, data[key], prefix);
 	}
+	
 	
 	// cleanup old states when playing something new
 	if (prefix.indexOf('_playing') > -1 && data.event == 'media.play') {
-		library.runGarbageCollector(prefix, false, 30, [...Library.garbageExcluded, '_Controls']);
-	}
-}
-
-/**
- * Read and write data received from event
- *
- */
-function readData(key, data, prefix, properties)
-{
-	// only proceed if data is given
-	if (data === undefined || data === 'undefined')
-		return false;
-	
-		// get node details	
-	let node = library.getNode(key.indexOf('_playing') > -1 ? 'playing' + key.slice(key.indexOf('.', prefix.length)) : key, true);
-
-	// loop nested data
-	if (typeof data == 'object')
-	{
-		// flatten nested data in one state
- 		if (Array.isArray(data))
-		{
-			if (data.length)
-			{
-				library.set(
-					{
-						'node': key,
-						'type': node.type,
-						'role': node.role,
-						'description': node.description
-					},
-					data.map(item => item.tag ? item.tag : item.name).join(', '),
-					properties
-				);
-			}
-			
-			key = key + 'Tree';
-		}
-		
-		// create channel
-		if (Object.keys(data).length > 0 && (key.indexOf('Tree') === -1 || (key.indexOf('Tree') > -1 && adapter.config.getMetadataTrees)))
-		{
-			// channel
-			library.set(
-				{
-					'node': key,
-					'role': 'channel',
-					'description': RegExp('\.[0-9]{3}$').test(key.slice(-4)) ? 'Index ' + key.slice(key.lastIndexOf('.')+1) : library.ucFirst(key.slice(key.lastIndexOf('.')+1).replace('Tree', '')) + ' Information'
-				},
-				undefined,
-				properties
-			);
-			
-			// read nested data
-			let indexKey;
-			for (let nestedKey in data)
-			{
-				indexKey = nestedKey >= 0 && nestedKey < 100 ? (nestedKey >= 0 && nestedKey < 10 ? '00' + nestedKey : '0' + nestedKey) : nestedKey;
-				
-				if (data[nestedKey] !== undefined && data[nestedKey] !== 'undefined')
-				{
-					if (typeof data[nestedKey] == 'object' && (!Array.isArray(data[nestedKey]) || (Array.isArray(data[nestedKey]) && adapter.config.getMetadataTrees)))
-					{
-						library.set({
-							'node': key + '.' + (Array.isArray(data[nestedKey]) ? nestedKey + 'Tree' : indexKey) + '._data',
-							'role': 'json',
-							'description': 'Data of this folder in JSON format'}, JSON.stringify(data[nestedKey]), properties);
-					}
-					
-					readData(key + '.' + indexKey, data[nestedKey], prefix);
-				}
-			}
-		}
-	}
-	
-	// write to states
-	else
-	{
-		// convert data
-		node.key = key;
-		data = convertNode(node, data);
-
-		// set data
-		library.set(
-			{
-				'node': key,
-				'type': node.type,
-				'role': node.role,
-				'description': node.description
-			},
-			data,
-			properties
-		);
+		library.runGarbageCollector(prefix, false, 30000, [...Controller.garbageExcluded, '_Controls']);
 	}
 }
 
@@ -713,7 +709,7 @@ function replacePlaceholders(message, data)
 				path = path.slice(path.indexOf('.')+1);
 				tmp = tmp[index];
 			}
-			catch(err) {adapter.log.debug(err.message)}
+			catch(err) {adapter.log.debug('catch: 30 ' + err.message)}
 		}
 		
 		// check value
@@ -736,7 +732,7 @@ function is(res)
 	if (res === undefined || res.response === undefined || res.response.result === undefined || res.response.result !== 'success')
 	{
 		adapter.log.warn('API response invalid!');
-		adapter.log.debug(JSON.stringify(res));
+		adapter.log.debug('debug 23 ' + JSON.stringify(res));
 		return false;
 	}
 	else if (res.response.message === 'Invalid apikey')
@@ -749,97 +745,6 @@ function is(res)
 		return true;
 }
 
-/**
- *
- *
- */
-function convertNode(node, data)
-{
-	if (!(node && node.convert)) return data
-	switch(node.convert.func)
-	{
-		case "date-timestamp":
-			
-			// convert timestamp to date
-			let date;
-			if (data.toString().indexOf('-') > -1)
-			{
-				date = data
-				data = Math.floor(new Date(data).getTime()/1000)
-			}
-			
-			// or keep date if that is given
-			else
-			{
-				let ts = new Date(data*1000);
-				date = ts.getFullYear() + '-' + ('0'+ts.getMonth()).slice(-2) + '-' + ('0'+ts.getDate()).slice(-2);
-			}
-			
-			// set date
-			library.set(
-				{
-					'node': node.key + 'Date',
-					'type': 'string',
-					'role': 'text',
-					'description': node.description.replace('Timestamp', 'Date')
-				},
-				date
-			);
-			break;
-		case "seconds-readable":
-			let d = new Date(data)
-			let value = (d.getHours()-1) ? (d.getHours()-1).toString() : '' 
-			value += value ? ':'+('0'+d.getMinutes()).slice(-2) : d.getMinutes().toString() + ':' + ('0'+d.getSeconds()).slice(-2)
-			library.set(
-				{
-					'node': node.key + 'human',
-					'type': 'string',
-					'role': 'text',
-					'description': 'Last viewing position'
-				},
-				value
-			)
-			library.set(
-				{
-					'node': node.key + 'Seconds',
-					'type': 'number',
-					'role': 'media.elapsed',
-					'description': 'Last viewing position in seconds(refresh)'
-
-				},
-				Math.floor(data/1000)
-			)
-			break;
-		
-		case "ms-min":
-			let duration = data/1000;
-			library.set(
-				{
-					'node': node.key + 'Seconds',
-					'type': 'number',
-					'role': 'media.duration',
-					'description': node.description.replace('in minutes', 'in seconds')
-				},
-				duration < 1 ? data * 60 : Math.floor(duration)
-			)
-			return duration < 1 ? data : Math.floor(duration/60);
-			break;
-		case "create-link":
-			let link = data ? (REQUEST_OPTIONS._protocol + '//' + adapter.config.plexIp + ':' + adapter.config.plexPort + '' + data + '?X-Plex-Token=' + adapter.config.plexToken) : ''
-			library.set(
-				{
-					'node': node.key + node.convert.key,
-					'type': node.convert.type,
-					'role': node.convert.role,
-					'description': (node.description + ' (link)')
-				},
-				link
-			)
-			break;
-	}
-	
-	return data;
-}
 
 /**
  * Get Items from Plex
@@ -877,8 +782,9 @@ function getItems(path, key, node)
 function retrieveData()
 {
 	// GET SERVERS
-	if (adapter.config.getServers)
+	if (adapter.config.getServers) {
 		getServers();
+	}
 	
 	// GET LIBRARIES
 	if (adapter.config.getLibraries)
@@ -906,17 +812,35 @@ function retrieveData()
  */
 function getServers()
 {
+	
 	plex.query('/servers').then(res =>
+	//plex.query('/:/timeline').then(res =>
 	{
 		adapter.log.debug('Retrieved Servers from Plex.');
-		library.set({node: 'servers', role: library.getNode('servers').role, description: library.getNode('servers').description});
+		/*adapter.log.debug(JSON.stringify(res.MediaContainer))
+		adapter.log.debug(JSON.stringify(res))
+		return*/
+		library.set(
+			{
+				node: 'servers', 
+				role: library.getNode('servers').role, 
+				description: library.getNode('servers').description
+			},
+			undefined
+		);
 		
 		let data = res.MediaContainer.Server || [];
 		data.forEach(entry =>
 		{
 			let serverId = entry['name'].toLowerCase();
-			library.set({node: 'servers.' + serverId, role: library.getNode('server').role, description: library.getNode('server').description.replace(/%server%/gi, entry['name'])});
-			
+			library.set(
+				{
+					node: 'servers.' + serverId, 
+					role: library.getNode('server').role, 
+					description: library.replaceDescription(library.getNode('server').description,'%server%', entry['name'])
+				},
+				undefined
+			);
 			// index all keys as states
 			for (let key in entry)
 			{
@@ -954,15 +878,22 @@ function getLibraries()
 		data.forEach(entry =>
 		{
 			let libId = entry['key'] + '-' + entry['title'].toLowerCase();
-			library.set({node: 'libraries.' + libId, role: library.getNode('library').role, description: library.getNode('library').description.replace(/%library%/gi, entry['title'])});
+			library.set(
+				{
+					node: 'libraries.' + libId, 
+					role: library.getNode('library').role, 
+					description: library.replaceDescription(library.getNode('library').description,'%library%', entry['title'])
+				},
+				undefined
+			);
 			
 			// refresh button
 			library.set(
 				{
 					'node': 'libraries.' + libId + '._refresh',
-					'type': 'boolean', 
-					'role': 'button',
-					'description': 'Scan Library Files'
+					'type': library.getNode('plex.events', true).type, 
+					'role': library.getNode('plex.events', true).role,
+					'description': library.getNode('plex.events', true).description 
 				},
 				false
 			);
@@ -995,8 +926,8 @@ function getLibraries()
 					adapter.log.debug('Retrieved Watch Statistics for Library ' + entry['title'] + ' from Tautulli.');
 					
 					library.set({node: 'statistics', role: library.getNode('statistics').role, description: library.getNode('statistics').description});
-					library.set({node: 'statistics.libraries', role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, '')});
-					library.set({node: 'statistics.libraries.' + libId, role: library.getNode('statistics.libraries').role, description: library.getNode('statistics.libraries').description.replace(/%library%/gi, entry['title'])});
+					library.set({node: 'statistics.libraries', role: library.getNode('statistics.libraries').role, description: library.replaceDescription(library.getNode('statistics.libraries').description, '%library%', '')});
+					library.set({node: 'statistics.libraries.' + libId, role: library.getNode('statistics.libraries').role, description: library.replaceDescription(library.getNode('statistics.libraries').description, '%library%', entry['title'])});
 					
 					data.forEach((entry, i) =>
 					{
@@ -1037,7 +968,7 @@ function getUsers()
 			let userId = library.clean(userName, true).replace(/\./g, '');
 			if (userId === 'local') return;
 			
-			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.getNode('user').description.replace(/%user%/gi, userName)});
+			library.set({node: 'users.' + userId, role: library.getNode('user').role, description: library.replaceDescription(library.getNode('user').description, '%user%', userName)});
 			
 			// index all keys as states
 			for (let key in entry)
@@ -1056,8 +987,8 @@ function getUsers()
 					if (!is(res)) return; else data = res.response.data || [];
 					adapter.log.debug('Retrieved Watch Statistics for User ' + userName + ' from Tautulli.');
 					
-					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, '')});
-					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.getNode('statistics.users').description.replace(/%user%/gi, userName)});
+					library.set({node: 'statistics.users', role: library.getNode('statistics.users').role, description: library.replaceDescription(library.getNode('statistics.users').description, '%user%', '')});
+					library.set({node: 'statistics.users.' + userId, role: library.getNode('statistics.users').role, description: library.replaceDescription(library.getNode('statistics.users').description, '%user%', userName)});
 					
 					data.forEach((entry, i) =>
 					{
@@ -1136,7 +1067,7 @@ function getPlaylists()
 			{
 				let node = library.getNode('playlists.' + key.toLowerCase());
 				node.key = 'playlists.' + playlistId + '.' + key;
-				entry[key] = convertNode(node, entry[key]);
+				entry[key] = library.convertNode(node, entry[key]);
 				
 				library.set(
 					{
@@ -1169,59 +1100,51 @@ function getPlayers()
 	plex.query('/clients').then(res =>
 	{
 		let data = res.MediaContainer.Server || [];
-		adapter.log.debug('Retrieved Players from Plex.');
+		adapter.log.debug(`Retrieved Players from Plex. JSON: ${JSON.stringify(res)}`);
 		data.forEach(player =>
 		{
 			// group by player
 			players.push(player.machineIdentifier);
-			let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
+			//let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
 			
 			// create player
-			library.set({node: '_playing', role: 'channel', description: 'Plex Media being played'});
-			library.set({node: '_playing.' + groupBy, role: 'channel', description: 'Player ' + player.name});
-			
-			// add player controls
-			library.set({'node': '_playing.' + groupBy + '.Player.localAddress', ...library.getNode('playing.player.localaddress') }, player.address);
-			library.set({'node': '_playing.' + groupBy + '.Player.port', ...library.getNode('playing.player.port') }, player.port);
-			
-			let controls = '_playing.' + groupBy + '._Controls';
-			library.set({node: controls, role: 'channel', description: 'Playback & Navigation Controls'});
-			//library.set({node: controls + '.remotePlayer', role: 'switch', type: 'boolean', write: true, description: 'Use remote/public instead of local player IP'}, false);
-			
-			player.protocolCapabilities.split(',').forEach(mode => // e.g. "timeline,playback,navigation,mirror,playqueues"
-			{
-				if (_ACTIONS[mode] === undefined) return;
-				
-				library.set({node: controls + '.' + mode, role: 'channel', description: library.ucFirst(mode) + ' Controls'});
-				
-				let button;
-				for (let key in _ACTIONS[mode])
-				{
-					button = typeof _ACTIONS[mode][key] == 'string' ? { "key": key, "description": _ACTIONS[mode][key] } : _ACTIONS[mode][key];
-					
-					library.set({
-						'node': controls + '.' + mode + '.' + key,
-						'description': 'Playback ' + library.ucFirst(button.description),
-						
-						'role': _ACTIONS[mode][key].role !== undefined ? _ACTIONS[mode][key].role : (_ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'value' : 'text') : 'button'),
-						'type': _ACTIONS[mode][key].type !== undefined ? _ACTIONS[mode][key].type : (_ACTIONS[mode][key].attribute !== undefined || _ACTIONS[mode][key].default !== undefined ? (_ACTIONS[mode][key].values || Number.isInteger(_ACTIONS[mode][key].default) ? 'number' : 'string') : 'boolean'),
-						
-						'common': {
-							'write': true,
-							'read': true,
-							'states': _ACTIONS[mode][key].values
-						},
-					}, _ACTIONS[mode][key].default !== undefined ? _ACTIONS[mode][key].default : false);
+			let playerTemp = controller.createPlayerIfNotExist({
+				"config": {
+					title: player.name, 
+					uuid: player.machineIdentifier
 				}
-				
-				adapter.subscribeStates(controls + '.' + mode + '.*');
-			});
+			})
+			
+			playerTemp.setClientData(player)
 		});
 	})
 	.catch(err =>
 	{
 		adapter.log.debug('Could not retrieve Players from Plex!');
 		adapter.log.debug(err);
+	});
+}
+
+function getItemDetails(item, prefix){//"/library/metadata/34679"
+	
+	if (!item || typeof item !== 'string') return
+	
+	adapter.log.debug(`Retrieved Libary details for ${item} from Plex.`)
+	
+	plex.query(item).then(function (result) {
+		if (!result || !result.MediaContainer||!result.MediaContainer.Metadata || !result.MediaContainer.Metadata[0].Media ) return
+		//newConstantJson = newConstantJson || {}
+		let data = {"Media": result.MediaContainer.Metadata[0].Media}
+
+		// remove unwanted data
+		delete data.guid
+		for (const d in data) if (typeof data[d] !== 'object') delete data[d]
+
+		library.readData(prefix+'.Metadata', data, prefix, undefined)
+		//adapter.log.debug(JSON.stringify(newConstantJson))
+		
+	}, function (err) {
+		console.error("Could not connect to server", err);
 	});
 }
 
@@ -1245,15 +1168,16 @@ function startListener()
 			res.end();
 			
 			// write payload to states
-			if (['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(payload.event) > -1)
+			
+		}
+		catch(e) {
+			adapter.log.warn('startListener: ' + e.message);
+			//res.sendStatus(500);
+		}
+		if (['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(payload.event) > -1)
 				setEvent(payload, 'plex', '_playing');
 			
 			setEvent(payload, 'plex', 'events');
-		}
-		catch(e) {
-			adapter.log.warn(e.message);
-			//res.sendStatus(500);
-		}
 	});
 	
 	// listen to events from Tautulli
@@ -1266,17 +1190,18 @@ function startListener()
 			payload = req.body;
 			res.sendStatus(200);
 			res.end();
-			
+		}
+			catch(e) {
+				adapter.log.warn(`Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`);
+				//res.sendStatus(500);
+			}	
 			// write payload to states
 			if (['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(payload.event) > -1)
 				setEvent(payload, 'tautulli', '_playing');
 			
 			setEvent(payload, 'tautulli', 'events');
-		}
-		catch(e) {
-			adapter.log.warn(`Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`);
-			//res.sendStatus(500);
-		}
+		
+		
 	});
 	
 	_http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
@@ -1287,9 +1212,10 @@ function startListener()
  */
 function refreshViewOffset() {
 	if (!unloaded) {
+		if (detailsCounter++ > 15) detailsCounter = 0
 		playingDevice.forEach((player) => {
 			let state =  player.prefix + '.Metadata.viewOffset' ;		
-			let value = Math.floor((library.getDeviceState(state) + Date.now() - player.start)/1000)
+			let value = library.getDeviceState(state) + 1000
 			state += 'Seconds'
 			//adapter.log.debug(Math.floor((Date.now() - player.start)/1000))
 			library.set(
@@ -1299,12 +1225,117 @@ function refreshViewOffset() {
 					'role': 'media.elapsed',
 					'description': 'Last viewing position in seconds(refresh)'
 				},
-				value
+				value/1000
 			)
+			
 		}) 
 	}
 }
 
+/**
+ *Use /player/timeline to get current runtime details about mediastreams (only works with number datapoints so far extend it)
+ * 
+ * @param {string} playerIp 			ip of player client
+ * @param {string} playerPort 			port of player client
+ * @param {string} playerIdentifier 	player plex identifier
+ * @param {string} playerTitle 			player name
+ */
+
+function getCurrentPlayerDetail(playerIp, playerPort, playerIdentifier, playerTitle) {
+	if (playerIp && playerPort && playerIdentifier && playerTitle) {
+	//	let url = 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?wait=0&X-Plex-Client-Identifier='+plexOptions.identifier+'&X-Plex-Device-Name='+ playerTitle  + '&X-Plex-Token=' + adapter.config.plexToken + '&X-Plex-Target-Client-Identifier=' + playerIdentifier
+		let options = {
+			...library.AXIOS_OPTIONS,
+			'method': 'GET',
+			'url': 'http:' + '//' + playerIp + ':' + playerPort + '/player/timeline/poll?',
+			'headers': {
+				"wait": 0,
+				"X-Plex-Target-Client-Identifier": playerIdentifier,
+				"X-Plex-Client-Identifier": plexOptions.identifier,
+				"X-Plex-Device-Name": playerTitle,
+				"X-Plex-Token": adapter.config.plexToken			
+			}
+		};
+	
+		_axios(options).then(res =>
+		{
+			xml.parseString(res.data, function (err, result) {
+				adapter.log.debug('Timeline data from '+ library.clean(playerTitle, true) + ' json:' + JSON.stringify(result));
+				//if (err) adapter.log.warn(err)
+				for (let d in result.MediaContainer.Timeline) {
+					let data = result.MediaContainer.Timeline[d].$
+					Object.keys(data).forEach((key) => {
+						let prefix = '_playing.'+ library.clean(playerTitle, true) +'-'+ playerIdentifier
+
+						let node = _PLAYERDETAILS["playerDetails"][key] 
+							&& _PLAYERDETAILS["playerDetails"][key].type === 'action' 
+							&& _PLAYERDETAILS["playerDetails"][key].node
+						
+						if (node) {
+							library.confirmNode({node: prefix + '._Controls.'+node}, Number(data[key]))
+						} 
+						else if (node = _PLAYERDETAILS["playerDetails"][key] 
+										&& _PLAYERDETAILS["playerDetails"][key].type === 'node' 
+										&& _PLAYERDETAILS["playerDetails"][key].node) {
+							readData(prefix + '.' + node, Number(data[key]), prefix);
+						}					
+					})
+				}
+			}).catch((err) => {
+				adapter.log.warn(err)
+			})	
+		})
+		.catch((err, body) =>
+		{
+			adapter.log.debug('catch() 31 ' + JSON.stringify(err));
+		});
+	}
+}
+// some functions to translate states and write them into folder - always deactivated in commits
+function writeNodes(name,json) {
+	let source = {}
+	for (let key in json) {
+		let node = json[key]
+		if (typeof node.description !== 'object') {
+			source[key] = node.description;
+		} else {
+			source[key] = node.description['en']
+		}
+	}
+	writeJsonToFile(name , source)
+}
+async function covertI18n(name, json) {
+	let language = ['en','de','ru','pt','nl','fr','it','es','pl','uk','zh-cn'];
+	let translations = {}
+	for (let n in language) translations[language[n]] = await readJsonFromFile(name, language[n])
+	for (let key in json) {
+		json[key].description = {}
+		for (let n in language) json[key].description[language[n]] = translations[language[n]][key]	
+	}
+	writeJsonToFile(name, json, true)
+}
+
+async function writeJsonToFile(name, json, isFile = false) {//.dataTest/admin
+	let file = isFile ? "./.dataTest/"+name+'.json' : "./.dataTest/"+name+"/admin/i18n/en/translations.json"
+
+	await _fs.writeFile(file , JSON.stringify(json), function(err) {
+		if(err) {
+			return adapter.log.error(err);
+		}
+		adapter.log.debug("The file was saved!");
+	}); 
+}
+async function readJsonFromFile(name, dir) {
+	return JSON.parse(await _fs.readFileSync(`./.dataTest/${name}/admin/i18n/${dir}/translations.json`));
+}
+// npm run translate -- -a ./.dataTest/Nodes/admin
+function internalConvert(json) {
+	if (_fs.existsSync('./.dataTest')) {
+		//writeNodes('Nodes', json);
+		//covertI18n('Nodes', json);
+	}
+	return;
+}
 /*
  * COMPACT MODE
  * If started as allInOne/compact mode => return function to create instance

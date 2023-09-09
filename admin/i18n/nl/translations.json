@@ -31,6 +31,7 @@
     "event": "Soort gebeurtenis",
     "events": "Inschrijven / luisteren naar gebeurtenissen (Configuratie van de webhook)",
     "eventsInfo": "Luisteren naar evenementen kunt u gebeurtenissen ontvangen van zowel Plex of Tautulli.",
+    "getAllItem": "Haal alle huidige streaminginformatie op",
     "getAllItems": "Het ophalen van alle items in een bibliotheek",
     "getLibraries": "Ophalen bibliotheken",
     "getPlaylists": "Afspeellijsten ophalen",

@@ -353,3 +353,4 @@ module.exports =
 	"settings.transcoder.transcoderh264minimumcrf": {"description": "transcoderh264minimumcrf", "role": "state", "type": "string"}	
 	
 }
+

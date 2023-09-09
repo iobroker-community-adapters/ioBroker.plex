@@ -132,6 +132,17 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added: Retrieve a bit more information about streams 
+- (ticaki) Added: Retrieve status informations from local clients (webhook needed)
+- (ticaki) Added: Update local client data while not stopped (video/music) every second (webhook needed)
+- (ticaki) Added: Update metadata on local client playing target change 
+- (ticaki) Added: alot more states
+
+- todo:
+- sort ALOT more states :)
+- Add: admin configuration for refresh of metadata and clientdata
+
 ### 1.0.5 (2023-08-31)
 - (ticaki) Fixed: Control did not work with Plexamp.
 - (ticaki) some minor improvements.

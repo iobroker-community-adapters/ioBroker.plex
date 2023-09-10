@@ -373,8 +373,8 @@ function init()
 	plex.query('/status/sessions')
 		.then(res =>
 		{
+			adapter.log.debug(`Retrieved playing now from plex server: ${res && res.MediaContainer && JSON.stringify(res.MediaContainer) || 'empty'}`)
 			library.set(Library.CONNECTION, true);
-			
 			// retrieve values from states to avoid message "Unsubscribe from all states, except system's, because over 3 seconds the number of events is over 200 (in last second 0)"
 			adapter.getStates(`${adapter.name}.${adapter.instance}.*`, (err, states) =>
 			{

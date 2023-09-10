@@ -34,6 +34,7 @@
     "getAllItem": "检索当前所有流媒体信息",
     "getAllItems": "检索的所有项目在图书馆",
     "getLibraries": "检索图书馆",
+    "getPlayerRefreshInfo": "播放器的刷新率影响seekTo、viewOffset和歌词的准确性。设置为 0 以停用。",
     "getPlaylists": "检索的播放列表",
     "getServers": "检索的服务器",
     "getSettings": "检索设置",

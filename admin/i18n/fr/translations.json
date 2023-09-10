@@ -34,6 +34,7 @@
     "getAllItem": "Récupérer toutes les informations de streaming actuelles",
     "getAllItems": "Récupérer tous les éléments à l'intérieur d'une bibliothèque",
     "getLibraries": "Récupérer des bibliothèques",
+    "getPlayerRefreshInfo": "Le taux de rafraîchissement du lecteur affecte la précision de seekTo, viewOffset et des paroles. Réglez sur 0 pour désactiver.",
     "getPlaylists": "Récupérer des listes de lecture",
     "getServers": "Récupérer des serveurs",
     "getSettings": "Récupérer les paramètres",

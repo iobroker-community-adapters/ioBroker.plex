@@ -34,6 +34,7 @@
     "getAllItem": "Recuperar toda la información de transmisión actual",
     "getAllItems": "Recuperar todos los elementos dentro de una biblioteca",
     "getLibraries": "Recuperar las bibliotecas",
+    "getPlayerRefreshInfo": "La frecuencia de actualización del reproductor afecta la precisión de seekTo, viewOffset y letras. Establezca en 0 para desactivar.",
     "getPlaylists": "Recuperar listas de reproducción",
     "getServers": "Recuperar servidores",
     "getSettings": "Recuperar la configuración",

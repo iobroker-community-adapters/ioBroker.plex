@@ -34,6 +34,7 @@
     "getAllItem": "Recupera tutte le informazioni di streaming correnti",
     "getAllItems": "Recuperare tutti gli elementi all'interno di una biblioteca",
     "getLibraries": "Recuperare le librerie",
+    "getPlayerRefreshInfo": "La frequenza di aggiornamento del lettore influisce sulla precisione di seeTo, viewOffset e testi. Impostare su 0 per disattivare.",
     "getPlaylists": "Recuperare playlist",
     "getServers": "Recuperare i server",
     "getSettings": "Recuperare le impostazioni",

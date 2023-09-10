@@ -165,6 +165,7 @@
         "getSettings": true,
         "getMetadataTrees": false,
         "getPlaylistsDetails": false,
+        "getPlayerRefresh": 1,
         "notifications": [
             {
                 "media": "any",

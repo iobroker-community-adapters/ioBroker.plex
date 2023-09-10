@@ -34,6 +34,7 @@
     "getAllItem": "Haal alle huidige streaminginformatie op",
     "getAllItems": "Het ophalen van alle items in een bibliotheek",
     "getLibraries": "Ophalen bibliotheken",
+    "getPlayerRefreshInfo": "De vernieuwingsfrequentie van de speler beïnvloedt de nauwkeurigheid van seekTo, viewOffset en songteksten. Stel in op 0 om te deactiveren.",
     "getPlaylists": "Afspeellijsten ophalen",
     "getServers": "Ophalen servers",
     "getSettings": "Instellingen ophalen",

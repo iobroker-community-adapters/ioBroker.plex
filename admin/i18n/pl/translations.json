@@ -34,6 +34,7 @@
     "getAllItem": "Pobierz wszystkie aktualne informacje o transmisji strumieniowej",
     "getAllItems": "Zobacz wszystkie przedmioty w bibliotece",
     "getLibraries": "Przywrócić biblioteki",
+    "getPlayerRefreshInfo": "Częstotliwość odświeżania odtwarzacza wpływa na dokładność wyszukiwaniaTo, viewOffset i tekstów. Ustaw na 0, aby dezaktywować.",
     "getPlaylists": "Otrzymywać listy odtwarzania",
     "getServers": "Usuwanie serwera",
     "getSettings": "Uzyskać ustawienia",

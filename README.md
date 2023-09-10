@@ -133,7 +133,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Added: Lyrics are written as link and text in data points
+- (ticaki) Added: Lyrics are written as link and text in states
 - (ticaki) Added: Connection to players with refresh of playerdetail
 - (ticaki) Added: New states with player data.
 - (ticaki) Added: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true

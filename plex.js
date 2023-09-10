@@ -366,10 +366,10 @@ function init() {
 						{ "text": ".Player.uuid", "key": "uuid" },
 						{ "text": ".Player.title", "key": "title" }
 					]) {
-						if (state.endsWith(end.text)) {
+						if (state.endsWith(end.text) && state.indexOf('Metadata'+end.text) == -1) {
 							let prefix = state.replace(`${adapter.name}.${adapter.instance}.`, '').replace(end.text, '');
 							playerConfig[prefix] = playerConfig[prefix] || {};
-							playerConfig[prefix][end.key] = states[state].val;
+							playerConfig[prefix][end.key] = states[state] && states[state].val || '';
 						}
 					}
 				}

@@ -3224,7 +3224,15 @@
             "zh-cn": "这首歌词的编解码器"
         },
         "role": "value",
-        "type": "string"
+        "type": "string",
+        "convert": {
+            "complex": {
+                "func": "lyric",
+                "pattern":"codec",
+                "data":"playing.metadata.music.lyric.url",
+                "key":"playing.metadata.music.lyric.text"
+            }
+        }
     },
     "playing.metadata.music.lyric.url": {
         "description": {

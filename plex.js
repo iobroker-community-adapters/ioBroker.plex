@@ -102,7 +102,7 @@ function startAdapter(options) {
         // Secure connection
         library.AXIOS_OPTIONS.secureConnection = false;
         library.AXIOS_OPTIONS._protocol = 'http:';
-        library.AXIOS_OPTIONS.timeout = 1000;
+        library.AXIOS_OPTIONS.timeout = 3000;
 
         if (adapter.config.secureConnection && adapter.config.certPublicVal && adapter.config.certPrivateVal) {
             adapter.log.info('Establishing secure connection to Plex Media Server...');

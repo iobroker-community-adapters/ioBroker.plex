@@ -65,7 +65,7 @@
     "plexAuth": "Connection settings of the Plex instance",
     "plexAuthInfo": "IP address and port of your Plex Media Server as well as login credentials. If you do <strong>not</strong> want to provide user and password, please <a target='_blank' href='https://github.com/iobroker-community-adapters/ioBroker.plex#21-basic-setup'>read the setup guide</a> on how to avoid providing them.",
     "plexIp": "IP address",
-    "plexPassword": "Plex Passwort",
+    "plexPassword": "Plex Password",
     "plexPort": "Port",
     "plexSecure": "Secure (https)",
     "plexToken": "Plex Token",

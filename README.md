@@ -133,7 +133,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.1.0 (2023-09-11)
 - (ticaki) Added: Lyrics are written as link and text in _playing.device.Metadata.Music.Lyric
 - (ticaki) Added: Connection to players with refresh of playerdetail
 - (ticaki) Added: New states with player data.

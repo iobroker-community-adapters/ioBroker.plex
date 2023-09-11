@@ -63,7 +63,7 @@
     "passphrase": "Passwort (nur wenn privater Schlüssel zusätzlich verschlüsselt ist)",
     "playback by shared user": "Wiedergabe eines anderen Benutzers",
     "plexAuth": "Die Verbindungseinstellungen der Plex Instanz",
-    "plexAuthInfo": "Die IP-Adresse und der Port des Plex-Media-Server sowie die Anmeldeinformationen. Diese müssen <b>nicht</b> zwangsweise angegeben werden. Bitte <a target='_blank' href='https://github.com/iobroker-community-adapters/ioBroker.plex#21-basic-setup'>die Einrichtungsanleitung lesen</a> wie dies vermieden werden kann.",
+    "plexAuthInfo": "Die IP-Adresse und der Port des Plex-Media-Server sowie die Anmeldeinformationen. Diese müssen <strong>nicht</strong> zwangsweise angegeben werden. Bitte <a target='_blank' href='https://github.com/iobroker-community-adapters/ioBroker.plex#21-basic-setup'>die Einrichtungsanleitung lesen</a> wie dies vermieden werden kann.",
     "plexIp": "IP-Adresse",
     "plexPassword": "Plex Passwort",
     "plexPort": "Port",

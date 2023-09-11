@@ -34,7 +34,7 @@
     "getAllItem": "Retrieve all current streaming information",
     "getAllItems": "Retrieve all items within a library",
     "getLibraries": "Retrieve libraries",
-    "getPlayerRefreshInfo": "The refresh rate of the player affects the accuracy of seekTo, viewOffset and lyrics. Set to 0 to deactivate.",
+    "getPlayerRefreshInfo": "The refresh rate (in seconds) of the player affects the accuracy of seekTo, viewOffset and lyrics. Set to 0 to deactivate.",
     "getPlaylists": "Retrieve playlists",
     "getServers": "Retrieve servers",
     "getSettings": "Retrieve settings",

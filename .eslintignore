@@ -3,5 +3,4 @@ admin/words.js
 _*.js
 www/**
 admin/**
-lib/**
-plex.js
+./dataTest/**

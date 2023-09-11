@@ -34,7 +34,7 @@
     "getAllItem": "Rufen Sie alle aktuellen Streaming-Informationen ab",
     "getAllItems": "alle Elemente der Bibliothek(en) abrufen",
     "getLibraries": "Bibliotheken abrufen",
-    "getPlayerRefreshInfo": "Die Bildwiederholfrequenz des Players beeinflusst die Genauigkeit von „seekTo“, „viewOffset“ und „lyrics“. Zum Deaktivieren auf 0 setzen.",
+    "getPlayerRefreshInfo": "Die Aktualisierungsrate (in Sekunden) des Players beeinflusst die Genauigkeit von „seekTo“, „viewOffset“ und „lyrics“. Zum Deaktivieren auf 0 setzen.",
     "getPlaylists": "Playlists abrufen",
     "getServers": "Server abrufen",
     "getSettings": "Einstellungen abrufen",

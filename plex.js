@@ -401,11 +401,16 @@ function init() {
 
             // initialize Tautulli API
             else {
-                tautulli = new Tautulli(
-                    adapter.config.tautulliIp,
-                    adapter.config.tautulliPort || 8181,
-                    library.decode(encryptionKey, adapter.config.tautulliToken)
-                );
+                try {
+                    tautulli = new Tautulli(
+                        adapter.config.tautulliIp,
+                        adapter.config.tautulliPort || 8181,
+                        library.decode(encryptionKey, adapter.config.tautulliToken)
+                    );
+                }
+                catch(error) {
+                    adapter.log.error(`Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:${library.decode(encryptionKey, adapter.config.tautulliToken)}`);
+                }
             }
 
             // retrieve data
@@ -869,7 +874,9 @@ function getLibraries() {
                             library.set({ node: 'statistics.libraries.' + libId + '.' + id + '.' + key, type: library.getNode('statistics.' + key).type, role: library.getNode('statistics.' + key).role, description: library.getNode('statistics.' + key).description }, entry[key]);
                     });
                 })
-                    .catch();
+                    .catch(err => {
+                        adapter.log.error(`Tautulli configuration is incorrect. IP: ${adapter.config.tautulliIp} Port: ${adapter.config.tautulliPort} Api-Key: ${library.decode(encryptionKey, adapter.config.tautulliToken)} Error: ${err}`);
+                    });
             }
 
         });
@@ -922,7 +929,9 @@ function getUsers() {
                             library.set({ node: 'statistics.users.' + userId + '.' + id + '.' + key, type: library.getNode('statistics.' + key).type, role: library.getNode('statistics.' + key).role, description: library.getNode('statistics.' + key).description }, entry[key]);
                     });
                 })
-                    .catch();
+                    .catch(err => {
+                        adapter.log.error(`Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:${library.decode(encryptionKey, adapter.config.tautulliToken)} Error: ${err}`);
+                    });
             }
 
         });
@@ -1070,11 +1079,10 @@ function getPlayers() {
 
             playerTemp.setClientData(player);
         });
-    })
-        .catch(err => {
-            adapter.log.debug('Could not retrieve Players from Plex!');
-            adapter.log.debug(err);
-        });
+    }).catch(err => {
+        adapter.log.debug('Could not retrieve Players from Plex!');
+        adapter.log.debug(err);
+    });
 }
 
 /**

@@ -133,6 +133,9 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
+
 ### 1.1.1 (2023-09-16)
 - (ticaki) Fixed: State common.name english/german
 - (ticaki) some minor improvements

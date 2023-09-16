@@ -1,7 +1,7 @@
 {
   "common": {
     "name": "plex",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "titleLang": {
       "en": "Plex Media Server",
       "de": "Plex Media Server",
@@ -29,6 +29,19 @@
       "uk": "Інтеграція медіасервера Plex і Tautulli"
     },
     "news": {
+      "1.1.1": {
+        "en": "Fixed: State common.name english/german\nsome minor improvements",
+        "de": "Behoben: State common.name Englisch/Deutsch\neinige kleinere Verbesserungen",
+        "ru": "Исправлено: State common.name english/german\nнекоторые незначительные улучшения",
+        "pt": "Corrigido: Estado comum.nome inglês/german\nalgumas pequenas melhorias",
+        "nl": "Vertaling:\nwat kleine verbetering",
+        "fr": "Fixed: State common.name english/german\nquelques améliorations mineures",
+        "it": "Fisso: Stato comune.name inglese/german\nalcuni miglioramenti minori",
+        "es": "Fijo: Estado común.nombre español/german\nalgunas mejoras menores",
+        "pl": "W: Państwowe wspólne nazwy english/german\ndrobne ulepszenia",
+        "uk": "Виправлено: Назва держави англійська/герман\nдеякі незначні поліпшення",
+        "zh-cn": "固定:国家共同名称\n某些微小的改进"
+      },
       "1.1.0": {
         "en": "Added: Lyrics are written as link and text in _playing.device.Metadata.Music.Lyric\nAdded: Connection to players with refresh of playerdetail\nAdded: New states with player data.\nAdded: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
         "de": "Hinzugefügt: Lyrics werden als Link und Text in _playing.device.Metadata.Music.Lyric geschrieben\nHinzugefügt: Verbindung zu Playern mit Aktualisierung von Playerdetails\nHinzugefügt: Neue Zustände mit Playerdaten.\nHinzugefügt: Aktualisierung des Players kann durch aktiviert von _Controls.timeline.refreshDetails gesteuert werden",
@@ -106,19 +119,6 @@
         "pl": "Xmlparser call (ang.)",
         "uk": "Xml Генератор виклик фіксований",
         "zh-cn": "十mlparser 固定电话"
-      },
-      "1.0.0": {
-        "en": "fixed: several minor issues have been fixed",
-        "de": "behoben: es wurden mehrere kleinere Probleme behoben",
-        "ru": "исправлено: исправлено несколько мелких вопросов",
-        "pt": "corrigido: várias questões menores foram corrigidas",
-        "nl": "er zijn meerdere kleine kwesties opgelost",
-        "fr": "fixe: plusieurs questions mineures ont été corrigées",
-        "it": "fisso: sono stati fissati diversi problemi minori",
-        "es": "fijo: se han resuelto varias cuestiones menores",
-        "pl": "ustalono kilka drobnych problemów",
-        "uk": "виправлено: виправлено кілька незначних питань",
-        "zh-cn": "固定:几个小问题已经确定。"
       }
     },
     "license": "MIT",

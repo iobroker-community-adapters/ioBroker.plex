@@ -460,7 +460,7 @@
     "libraries.itemscount": {
         "description": {
             "en": "Number of items in the library",
-            "de": "Anzahl der Elemente in der Bibliothek",
+            "de": "Anzahl der Multimediainhalte in der Bibliothek",
             "ru": "Количество предметов в библиотеке",
             "pt": "Número de itens na biblioteca",
             "nl": "Aantal items in de bibliotheek",
@@ -707,8 +707,7 @@
             "uk": "Перегляд облікового запису",
             "zh-cn": "查看帐户"
         },
-        "role": "value",
-        "type": "string"
+        "role": "channel"
     },
     "playing.account.id": {
         "description": {
@@ -879,7 +878,7 @@
         },
         "description": {
             "en": "The artwork of the item",
-            "de": "Das Kunstwerk des Artikels",
+            "de": "Das Cover des Multimediainhalts.",
             "ru": "Изображение предмета",
             "pt": "A arte do item",
             "nl": "Het artwork van het item",
@@ -902,7 +901,7 @@
         },
         "description": {
             "en": "The artwork of the item",
-            "de": "Das Kunstwerk des Artikels",
+            "de": "Das Cover des Multimediainhalts.",
             "ru": "Изображение предмета",
             "pt": "A arte do item",
             "nl": "Het artwork van het item",
@@ -1139,7 +1138,7 @@
     "playing.metadata.collectiontree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -1241,7 +1240,7 @@
     "playing.metadata.countrytree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -1326,7 +1325,7 @@
     "playing.metadata.directortree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -1481,7 +1480,7 @@
     "playing.metadata.file.name": {
         "description": {
             "en": "The file name of the item",
-            "de": "Der Dateiname des Elements",
+            "de": "Der Dateiname des Multimediainhalts",
             "ru": "Имя файла элемента",
             "pt": "O nome do arquivo do item",
             "nl": "De bestandsnaam van het item",
@@ -1515,7 +1514,7 @@
     "playing.metadata.file.size": {
         "description": {
             "en": "The file size of the item",
-            "de": "Die Dateigröße des Elements",
+            "de": "Die Dateigröße des Multimediainhalts",
             "ru": "Размер файла элемента",
             "pt": "O tamanho do arquivo do item",
             "nl": "De bestandsgrootte van het item",
@@ -1549,7 +1548,7 @@
     "playing.metadata.genretree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -1621,7 +1620,19 @@
             "role": "media.cover.big",
             "type": "string"
         },
-        "description": {},
+        "description": {
+            "en": "Cover of the series",
+            "de": "Abdeckung der Serie",
+            "ru": "Обложка серии",
+            "pt": "Capa da série",
+            "nl": "Dekking van de serie",
+            "fr": "Couverture de la série",
+            "it": "Copertura della serie",
+            "es": "Cubierta de la serie",
+            "pl": "Cover of the series (ang.)",
+            "uk": "Кришка серії",
+            "zh-cn": "A. 系列的覆盖"
+        },
         "role": "text",
         "type": "string"
     },
@@ -1632,7 +1643,19 @@
             "role": "media.cover.big",
             "type": "string"
         },
-        "description": {},
+        "description": {
+            "en": "Url to the cover of the series.",
+            "de": "Url auf die Abdeckung der Serie.",
+            "ru": "Урл на обложку серии.",
+            "pt": "Url para a capa da série.",
+            "nl": "Url naar de dekking van de serie.",
+            "fr": "Url à la couverture de la série.",
+            "it": "Url alla copertina della serie.",
+            "es": "Url a la cubierta de la serie.",
+            "pl": "Odcinek do okładki serialu.",
+            "uk": "Урл до чохла серії.",
+            "zh-cn": "要求将这一系列活动包括在内。."
+        },
         "role": "media.cover.big",
         "type": "string"
     },
@@ -1642,17 +1665,53 @@
         "type": "string"
     },
     "playing.metadata.grandparentkey": {
-        "description": {},
+        "description": {
+            "en": "Library key of the series.",
+            "de": "Bibliotheksschlüssel der Serie.",
+            "ru": "Библиотека ключа серии.",
+            "pt": "Chave da biblioteca da série.",
+            "nl": "Bibliotheeksleutel van de serie.",
+            "fr": "La clé bibliothèque de la série.",
+            "it": "La chiave della serie.",
+            "es": "La clave de la serie.",
+            "pl": "Klucz biblioteczny serii.",
+            "uk": "Бібліотечний ключ серії.",
+            "zh-cn": "图书馆系列的关键。."
+        },
         "role": "text",
         "type": "string"
     },
     "playing.metadata.grandparentratingkey": {
-        "description": {},
+        "description": {
+            "en": "Rating key of the series.",
+            "de": "Bewertungsschlüssel der Serie.",
+            "ru": "Рейтинговый ключ серии.",
+            "pt": "Chaveiro de classificação da série.",
+            "nl": "Sleutel van de serie.",
+            "fr": "Notez le keyl de la série.",
+            "it": "Rating keyl della serie.",
+            "es": "Clasificación clavel de la serie.",
+            "pl": "Klucz z serii.",
+            "uk": "Рейтинговий ключ серії.",
+            "zh-cn": "确定系列的主要内容。."
+        },
         "role": "text",
         "type": "string"
     },
     "playing.metadata.grandparenttheme": {
-        "description": {},
+        "description": {
+            "en": "Theme of the series.",
+            "de": "Thema der Serie.",
+            "ru": "Тема серии.",
+            "pt": "Tema da série.",
+            "nl": "Thema van de serie.",
+            "fr": "Thème de la série.",
+            "it": "Tema della serie.",
+            "es": "Tema de la serie.",
+            "pl": "Temat serii.",
+            "uk": "Тема серії.",
+            "zh-cn": "系列主题。."
+        },
         "role": "text",
         "type": "string"
     },
@@ -1663,7 +1722,19 @@
             "role": "media.cover.small",
             "type": "string"
         },
-        "description": {},
+        "description": {
+            "en": "Thumbnail of the series.",
+            "de": "Thumbnail der Serie.",
+            "ru": "Миниатюра серии.",
+            "pt": "Thumbnail da série.",
+            "nl": "Thumbnail van de serie.",
+            "fr": "Le jembnail de la série.",
+            "it": "Incisione della serie.",
+            "es": "Thumbnail de la serie.",
+            "pl": "Gąbka z serii.",
+            "uk": "Натяг серії.",
+            "zh-cn": "系列的挖掘。."
+        },
         "role": "text",
         "type": "string"
     },
@@ -1674,7 +1745,19 @@
             "role": "media.cover.small",
             "type": "string"
         },
-        "description": {},
+        "description": {
+            "en": "Url to the thumbnail of the series.",
+            "de": "Url auf die Miniaturansicht der Serie.",
+            "ru": "Урль к миниатюре серии.",
+            "pt": "Url para a miniatura da série.",
+            "nl": "Url tot de duim van de serie.",
+            "fr": "Url à la miniature de la série.",
+            "it": "Url alla miniatura della serie.",
+            "es": "Url a la miniatura de la serie.",
+            "pl": "Odcinek do kciuka z serii.",
+            "uk": "Урл до великого пальця серії.",
+            "zh-cn": "这一系列的谦卑。."
+        },
         "role": "media.cover.small",
         "type": "string"
     },
@@ -1698,7 +1781,7 @@
     "playing.metadata.guid": {
         "description": {
             "en": "IMDb ID of the item",
-            "de": "IMDb-ID des Artikels",
+            "de": "IMDb-ID des Multimediainhalts.",
             "ru": "IMDb-идентификатор объекта",
             "pt": "ID IMDb do item",
             "nl": "IMDb-ID van het item",
@@ -1720,7 +1803,7 @@
     "playing.metadata.key": {
         "description": {
             "en": "Key of the item",
-            "de": "Schlüssel des Artikels",
+            "de": "Schlüssel des Multimediainhalts.",
             "ru": "Ключ предмета",
             "pt": "Chave do item",
             "nl": "Sleutel van het artikel",
@@ -1778,7 +1861,7 @@
     "playing.metadata.librarysectionid": {
         "description": {
             "en": "The library ID of the item",
-            "de": "Die Bibliotheks-ID des Elements",
+            "de": "Die Bibliotheks-ID des Multimediainhalts",
             "ru": "Идентификатор библиотеки элемента",
             "pt": "O ID da biblioteca do item",
             "nl": "De bibliotheek-ID van het item",
@@ -1795,7 +1878,7 @@
     "playing.metadata.librarysectionkey": {
         "description": {
             "en": "The library key of the item",
-            "de": "Der Bibliotheksschlüssel des Elements",
+            "de": "Der Bibliotheksschlüssel des Multimediainhalts",
             "ru": "Библиотечный ключ элемента",
             "pt": "A chave da biblioteca do item",
             "nl": "De bibliotheeksleutel van het item",
@@ -1812,7 +1895,7 @@
     "playing.metadata.librarysectiontitle": {
         "description": {
             "en": "The library name of the item",
-            "de": "Der Bibliotheksname des Elements",
+            "de": "Der Bibliotheksname des Multimediainhalts",
             "ru": "Имя библиотеки элемента",
             "pt": "O nome da biblioteca do item",
             "nl": "De bibliotheeknaam van het item",
@@ -1829,7 +1912,7 @@
     "playing.metadata.librarysectiontype": {
         "description": {
             "en": "The library type of the item",
-            "de": "Der Bibliothekstyp des Elements",
+            "de": "Der Bibliothekstyp des Multimediainhalts",
             "ru": "Тип библиотеки элемента",
             "pt": "O tipo de biblioteca do item",
             "nl": "Het bibliotheektype van het item",
@@ -3228,9 +3311,9 @@
         "convert": {
             "complex": {
                 "func": "lyric",
-                "pattern":"codec",
-                "data":"playing.metadata.music.lyric.url",
-                "key":"playing.metadata.music.lyric.text"
+                "pattern": "codec",
+                "data": "playing.metadata.music.lyric.url",
+                "key": "playing.metadata.music.lyric.text"
             }
         }
     },
@@ -3495,12 +3578,11 @@
         },
         "role": "media.cover",
         "type": "string"
-        
     },
     "playing.metadata.primaryextrakey": {
         "description": {
             "en": "Key (#2) of the item",
-            "de": "Schlüssel (#2) des Artikels",
+            "de": "Schlüssel (#2) des Multimediainhalts.",
             "ru": "Key (#2) of the item",
             "pt": "Chave (#2) do item",
             "nl": "Sleutel (#2) van het item",
@@ -3534,7 +3616,7 @@
     "playing.metadata.producertree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -3602,7 +3684,7 @@
     "playing.metadata.rating": {
         "description": {
             "en": "The rating (out of 10) for the item",
-            "de": "Die Bewertung (von 10) für den Artikel",
+            "de": "Die Bewertung (von 10) des Multimediainhalt.",
             "ru": "The rating (out of 10) for the item",
             "pt": "A classificação (de 10) para o item",
             "nl": "De beoordeling (op 10) voor het item",
@@ -3634,7 +3716,19 @@
         "type": "number"
     },
     "playing.metadata.ratingimage": {
-        "description": {},
+        "description": {
+            "en": "Rating image.",
+            "de": "Rating-Bild.",
+            "ru": "Рейтинг изображения.",
+            "pt": "Imagem de classificação.",
+            "nl": "Verkrachtingsbeeld.",
+            "fr": "Notez l'image.",
+            "it": "Immagine di valutazione.",
+            "es": "Imagen de valoración.",
+            "pl": "Zdjęcie ratownicze.",
+            "uk": "Рейтингове зображення.",
+            "zh-cn": "图像。."
+        },
         "role": "text",
         "type": "string"
     },
@@ -3675,7 +3769,7 @@
     "playing.metadata.roletree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -3794,7 +3888,7 @@
     "playing.metadata.similartree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -4164,17 +4258,17 @@
     "playing.metadata.player": {
         "role": "channel",
         "description": {
-            "en": "Player",
-            "de": "Spieler",
-            "ru": "Игрок",
-            "pt": "Jogador",
-            "nl": "Speler",
-            "fr": "Joueur",
-            "it": "Giocatore",
-            "es": "Jugador",
-            "pl": "Gracz",
-            "uk": "гравець",
-            "zh-cn": "玩家"
+            "en": "Player information from server (not live)",
+            "de": "Player Information vom Server (nicht live)",
+            "ru": "Информация о игроке с сервера (не жить)",
+            "pt": "InformaÃ§Ãμes do jogador do servidor (não ao vivo)",
+            "nl": "Player informatie van server (not live)",
+            "fr": "Informations de lecteur du serveur (pas en direct)",
+            "it": "Informazioni sul giocatore dal server (non dal vivo)",
+            "es": "Información del reproductor desde el servidor (no en vivo)",
+            "pl": "Gracz informacji z serwera (nie żyje)",
+            "uk": "Інформація про гравців з сервера (не жити)",
+            "zh-cn": "服务器(未生活)的信息"
         }
     },
     "playing.metadata.player.device": {
@@ -4199,7 +4293,7 @@
         "role": "text",
         "description": {
             "en": "Player model",
-            "de": "Spielermodell",
+            "de": "Playermodell",
             "ru": "Модель игрока",
             "pt": "Modelo de jogador",
             "nl": "Spelersmodel",
@@ -4267,7 +4361,7 @@
         "role": "text",
         "description": {
             "en": "Player profile",
-            "de": "Spielerprofil",
+            "de": "Playerprofil",
             "ru": "Профиль игрока",
             "pt": "Perfil do jogador",
             "nl": "Speler profiel",
@@ -4284,7 +4378,7 @@
         "role": "text",
         "description": {
             "en": "Player status",
-            "de": "Spielerstatus",
+            "de": "Playerstatus",
             "ru": "Статус игрока",
             "pt": "Status do jogador",
             "nl": "Spelerstatus",
@@ -4301,7 +4395,7 @@
         "role": "text",
         "description": {
             "en": "Name of the Player",
-            "de": "Name des Spielers",
+            "de": "Name des Players",
             "ru": "Имя игрока",
             "pt": "Nome do Jogador",
             "nl": "Naam van de speler",
@@ -4352,7 +4446,7 @@
         "role": "indicator",
         "description": {
             "en": "Player is local",
-            "de": "Der Spieler ist lokal",
+            "de": "Der Player ist lokal",
             "ru": "Игрок локальный",
             "pt": "O jogador é local",
             "nl": "Speler is lokaal",
@@ -4572,7 +4666,7 @@
         "role": "text",
         "description": {
             "en": "Current Player Profile",
-            "de": "Aktuelles Spielerprofil",
+            "de": "Aktuelles Playerprofil",
             "ru": "Текущий профиль игрока",
             "pt": "Perfil do jogador atual",
             "nl": "Huidig ​​spelersprofiel",
@@ -4589,7 +4683,7 @@
         "role": "text",
         "description": {
             "en": "Current player status",
-            "de": "Aktueller Spielerstatus",
+            "de": "Aktueller Playerstatus",
             "ru": "Текущий статус игрока",
             "pt": "Status atual do jogador",
             "nl": "Huidige spelerstatus",
@@ -6011,7 +6105,7 @@
     "playing.metadata.studio": {
         "description": {
             "en": "The studio for the item",
-            "de": "Das Studio für den Artikel",
+            "de": "Das Studio des Multimediainhalt.",
             "ru": "Студия для предмета",
             "pt": "The studio for the item",
             "nl": "De studio voor het item",
@@ -6021,6 +6115,23 @@
             "pl": "Studio dla przedmiotu",
             "uk": "Студія для п.п",
             "zh-cn": "该项目的工作室"
+        },
+        "role": "text",
+        "type": "string"
+    },
+    "playing.metadata.parentstudio": {
+        "description": {
+            "en": "The producing studio of the season/album",
+            "de": "Das produzierende Studio der Saison/Album",
+            "ru": "Продюсерская студия сезона/альбома",
+            "pt": "O estúdio de produção da temporada/álbum",
+            "nl": "De producerende studio van het seizoen/album",
+            "fr": "Le studio de production de la saison/album",
+            "it": "Lo studio di produzione della stagione/album",
+            "es": "El estudio de producción de la temporada/album",
+            "pl": "Studio produkcyjne sezonu i albumu",
+            "uk": "Продакшн-студія сезону/альбому",
+            "zh-cn": "A. 季节/节制的制作"
         },
         "role": "text",
         "type": "string"
@@ -6220,7 +6331,7 @@
         },
         "description": {
             "en": "The thumbnail of the item",
-            "de": "Die Miniaturansicht des Elements",
+            "de": "Die Miniaturansicht des Multimediainhalts",
             "ru": "Миниатюра элемента",
             "pt": "The thumbnail of the item",
             "nl": "De miniatuur van het item",
@@ -6243,7 +6354,7 @@
         },
         "description": {
             "en": "The thumbnail of the item",
-            "de": "Die Miniaturansicht des Elements",
+            "de": "Die Miniaturansicht des Multimediainhalts",
             "ru": "Миниатюра элемента",
             "pt": "The thumbnail of the item",
             "nl": "De miniatuur van het item",
@@ -6260,7 +6371,7 @@
     "playing.metadata.title": {
         "description": {
             "en": "The full title of the item",
-            "de": "Der vollständige Titel des Artikels",
+            "de": "Der vollständige Titel des Multimediainhalts.",
             "ru": "Полное название предмета",
             "pt": "The full title of the item",
             "nl": "De volledige titel van het item",
@@ -6277,7 +6388,7 @@
     "playing.metadata.titlesort": {
         "description": {
             "en": "The sorting title of the item",
-            "de": "Der Sortiertitel des Elements",
+            "de": "Der Sortiertitel des Multimediainhalts",
             "ru": "Название сортировки элемента",
             "pt": "The sorting title of the item",
             "nl": "De sorteertitel van het item",
@@ -7022,7 +7133,7 @@
     "playing.metadata.writertree.count": {
         "description": {
             "en": "Number of items within Plex in that category",
-            "de": "Anzahl der Elemente innerhalb von Plex in dieser Kategorie",
+            "de": "Anzahl der Multimediainhalte innerhalb von Plex in dieser Kategorie",
             "ru": "Количество элементов в Plex в этой категории",
             "pt": "Número de itens no Plex nessa categoria",
             "nl": "Aantal items binnen Plex in die categorie",
@@ -7090,7 +7201,7 @@
     "playing.metadata.year": {
         "description": {
             "en": "The release year for the item",
-            "de": "Das Erscheinungsjahr für den Artikel",
+            "de": "Das Erscheinungsjahr des Multimediainhalt.",
             "ru": "Год выпуска товара",
             "pt": "The release year for the item",
             "nl": "Het jaar van uitgave voor het item",
@@ -7135,8 +7246,7 @@
             "uk": "Пристрій перегляду",
             "zh-cn": "观察装置"
         },
-        "role": "value",
-        "type": "string"
+        "role": "channel"
     },
     "playing.player.connected": {
         "description": {
@@ -7175,7 +7285,7 @@
     "playing.player.details": {
         "description": {
             "en": "Details from and for Player",
-            "de": "Details von und für Spieler",
+            "de": "Details von und für Player",
             "ru": "Подробности от и для игрока",
             "pt": "Details from and for Player",
             "nl": "Details van en voor Speler",
@@ -7756,7 +7866,7 @@
     "playing.player.details.video.playqueueitemid": {
         "description": {
             "en": "Video play queue item id",
-            "de": "ID des Elements der Videowiedergabewarteschlange",
+            "de": "ID des Multimediainhalts der Videowiedergabewarteschlange",
             "ru": "Идентификатор элемента очереди воспроизведения видео",
             "pt": "ID do item da fila de reprodução de vídeo",
             "nl": "Item-ID van wachtrij voor video afspelen",
@@ -8028,7 +8138,7 @@
     "playing.player.device": {
         "description": {
             "en": "Device Name of Player",
-            "de": "Gerätename des Spielers",
+            "de": "Gerätename des Players",
             "ru": "Имя устройства игрока",
             "pt": "Nome do dispositivo do player",
             "nl": "Apparaatnaam van speler",
@@ -8045,7 +8155,7 @@
     "playing.player.host": {
         "description": {
             "en": "Player host name",
-            "de": "Hostname des Spielers",
+            "de": "Hostname des Players",
             "ru": "Имя хоста игрока",
             "pt": "Nome do host do jogador",
             "nl": "Hostnaam van speler",
@@ -8113,7 +8223,7 @@
     "playing.player.product": {
         "description": {
             "en": "Product of Player",
-            "de": "Produkt des Spielers",
+            "de": "Produkt des Players",
             "ru": "Продукт игрока",
             "pt": "Produto do jogador",
             "nl": "Product van speler",
@@ -8249,7 +8359,7 @@
     "playing.players": {
         "description": {
             "en": "Players currently playing",
-            "de": "Spieler, die gerade spielen",
+            "de": "Player, die gerade spielen",
             "ru": "Игроки, играющие сейчас",
             "pt": "Jogadores atualmente jogando",
             "nl": "Spelers die momenteel spelen",
@@ -8350,7 +8460,7 @@
     "playing.streams": {
         "description": {
             "en": "Number of players currently playing",
-            "de": "Anzahl der aktuell spielenden Spieler",
+            "de": "Anzahl der aktuell spielenden Player",
             "ru": "Количество игроков, играющих в данный момент",
             "pt": "Número de jogadores jogando atualmente",
             "nl": "Aantal spelers dat momenteel speelt",
@@ -8546,7 +8656,7 @@
     "playlists.items": {
         "description": {
             "en": "List of all items in the Playlist",
-            "de": "Liste aller Elemente in der Playlist",
+            "de": "Liste aller Multimediainhalte in der Playlist",
             "ru": "Список всех элементов в плейлисте",
             "pt": "Lista de todos os itens da Playlist",
             "nl": "List of all items in the Playlist",
@@ -8562,7 +8672,7 @@
     "playlists.itemscount": {
         "description": {
             "en": "Number of items in the Playlist",
-            "de": "Anzahl der Elemente in der Playlist",
+            "de": "Anzahl der Multimediainhalte in der Playlist",
             "ru": "Количество элементов в плейлисте",
             "pt": "Número de itens na lista de reprodução",
             "nl": "Number of items in the Playlist",
@@ -8579,7 +8689,7 @@
     "playlists.key": {
         "description": {
             "en": "Path to items of the Playlist",
-            "de": "Pfad zu Elementen der Playlist",
+            "de": "Pfad zu Multimediainhalten der Playlist",
             "ru": "Путь к элементам плейлиста",
             "pt": "Caminho para itens da Playlist",
             "nl": "Path to items of the Playlist",
@@ -8840,7 +8950,7 @@
     "plex.player": {
         "description": {
             "en": "Player",
-            "de": "Spieler",
+            "de": "Player",
             "ru": "Игрок",
             "pt": "Jogador",
             "nl": "Speler",
@@ -8871,7 +8981,7 @@
     "plexplayers": {
         "description": {
             "en": "Plex Players",
-            "de": "Plex-Spieler",
+            "de": "Plex-Player",
             "ru": "Плекс Игроки",
             "pt": "Jogadores Plex",
             "nl": "Plex-spelers",

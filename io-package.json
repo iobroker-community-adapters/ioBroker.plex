@@ -1,349 +1,349 @@
 {
-    "common": {
-        "authors": [
-            {
-                "email": "zefau@mailbox.org",
-                "name": "Zefau"
-            },
-            {
-                "email": "ticaki@renopoint.de",
-                "name": "ticaki"
-            }
-        ],
-        "compact": true,
-        "connectionType": "local",
-        "dataSource": "push",
-        "desc": {
-            "de": "Integration des Plex Media Servers und Tautulli",
-            "en": "Integration of your Plex Media Server and your Tautulli",
-            "es": "La integración de su Plex Media Server y / o su Tautulli",
-            "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
-            "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
-            "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
-            "pl": "Integracja Plex media serwer i / lub Tautulli",
-            "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
-            "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
-            "uk": "Інтеграція медіасервера Plex і Tautulli",
-            "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
-        },
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
-        "icon": "plex.jpg",
-        "keywords": [
-            "tautulli",
-            "plex",
-            "media"
-        ],
-        "license": "MIT",
-        "localLinks": {
-            "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
-        },
-        "loglevel": "info",
-        "materialize": true,
-        "messagebox": true,
-        "mode": "daemon",
-        "name": "plex",
-        "news": {
-            "1.0.2": {
-                "de": "Hinzugefügt: ein Play/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Coverartworks (bereit für Verwendung)\nHinzugefügt: State viewOffsetSeconds aktualisiert jede Sekunde beim Abspielen von Medien (interner Zähler)",
-                "en": "Added: a play/pause switch for mediaplayer\nAdded: links to artworks (ready to use)\nAdded: state viewOffsetSeconds refresh every second while playing media(internal counter)",
-                "es": "Añadido: un interruptor de juego/pausa para mediaplayer\nAñadido: enlaces a obras de arte (listos para usar)\nAñadido: vista del estadoOffsetSeconds refresca cada segundo mientras juega media(contrar interno)",
-                "fr": "Ajouté: un commutateur de lecture/pause pour le lecteur multimédia\nAjouté: liens aux œuvres d'art (prêt à l'emploi)\nAjouté : Aperçu de l'étatOffsetSeconds rafraîchit chaque seconde tout en jouant aux médias(interne)",
-                "it": "Aggiunto: a play/pause switch for mediaplayer\nAggiunto: link a opere d'arte (pronto all'uso)\nAggiunto: stato viewOffsetSeconds rinfrescare ogni secondo mentre giocando media (internal counter)",
-                "nl": "Toegevoegd, een speel/pauzeschakelaar voor mediaplayer\nToegevoegd: links naar kunstwerken\nToegevoegd: de staatsbeelden verfrissen elke seconde terwijl ze media spelen",
-                "pl": "Added: a play/pause switch for mediaplayer\nAdded: linki do dzieł sztuki (czytanie do użycia)\nNastępująco: stanowy widok (OffsetSeconds refresh each second) gra na mediach (internal counter)",
-                "pt": "Adicionado: a play/pause switch for mediaplayer\nAdicionado: links para obras de arte (já para usar)\nAdicionado: state viewOffsetSeconds refrescar cada segundo enquanto jogando mídia (contador interno)",
-                "ru": "Добавлен: переключатель play/pause для mediaplayer\nДобавлено: ссылки на произведения искусства (готово к использованию)\nДобавлена: state viewOffsetSeconds обновляет каждую секунду, играя в СМИ (внутренний счетчик)",
-                "uk": "Додано: перемикач відтворення / паузи для медіаплеєра\nДоданий: посилання на твори мистецтва (читати для використання)\nДодано: Державний виглядОффсетСеконс освіжає кожну секунду, граючи медіа (внутрішній лічильник)",
-                "zh-cn": "增 编:对媒体互动作用/转播\n添加:艺术作品的链接(易于使用)\n添加:国家观Offset IIs reresh每秒钟,同时担任媒体(内部反击)。"
-            },
-            "1.0.3": {
-                "de": "Behoben: Fügen keine leeren Benachrichtigungen zur History hinzu #[183](https://github.com/iobroker-community-adapter/ioBroker.plex/issues/183) \nBehoben: Verhindere die Erstellung doppelter Histroyeinträge in den meisten Fällen",
-                "en": "Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFixed: prevent the creation of duplicate history entries in most cases",
-                "es": "Fijo: No añadas las notificaciones vacías a la historia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFijo: prevenir la creación de entradas de historia duplicadas en la mayoría de los casos",
-                "fr": "Fixed: Don't add empty notifications to history #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrection : empêcher la création de doubles entrées d'histoire dans la plupart des cas",
-                "it": "Fisso: Non aggiungere notifiche vuote alla storia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nRisolto: impedire la creazione di voci di storia duplicate nella maggior parte dei casi",
-                "nl": "Voeg geen lege aanmeldingen toe aan geschiedenis 183:\nVertaling:",
-                "pl": "(Fixed: Don't add empty notifications to history #183(https:/github.com/iobroker-community-adapters/ioBroker.plex/issues/183) (ang.)\nFixed: Zapobieganie stworzenia replikacyjnej historii w większości przypadków",
-                "pt": "Corrigido: Não adicione notificações vazias ao histórico #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrigido: evitar a criação de entradas de histórico duplicado na maioria dos casos",
-                "ru": "Исправлено: Не добавляйте пустые уведомления в историю #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nИсправлено: предотвратить создание записей истории дублирования в большинстве случаев",
-                "uk": "Виправлено: Не додайте порожні повідомлення до історії #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nВиправлено: запобігти створенню записів історії дублікатів у більшості випадків",
-                "zh-cn": "九. 固定:向历史编号[183](http://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)增添空通知。\n固定:防止在多数情况下建立重复的历史内容"
-            },
-            "1.0.4": {
-                "de": "Behoben: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "en": "Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "es": "Corregido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "fr": "Correction : #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "it": "Fisso: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "nl": "Quality over Quantity (QoQ) Releases Vertaling:",
-                "pl": "Fixed: #184 (https:/github.com/iobroker-community-adapters/ioBrokerplex/issues/184) (ang.)",
-                "pt": "Corrigido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "ru": "Исправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-                "uk": "Виправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/products/184)",
-                "zh-cn": "固定:第[184]号(http://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)"
-            },
-            "1.0.5": {
-                "de": "Behoben: Controls funktionierten nicht mit Plexamp.\neinige kleinere verbesserungen.",
-                "en": "Fixed: Controls didn't work with Plexamp.\nsome minor improvements.",
-                "es": "Fijo: El control no funcionó con Plexamp.\nalgunas mejoras menores.",
-                "fr": "Correction : Le contrôle n'a pas fonctionné avec Plexamp.\nquelques améliorations mineures.",
-                "it": "Fisso: il controllo non ha funzionato con Plexamp.\nalcuni piccoli miglioramenti.",
-                "nl": "Control werkte niet met Plexamp.\nwat kleine verbetering.",
-                "pl": "Fixed: Kontrola nie pracowała z Plexampem.\nniektóre drobne poprawy.",
-                "pt": "Fixo: Control não funcionou com Plexamp.\nalgumas pequenas melhorias.",
-                "ru": "Исправлено: Контроль не работал с Plexamp.\nнекоторые незначительные улучшения.",
-                "uk": "Виправлено: Контроль не працює з Plexamp.\nдеякі незначні поліпшення.",
-                "zh-cn": "固定:控制没有与Plexamp合作。.\n略有改进。."
-            },
-            "1.1.0": {
-                "de": "Hinzugefügt: Lyrics werden als Link und Text in _playing.device.Metadata.Music.Lyric geschrieben\nHinzugefügt: Verbindung zu Playern mit Aktualisierung von Playerdetails\nHinzugefügt: Neue Zustände mit Playerdaten.\nHinzugefügt: Aktualisierung des Players kann durch aktiviert von _Controls.timeline.refreshDetails gesteuert werden",
-                "en": "Added: Lyrics are written as link and text in _playing.device.Metadata.Music.Lyric\nAdded: Connection to players with refresh of playerdetail\nAdded: New states with player data.\nAdded: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
-                "es": "Añadido: Las letras están escritas como enlace y texto en _playing.device.Metadatos.Música.Lírica\nAñadido: Conexión a los jugadores con refrigerio de playerdetail\nAñadido: Nuevos estados con datos del reproductor.\nAñadido: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
-                "fr": "Ajouté: Lyrics sont écrits comme lien et texte dans _playing.device.Metadata.Music.Lyric\nAjouté: Connexion aux joueurs avec rafraîchissement de la gamme\nAjouté : Nouveaux états avec les données du lecteur.\nAjouté : Rafraîchissement du joueur peut être activé par set _Controls.timeline.refreshDétails à true",
-                "it": "Aggiunto: I testi sono scritti come link e testo in _playing.device.Metadata.Music.Lyric\nAggiunto: Connessione ai giocatori con aggiornamento di giocatoredetail\nAggiunto: Nuovi stati con i dati del giocatore.\nAggiunto: Refresh of player può essere attivato da set _Controls.timeline.refreshDettagli a true",
-                "nl": "Lyrics zijn geschreven als link en tekst in het uitspelen\nVerbinding met spelers met verfrissing van spelerdetail\nNieuwe staten met spelersgegevens.\nVerfrissing van de speler kan worden geactiveerd door de tijdlijn",
-                "pl": "Added: Lyrics są zapisywane jako link i tekst w _playing.device.Metadata\nAdded: Połączenie do graczy z odświeżonym odświeżeniem\nW: Nowe państwa z danymi gracza.\nAdded: Refresh gracz może być aktywowany przez _Controls.timeline.refreshDetails",
-                "pt": "Adicionado: Lyrics são escritos como link e texto em _playing.device.Metadata.Music.Lyric\nAdicionado: Ligação aos jogadores com atualização de jogadordetail\nAdicionado: Novos estados com dados do jogador.\nAdicionado: Refresh do jogador pode ser ativado por set _Controls.timeline.refreshDetails to true",
-                "ru": "Добавлено: Тексты написаны как ссылка и текст в _playing.device.Metadata.Music.Lyric\nДобавлена: Подключение к игрокам с осведомлением игрокаdetail\nДобавлена: Новые состояния с данными игрока.\nДобавлена: Refresh of player можно активировать с помощью набора _Controls.timeline.refreshDetails to true",
-                "uk": "Додано: Лірики написані як посилання та текст _playing.device.Metadata.Music.Lyric\nДоданий: Підключення до гравців з освіженням програвача\nДодано: Нові стани з даними програвача.\nДодано: Refresh може бути активовано за допомогою set _Controls.timeline.refreshDetails to true",
-                "zh-cn": "增加:里克人被写成联系和案文,载于“互动.device.Metadata.Music.Lyricic\n增 编:与投身者进行斗争\n增加:有角色数据的新州。.\n增编:可按规定行事,即:"
-            },
-            "1.1.1": {
-                "de": "Behoben: State common.name Englisch/Deutsch\neinige kleinere Verbesserungen",
-                "en": "Fixed: State common.name english/german\nsome minor improvements",
-                "es": "Fijo: Estado común.nombre español/german\nalgunas mejoras menores",
-                "fr": "Fixed: State common.name english/german\nquelques améliorations mineures",
-                "it": "Fisso: Stato comune.name inglese/german\nalcuni miglioramenti minori",
-                "nl": "Vertaling:\nwat kleine verbetering",
-                "pl": "W: Państwowe wspólne nazwy english/german\ndrobne ulepszenia",
-                "pt": "Corrigido: Estado comum.nome inglês/german\nalgumas pequenas melhorias",
-                "ru": "Исправлено: State common.name english/german\nнекоторые незначительные улучшения",
-                "uk": "Виправлено: Назва держави англійська/герман\nдеякі незначні поліпшення",
-                "zh-cn": "固定:国家共同名称\n某些微小的改进"
-            },
-            "1.1.2": {
-                "de": "Verhindern Plex-Absturz durch fehlerhafte Tautulli-Konfiguration",
-                "en": "Prevent Plex from crashing due to incorrect Tautulli configuration",
-                "es": "prevención Plex de estrellarse debido a la configuración incorrecta tautulli",
-                "fr": "prévenir Plex from crashing due to incorrect tautulli configuration",
-                "it": "prevenire Plex da crash a causa della configurazione errata di tautulli",
-                "nl": "vertaling: Vertaling:",
-                "pl": "zapobiegać Plex z powodu nieprawidłowej konfiguracji",
-                "pt": "evitar Plex de travamento devido à configuração incorreta do tautulli",
-                "ru": "предотвратить Plex из-за неправильной настройки tautulli",
-                "uk": "запобігання Plex від аварійного завершення через неправильне налаштування таутуллі",
-                "zh-cn": "预防 因不正确地形态而造成的意外事故"
-            }
-        },
-        "platform": "Javascript/Node.js",
-        "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
-        "subscribe": "messagebox",
-        "titleLang": {
-            "de": "Plex Media Server",
-            "en": "Plex Media Server",
-            "es": "Plex Media Server",
-            "fr": "Plex Media Server",
-            "it": "Plex Media Server",
-            "nl": "Plex Media Server",
-            "pl": "Plex Media Server",
-            "pt": "Plex Media Server",
-            "ru": "Plex Media Server",
-            "uk": "Медіасервер Plex",
-            "zh-cn": "Plex Media Server"
-        },
-        "type": "multimedia",
-        "version": "1.1.2"
+  "common": {
+    "authors": [
+      {
+        "email": "zefau@mailbox.org",
+        "name": "Zefau"
+      },
+      {
+        "email": "ticaki@renopoint.de",
+        "name": "ticaki"
+      }
+    ],
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "push",
+    "desc": {
+      "de": "Integration des Plex Media Servers und Tautulli",
+      "en": "Integration of your Plex Media Server and your Tautulli",
+      "es": "La integración de su Plex Media Server y / o su Tautulli",
+      "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
+      "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
+      "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
+      "pl": "Integracja Plex media serwer i / lub Tautulli",
+      "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
+      "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
+      "uk": "Інтеграція медіасервера Plex і Tautulli",
+      "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
     },
-    "instanceObjects": [],
-    "native": {
-        "getAllItems": false,
-        "getLibraries": true,
-        "getMetadataTrees": false,
-        "getPlayerRefresh": 1,
-        "getPlaylists": true,
-        "getPlaylistsDetails": false,
-        "getServers": true,
-        "getSettings": true,
-        "getStatistics": false,
-        "getUsers": false,
-        "notifications": [
-            {
-                "caption": "",
-                "event": "any",
-                "media": "any",
-                "message": "No Message defined for media %Metadata.type% and event %event%",
-                "thumb": ""
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.play",
-                "media": "any",
-                "message": "%Metadata.title% (%Metadata.year%) playing",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.pause",
-                "media": "any",
-                "message": "%Metadata.title% (%Metadata.year%) paused",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.stop",
-                "media": "any",
-                "message": "%Metadata.title% (%Metadata.year%) stopped",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.resume",
-                "media": "any",
-                "message": "%Metadata.title% (%Metadata.year%) resumed",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.rate",
-                "media": "any",
-                "message": "%Metadata.title% (%Metadata.year%) rated",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.watched",
-                "media": "any",
-                "message": "%Metadata.title% (%Metadata.year%) watched",
-                "thumb": "%Metadata.thumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.play",
-                "media": "episode",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.pause",
-                "media": "episode",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.stop",
-                "media": "episode",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.resume",
-                "media": "episode",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.rate",
-                "media": "episode",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.watched",
-                "media": "episode",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
-                "thumb": "%Metadata.grandparentThumb%"
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.play",
-                "media": "track",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
-                "thumb": ""
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.pause",
-                "media": "track",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
-                "thumb": ""
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.stop",
-                "media": "track",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
-                "thumb": ""
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.resume",
-                "media": "track",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
-                "thumb": ""
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.rate",
-                "media": "track",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
-                "thumb": ""
-            },
-            {
-                "caption": "Played by %Account.title% on %Player.title%",
-                "event": "media.watched",
-                "media": "track",
-                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
-                "thumb": ""
-            },
-            {
-                "caption": "",
-                "event": "library.on.deck",
-                "media": "system",
-                "message": "A new item is added that appears in the user’s On Deck.",
-                "thumb": ""
-            },
-            {
-                "caption": "",
-                "event": "library.new",
-                "media": "system",
-                "message": "A new item is added to a library.",
-                "thumb": ""
-            },
-            {
-                "caption": "",
-                "event": "admin.database.backup",
-                "media": "system",
-                "message": "A database backup is completed successfully via scheduled tasks.",
-                "thumb": ""
-            },
-            {
-                "caption": "",
-                "event": "admin.database.corrupted",
-                "media": "system",
-                "message": "Corruption is detected in the server database.",
-                "thumb": ""
-            },
-            {
-                "caption": "",
-                "event": "device.new",
-                "media": "system",
-                "message": "A new device is using the Plex Media Server.",
-                "thumb": ""
-            },
-            {
-                "caption": "",
-                "event": "playback.started",
-                "media": "system",
-                "message": "Playback is started by a shared user.",
-                "thumb": ""
-            }
-        ]
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
+    "icon": "plex.jpg",
+    "keywords": [
+      "tautulli",
+      "plex",
+      "media"
+    ],
+    "license": "MIT",
+    "localLinks": {
+      "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
     },
-    "objects": []
+    "loglevel": "info",
+    "materialize": true,
+    "messagebox": true,
+    "mode": "daemon",
+    "name": "plex",
+    "news": {
+      "1.1.3": {
+        "en": "Fixed: Error in the formatted playback position",
+        "de": "Behoben: Fehler in der formatierten Abspielposition",
+        "ru": "исправлено: ошибка в читаемом смещение",
+        "pt": "corrigido: bug no deslocamento legível",
+        "nl": "vertaling:",
+        "fr": "corrigé: bug in readable offset",
+        "it": "fisso: bug in offset leggibile",
+        "es": "fijo: error en offset legible",
+        "pl": "uruchomiony: bug in readable offset",
+        "uk": "виправлено: помилка в читабельному офсеті",
+        "zh-cn": "固定:可宣读的抵偿金"
+      },
+      "1.0.2": {
+        "de": "Hinzugefügt: ein Play/Pausenschalter für Mediaplayer\nHinzugefügt: Links zu Coverartworks (bereit für Verwendung)\nHinzugefügt: State viewOffsetSeconds aktualisiert jede Sekunde beim Abspielen von Medien (interner Zähler)",
+        "en": "Added: a play/pause switch for mediaplayer\nAdded: links to artworks (ready to use)\nAdded: state viewOffsetSeconds refresh every second while playing media(internal counter)",
+        "es": "Añadido: un interruptor de juego/pausa para mediaplayer\nAñadido: enlaces a obras de arte (listos para usar)\nAñadido: vista del estadoOffsetSeconds refresca cada segundo mientras juega media(contrar interno)",
+        "fr": "Ajouté: un commutateur de lecture/pause pour le lecteur multimédia\nAjouté: liens aux œuvres d'art (prêt à l'emploi)\nAjouté : Aperçu de l'étatOffsetSeconds rafraîchit chaque seconde tout en jouant aux médias(interne)",
+        "it": "Aggiunto: a play/pause switch for mediaplayer\nAggiunto: link a opere d'arte (pronto all'uso)\nAggiunto: stato viewOffsetSeconds rinfrescare ogni secondo mentre giocando media (internal counter)",
+        "nl": "Toegevoegd, een speel/pauzeschakelaar voor mediaplayer\nToegevoegd: links naar kunstwerken\nToegevoegd: de staatsbeelden verfrissen elke seconde terwijl ze media spelen",
+        "pl": "Added: a play/pause switch for mediaplayer\nAdded: linki do dzieł sztuki (czytanie do użycia)\nNastępująco: stanowy widok (OffsetSeconds refresh each second) gra na mediach (internal counter)",
+        "pt": "Adicionado: a play/pause switch for mediaplayer\nAdicionado: links para obras de arte (já para usar)\nAdicionado: state viewOffsetSeconds refrescar cada segundo enquanto jogando mídia (contador interno)",
+        "ru": "Добавлен: переключатель play/pause для mediaplayer\nДобавлено: ссылки на произведения искусства (готово к использованию)\nДобавлена: state viewOffsetSeconds обновляет каждую секунду, играя в СМИ (внутренний счетчик)",
+        "uk": "Додано: перемикач відтворення / паузи для медіаплеєра\nДоданий: посилання на твори мистецтва (читати для використання)\nДодано: Державний виглядОффсетСеконс освіжає кожну секунду, граючи медіа (внутрішній лічильник)",
+        "zh-cn": "增 编:对媒体互动作用/转播\n添加:艺术作品的链接(易于使用)\n添加:国家观Offset IIs reresh每秒钟,同时担任媒体(内部反击)。"
+      },
+      "1.0.3": {
+        "de": "Behoben: Fügen keine leeren Benachrichtigungen zur History hinzu #[183](https://github.com/iobroker-community-adapter/ioBroker.plex/issues/183) \nBehoben: Verhindere die Erstellung doppelter Histroyeinträge in den meisten Fällen",
+        "en": "Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFixed: prevent the creation of duplicate history entries in most cases",
+        "es": "Fijo: No añadas las notificaciones vacías a la historia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFijo: prevenir la creación de entradas de historia duplicadas en la mayoría de los casos",
+        "fr": "Fixed: Don't add empty notifications to history #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrection : empêcher la création de doubles entrées d'histoire dans la plupart des cas",
+        "it": "Fisso: Non aggiungere notifiche vuote alla storia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nRisolto: impedire la creazione di voci di storia duplicate nella maggior parte dei casi",
+        "nl": "Voeg geen lege aanmeldingen toe aan geschiedenis 183:\nVertaling:",
+        "pl": "(Fixed: Don't add empty notifications to history #183(https:/github.com/iobroker-community-adapters/ioBroker.plex/issues/183) (ang.)\nFixed: Zapobieganie stworzenia replikacyjnej historii w większości przypadków",
+        "pt": "Corrigido: Não adicione notificações vazias ao histórico #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrigido: evitar a criação de entradas de histórico duplicado na maioria dos casos",
+        "ru": "Исправлено: Не добавляйте пустые уведомления в историю #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nИсправлено: предотвратить создание записей истории дублирования в большинстве случаев",
+        "uk": "Виправлено: Не додайте порожні повідомлення до історії #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nВиправлено: запобігти створенню записів історії дублікатів у більшості випадків",
+        "zh-cn": "九. 固定:向历史编号[183](http://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)增添空通知。\n固定:防止在多数情况下建立重复的历史内容"
+      },
+      "1.0.4": {
+        "de": "Behoben: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "en": "Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "es": "Corregido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "fr": "Correction : #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "it": "Fisso: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "nl": "Quality over Quantity (QoQ) Releases Vertaling:",
+        "pl": "Fixed: #184 (https:/github.com/iobroker-community-adapters/ioBrokerplex/issues/184) (ang.)",
+        "pt": "Corrigido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "ru": "Исправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+        "uk": "Виправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/products/184)",
+        "zh-cn": "固定:第[184]号(http://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)"
+      },
+      "1.0.5": {
+        "de": "Behoben: Controls funktionierten nicht mit Plexamp.\neinige kleinere verbesserungen.",
+        "en": "Fixed: Controls didn't work with Plexamp.\nsome minor improvements.",
+        "es": "Fijo: El control no funcionó con Plexamp.\nalgunas mejoras menores.",
+        "fr": "Correction : Le contrôle n'a pas fonctionné avec Plexamp.\nquelques améliorations mineures.",
+        "it": "Fisso: il controllo non ha funzionato con Plexamp.\nalcuni piccoli miglioramenti.",
+        "nl": "Control werkte niet met Plexamp.\nwat kleine verbetering.",
+        "pl": "Fixed: Kontrola nie pracowała z Plexampem.\nniektóre drobne poprawy.",
+        "pt": "Fixo: Control não funcionou com Plexamp.\nalgumas pequenas melhorias.",
+        "ru": "Исправлено: Контроль не работал с Plexamp.\nнекоторые незначительные улучшения.",
+        "uk": "Виправлено: Контроль не працює з Plexamp.\nдеякі незначні поліпшення.",
+        "zh-cn": "固定:控制没有与Plexamp合作。.\n略有改进。."
+      },
+      "1.1.0": {
+        "de": "Hinzugefügt: Lyrics werden als Link und Text in _playing.device.Metadata.Music.Lyric geschrieben\nHinzugefügt: Verbindung zu Playern mit Aktualisierung von Playerdetails\nHinzugefügt: Neue Zustände mit Playerdaten.\nHinzugefügt: Aktualisierung des Players kann durch aktiviert von _Controls.timeline.refreshDetails gesteuert werden",
+        "en": "Added: Lyrics are written as link and text in _playing.device.Metadata.Music.Lyric\nAdded: Connection to players with refresh of playerdetail\nAdded: New states with player data.\nAdded: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
+        "es": "Añadido: Las letras están escritas como enlace y texto en _playing.device.Metadatos.Música.Lírica\nAñadido: Conexión a los jugadores con refrigerio de playerdetail\nAñadido: Nuevos estados con datos del reproductor.\nAñadido: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
+        "fr": "Ajouté: Lyrics sont écrits comme lien et texte dans _playing.device.Metadata.Music.Lyric\nAjouté: Connexion aux joueurs avec rafraîchissement de la gamme\nAjouté : Nouveaux états avec les données du lecteur.\nAjouté : Rafraîchissement du joueur peut être activé par set _Controls.timeline.refreshDétails à true",
+        "it": "Aggiunto: I testi sono scritti come link e testo in _playing.device.Metadata.Music.Lyric\nAggiunto: Connessione ai giocatori con aggiornamento di giocatoredetail\nAggiunto: Nuovi stati con i dati del giocatore.\nAggiunto: Refresh of player può essere attivato da set _Controls.timeline.refreshDettagli a true",
+        "nl": "Lyrics zijn geschreven als link en tekst in het uitspelen\nVerbinding met spelers met verfrissing van spelerdetail\nNieuwe staten met spelersgegevens.\nVerfrissing van de speler kan worden geactiveerd door de tijdlijn",
+        "pl": "Added: Lyrics są zapisywane jako link i tekst w _playing.device.Metadata\nAdded: Połączenie do graczy z odświeżonym odświeżeniem\nW: Nowe państwa z danymi gracza.\nAdded: Refresh gracz może być aktywowany przez _Controls.timeline.refreshDetails",
+        "pt": "Adicionado: Lyrics são escritos como link e texto em _playing.device.Metadata.Music.Lyric\nAdicionado: Ligação aos jogadores com atualização de jogadordetail\nAdicionado: Novos estados com dados do jogador.\nAdicionado: Refresh do jogador pode ser ativado por set _Controls.timeline.refreshDetails to true",
+        "ru": "Добавлено: Тексты написаны как ссылка и текст в _playing.device.Metadata.Music.Lyric\nДобавлена: Подключение к игрокам с осведомлением игрокаdetail\nДобавлена: Новые состояния с данными игрока.\nДобавлена: Refresh of player можно активировать с помощью набора _Controls.timeline.refreshDetails to true",
+        "uk": "Додано: Лірики написані як посилання та текст _playing.device.Metadata.Music.Lyric\nДоданий: Підключення до гравців з освіженням програвача\nДодано: Нові стани з даними програвача.\nДодано: Refresh може бути активовано за допомогою set _Controls.timeline.refreshDetails to true",
+        "zh-cn": "增加:里克人被写成联系和案文,载于“互动.device.Metadata.Music.Lyricic\n增 编:与投身者进行斗争\n增加:有角色数据的新州。.\n增编:可按规定行事,即:"
+      },
+      "1.1.1": {
+        "de": "Behoben: State common.name Englisch/Deutsch\neinige kleinere Verbesserungen",
+        "en": "Fixed: State common.name english/german\nsome minor improvements",
+        "es": "Fijo: Estado común.nombre español/german\nalgunas mejoras menores",
+        "fr": "Fixed: State common.name english/german\nquelques améliorations mineures",
+        "it": "Fisso: Stato comune.name inglese/german\nalcuni miglioramenti minori",
+        "nl": "Vertaling:\nwat kleine verbetering",
+        "pl": "W: Państwowe wspólne nazwy english/german\ndrobne ulepszenia",
+        "pt": "Corrigido: Estado comum.nome inglês/german\nalgumas pequenas melhorias",
+        "ru": "Исправлено: State common.name english/german\nнекоторые незначительные улучшения",
+        "uk": "Виправлено: Назва держави англійська/герман\nдеякі незначні поліпшення",
+        "zh-cn": "固定:国家共同名称\n某些微小的改进"
+      }
+    },
+    "platform": "Javascript/Node.js",
+    "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
+    "subscribe": "messagebox",
+    "titleLang": {
+      "de": "Plex Media Server",
+      "en": "Plex Media Server",
+      "es": "Plex Media Server",
+      "fr": "Plex Media Server",
+      "it": "Plex Media Server",
+      "nl": "Plex Media Server",
+      "pl": "Plex Media Server",
+      "pt": "Plex Media Server",
+      "ru": "Plex Media Server",
+      "uk": "Медіасервер Plex",
+      "zh-cn": "Plex Media Server"
+    },
+    "type": "multimedia",
+    "version": "1.1.3"
+  },
+  "instanceObjects": [],
+  "native": {
+    "getAllItems": false,
+    "getLibraries": true,
+    "getMetadataTrees": false,
+    "getPlayerRefresh": 1,
+    "getPlaylists": true,
+    "getPlaylistsDetails": false,
+    "getServers": true,
+    "getSettings": true,
+    "getStatistics": false,
+    "getUsers": false,
+    "notifications": [
+      {
+        "caption": "",
+        "event": "any",
+        "media": "any",
+        "message": "No Message defined for media %Metadata.type% and event %event%",
+        "thumb": ""
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.play",
+        "media": "any",
+        "message": "%Metadata.title% (%Metadata.year%) playing",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.pause",
+        "media": "any",
+        "message": "%Metadata.title% (%Metadata.year%) paused",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.stop",
+        "media": "any",
+        "message": "%Metadata.title% (%Metadata.year%) stopped",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.resume",
+        "media": "any",
+        "message": "%Metadata.title% (%Metadata.year%) resumed",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.rate",
+        "media": "any",
+        "message": "%Metadata.title% (%Metadata.year%) rated",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.watched",
+        "media": "any",
+        "message": "%Metadata.title% (%Metadata.year%) watched",
+        "thumb": "%Metadata.thumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.play",
+        "media": "episode",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.pause",
+        "media": "episode",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.stop",
+        "media": "episode",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.resume",
+        "media": "episode",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.rate",
+        "media": "episode",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.watched",
+        "media": "episode",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
+        "thumb": "%Metadata.grandparentThumb%"
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.play",
+        "media": "track",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
+        "thumb": ""
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.pause",
+        "media": "track",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
+        "thumb": ""
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.stop",
+        "media": "track",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
+        "thumb": ""
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.resume",
+        "media": "track",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
+        "thumb": ""
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.rate",
+        "media": "track",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
+        "thumb": ""
+      },
+      {
+        "caption": "Played by %Account.title% on %Player.title%",
+        "event": "media.watched",
+        "media": "track",
+        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
+        "thumb": ""
+      },
+      {
+        "caption": "",
+        "event": "library.on.deck",
+        "media": "system",
+        "message": "A new item is added that appears in the user’s On Deck.",
+        "thumb": ""
+      },
+      {
+        "caption": "",
+        "event": "library.new",
+        "media": "system",
+        "message": "A new item is added to a library.",
+        "thumb": ""
+      },
+      {
+        "caption": "",
+        "event": "admin.database.backup",
+        "media": "system",
+        "message": "A database backup is completed successfully via scheduled tasks.",
+        "thumb": ""
+      },
+      {
+        "caption": "",
+        "event": "admin.database.corrupted",
+        "media": "system",
+        "message": "Corruption is detected in the server database.",
+        "thumb": ""
+      },
+      {
+        "caption": "",
+        "event": "device.new",
+        "media": "system",
+        "message": "A new device is using the Plex Media Server.",
+        "thumb": ""
+      },
+      {
+        "caption": "",
+        "event": "playback.started",
+        "media": "system",
+        "message": "Playback is started by a shared user.",
+        "thumb": ""
+      }
+    ]
+  },
+  "objects": []
 }

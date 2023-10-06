@@ -8,7 +8,7 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 [![Commits since last release](https://img.shields.io/github/commits-since/Zefau/ioBroker.plex/latest.svg)](https://github.com/iobroker-community-adapters/ioBroker.plex/releases/latest)
 [![Travis CI](https://travis-ci.com/iobroker-community-adapters/ioBroker.plex.svg?branch=master)](https://travis-ci.com/iobroker-community-adapters/ioBroker.plex)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.plex.svg)](https://www.npmjs.com/package/iobroker.plex)
-![Number of Installations](https://iobroker.live/badges/plex.svg)
+![Number of Installations](https://iobroker.live/badges/plex-installed.svg)
 [![Translation status](https://weblate.iobroker.net/widgets/adapters/-/plex/svg-badge.svg)](https://weblate.iobroker.net/engage/adapters/?utm_source=widget)
 
 [![NPM](https://nodei.co/npm/iobroker.plex.png?downloads=true)](https://nodei.co/npm/iobroker.plex/) 

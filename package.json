@@ -31,7 +31,7 @@
     "node": ">= 16"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.0.3",
+    "@iobroker/adapter-core": "^3.0.4",
     "axios": "^1.5.1",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",

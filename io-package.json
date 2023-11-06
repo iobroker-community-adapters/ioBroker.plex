@@ -44,6 +44,19 @@
     "mode": "daemon",
     "name": "plex",
     "news": {
+      "1.1.4": {
+        "en": "move logmessage into debug",
+        "de": "logmessing in debug verschieben",
+        "ru": "переместить logmessage в debug",
+        "pt": "mover logmessage para depuração",
+        "nl": "verplaats logica in debug",
+        "fr": "déplacer logmessage dans debug",
+        "it": "spostare logmessage in debug",
+        "es": "mover logmessage en depuración",
+        "pl": "logmesowanie ruchu w debugowanie",
+        "uk": "перемістити logmessage в debug",
+        "zh-cn": "将伐木移入黑体"
+      },
       "1.1.3": {
         "en": "Fixed: Error in the formatted playback position",
         "de": "Behoben: Fehler in der formatierten Abspielposition",
@@ -121,19 +134,6 @@
         "ru": "Добавлено: Тексты написаны как ссылка и текст в _playing.device.Metadata.Music.Lyric\nДобавлена: Подключение к игрокам с осведомлением игрокаdetail\nДобавлена: Новые состояния с данными игрока.\nДобавлена: Refresh of player можно активировать с помощью набора _Controls.timeline.refreshDetails to true",
         "uk": "Додано: Лірики написані як посилання та текст _playing.device.Metadata.Music.Lyric\nДоданий: Підключення до гравців з освіженням програвача\nДодано: Нові стани з даними програвача.\nДодано: Refresh може бути активовано за допомогою set _Controls.timeline.refreshDetails to true",
         "zh-cn": "增加:里克人被写成联系和案文,载于“互动.device.Metadata.Music.Lyricic\n增 编:与投身者进行斗争\n增加:有角色数据的新州。.\n增编:可按规定行事,即:"
-      },
-      "1.1.1": {
-        "de": "Behoben: State common.name Englisch/Deutsch\neinige kleinere Verbesserungen",
-        "en": "Fixed: State common.name english/german\nsome minor improvements",
-        "es": "Fijo: Estado común.nombre español/german\nalgunas mejoras menores",
-        "fr": "Fixed: State common.name english/german\nquelques améliorations mineures",
-        "it": "Fisso: Stato comune.name inglese/german\nalcuni miglioramenti minori",
-        "nl": "Vertaling:\nwat kleine verbetering",
-        "pl": "W: Państwowe wspólne nazwy english/german\ndrobne ulepszenia",
-        "pt": "Corrigido: Estado comum.nome inglês/german\nalgumas pequenas melhorias",
-        "ru": "Исправлено: State common.name english/german\nнекоторые незначительные улучшения",
-        "uk": "Виправлено: Назва держави англійська/герман\nдеякі незначні поліпшення",
-        "zh-cn": "固定:国家共同名称\n某些微小的改进"
       }
     },
     "platform": "Javascript/Node.js",
@@ -153,7 +153,7 @@
       "zh-cn": "Plex Media Server"
     },
     "type": "multimedia",
-    "version": "1.1.3"
+    "version": "1.1.4"
   },
   "instanceObjects": [],
   "native": {

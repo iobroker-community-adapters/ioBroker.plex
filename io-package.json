@@ -136,6 +136,7 @@
         "zh-cn": "增加:里克人被写成联系和案文,载于“互动.device.Metadata.Music.Lyricic\n增 编:与投身者进行斗争\n增加:有角色数据的新州。.\n增编:可按规定行事,即:"
       }
     },
+    "tier": 3,
     "platform": "Javascript/Node.js",
     "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
     "subscribe": "messagebox",

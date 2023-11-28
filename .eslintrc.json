@@ -37,6 +37,6 @@
         "semi": ["error", "always"]
     },
     "parserOptions": {
-        "ecmaVersion": "latest"
+        "ecmaVersion": 2022
     }
 }

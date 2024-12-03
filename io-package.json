@@ -34,7 +34,10 @@
       "plex",
       "media"
     ],
-    "license": "MIT",
+    "licenseInformation": {
+        "license": "MIT",
+        "type": "free"
+    },
     "localLinks": {
       "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
     },
@@ -139,7 +142,6 @@
     "tier": 3,
     "platform": "Javascript/Node.js",
     "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
-    "subscribe": "messagebox",
     "titleLang": {
       "de": "Plex Media Server",
       "en": "Plex Media Server",

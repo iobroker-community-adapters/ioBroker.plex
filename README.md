@@ -134,6 +134,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (ticaki) Dependencies updated
 - (mcm1957) Adapter requires nodejs >= 18 now
 
 ### 1.1.4 (2023-11-06)
@@ -285,7 +286,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 The MIT License (MIT)
 
 Copyright (c) 2019-2020 Zefau <zefau@mailbox.org>
-Copyright (c) 2024 iobroker-community-adapters
+Copyright (c) 2023-2024 iobroker-community-adapters
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

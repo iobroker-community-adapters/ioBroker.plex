@@ -90,8 +90,12 @@
     "io-package.json",
     "LICENSE",
     "main.js",
-    "_*.json",
-    "_*.js",
+    "_ACTIONS.json",
+    "_EVENTS.js",
+    "_NODES-tautulli.js",
+    "_NODES.json",
+    "_PLAYERDETAILS.json",
+    "plex.js",
     "*.md"
   ]
 }

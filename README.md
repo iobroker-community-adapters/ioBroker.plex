@@ -285,8 +285,9 @@ This adapter would not have been possible without the great work of @Zefau (http
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2019-2020 Zefau <zefau@mailbox.org>
 Copyright (c) 2023-2024 iobroker-community-adapters
+Copyright (c) 2019-2020 Zefau <zefau@mailbox.org>
+
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

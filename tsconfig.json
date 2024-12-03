@@ -29,7 +29,7 @@
     "include": [
         "**/*.js",
         "**/*.d.ts"
-    ],
+, "_NODES-tautulli.js.bck"    ],
     "exclude": [
         "node_modules/**",
         "widgets/**"

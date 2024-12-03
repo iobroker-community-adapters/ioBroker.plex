@@ -1451,7 +1451,7 @@ function internalConvert(json) {
  * If started as allInOne/compact mode => return function to create instance
  *
  */
-if (module === require.main) {
+if (module && module.parent) {
     module.exports = startAdapter;
 } else {
     startAdapter();

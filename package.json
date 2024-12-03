@@ -80,5 +80,18 @@
     "lint": "eslint .",
     "translate": "translate-adapter",
     "release": "release-script"
-  }
+  },
+  "files": [
+    "admin{,/!(src)/**}/!(tsconfig|tsconfig.*|.eslintrc).{json,json5}",
+    "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",
+    "lib/",
+    "img/",
+    "www/",
+    "io-package.json",
+    "LICENSE",
+    "main.js",
+    "_*.json",
+    "_*.js",
+    "*.md"
+  ]
 }

@@ -291,10 +291,8 @@ function startAdapter(options) {
                     );
                     adapter.log.debug(err);
                 });
-        }
-
-        // Player Controls
-        else {
+            // Player Controls
+        } else {
             const path = id.replace(`${adapter.name}.${adapter.instance}.`, '').split('.');
             action = path.pop() || '';
             const mode = path.pop();
@@ -339,10 +337,8 @@ function startAdapter(options) {
                         if (res.token === true) {
                             adapter.log.debug('Successfully retrieved token.');
                             library.msg(msg.from, msg.command, { result: true, token: res.auth_token }, msg.callback);
-                        }
-
-                        // failed getting token
-                        else {
+                        } else {
+                            // failed getting token
                             library.msg(
                                 msg.from,
                                 msg.command,
@@ -384,10 +380,21 @@ function startAdapter(options) {
     return adapter;
 }
 
+/*************  ✨ Codeium Command ⭐  *************/
 /**
- * Test connection
- *
+ * Initializes the Plex adapter and sets up connections and configurations.
+ * 
+ * - Queries the Plex server for session status and retrieves currently playing media.
+/******  b350a5c6-373d-49d9-b629-c3b8405c4f02  ******
+ * - Sets device states based on retrieved data to avoid excessive event subscriptions.
+ * - Configures and creates controllable players based on available player data.
+ * - Verifies and initializes Tautulli settings for additional media information.
+ * - Sets up a refresh cycle to periodically retrieve data from the Plex server.
+ * - Starts a listener for events from the Plex server.
+ * - Retrieves and sets the server ID if available.
+ * - Handles errors related to server connectivity and retries initialization if necessary.
  */
+
 function init() {
     plex.query('/status/sessions')
         .then(res => {
@@ -465,10 +472,8 @@ function init() {
                     `Tautulli ${!adapter.config.tautulliIp ? ' IP/ ' : ''}${!adapter.config.tautulliToken ? 'API token ' : ''}missing!`,
                 );
                 tautulli = { get: () => Promise.reject('Not connected!') };
-            }
-
-            // initialize Tautulli API
-            else {
+            } else {
+                // initialize Tautulli API
                 try {
                     tautulli = new Tautulli(
                         adapter.config.tautulliIp,
@@ -534,9 +539,9 @@ function init() {
 /**
  * Receive event from webhook
  *
- * @param data
- * @param source
- * @param prefix
+ * @param data - The event data received from the webhook
+ * @param source - The source of the event
+ * @param prefix - The prefix of the event
  */
 function setEvent(data, source, prefix) {
     adapter.log.debug(
@@ -671,10 +676,8 @@ function setEvent(data, source, prefix) {
             playerTemp.setNotificationData(JSON.parse(JSON.stringify(data))), 100;
             data = {};
         }
-    }
-
-    // EVENTS
-    else if (prefix == 'events') {
+    } else if (prefix == 'events') {
+        // EVENTS
         // channel
         library.set(
             {
@@ -755,10 +758,11 @@ function setEvent(data, source, prefix) {
 }
 
 /**
+ * Ersetzt Platzhalter im übergebenen Nachrichtentext durch die entsprechenden Werte aus den Daten.
  *
- *
- * @param message
- * @param data
+ * @param message - Die Nachricht mit Platzhaltern.
+ * @param data - Die Daten, die zum Ersetzen der Platzhalter verwendet werden.
+ * @returns - Die Nachricht mit ersetzten Platzhaltern.
  */
 function replacePlaceholders(message, data) {
     let pos, variable, tmp, path, index;
@@ -792,9 +796,10 @@ function replacePlaceholders(message, data) {
 }
 
 /**
- * Verify if API response is successful.
+ * Checks if the API response is valid.
  *
- * @param res
+ * @param res - The API response to be checked.
+ * @returns - Returns true if the response is valid, otherwise false.
  */
 function is(res) {
     if (
@@ -815,11 +820,11 @@ function is(res) {
 }
 
 /**
- * Get Items from Plex
+ * Retrieves items from the specified path and updates the library with the item count.
  *
- * @param path
- * @param key
- * @param node
+ * @param path - The path to query items from.
+ * @param key - The key used to identify the items.
+ * @param node - The node to update with the item count.
  */
 function getItems(path, key, node) {
     if (!adapter.config.getAllItems) {
@@ -885,52 +890,47 @@ function retrieveData() {
  */
 function getServers() {
     plex.query('/servers')
-        .then(res =>
-            //plex.query('/:/timeline').then(res =>
-            {
-                adapter.log.debug('Retrieved Servers from Plex.');
-                /*adapter.log.debug(JSON.stringify(res.MediaContainer))
-		adapter.log.debug(JSON.stringify(res))
-		return*/
+        .then(res => {
+            adapter.log.debug('Retrieved Servers from Plex.');
+
+            library.set(
+                {
+                    node: 'servers',
+                    role: library.getNode('servers').role,
+                    description: library.getNode('servers').description,
+                },
+                undefined,
+            );
+
+            const data = res.MediaContainer.Server || [];
+            data.forEach(entry => {
+                const serverId = entry['name'].toLowerCase();
                 library.set(
                     {
-                        node: 'servers',
-                        role: library.getNode('servers').role,
-                        description: library.getNode('servers').description,
+                        node: `servers.${serverId}`,
+                        role: library.getNode('server').role,
+                        description: library.replaceDescription(
+                            library.getNode('server').description,
+                            '%server%',
+                            entry['name'],
+                        ),
                     },
                     undefined,
                 );
-
-                const data = res.MediaContainer.Server || [];
-                data.forEach(entry => {
-                    const serverId = entry['name'].toLowerCase();
+                // index all keys as states
+                for (const key in entry) {
                     library.set(
                         {
-                            node: `servers.${serverId}`,
-                            role: library.getNode('server').role,
-                            description: library.replaceDescription(
-                                library.getNode('server').description,
-                                '%server%',
-                                entry['name'],
-                            ),
+                            node: `servers.${serverId}.${key}`,
+                            role: library.getNode(`servers.${key.toLowerCase()}`).role,
+                            type: library.getNode(`servers.${key.toLowerCase()}`).type,
+                            description: library.getNode(`servers.${key.toLowerCase()}`).description,
                         },
-                        undefined,
+                        entry[key],
                     );
-                    // index all keys as states
-                    for (const key in entry) {
-                        library.set(
-                            {
-                                node: `servers.${serverId}.${key}`,
-                                role: library.getNode(`servers.${key.toLowerCase()}`).role,
-                                type: library.getNode(`servers.${key.toLowerCase()}`).type,
-                                description: library.getNode(`servers.${key.toLowerCase()}`).description,
-                            },
-                            entry[key],
-                        );
-                    }
-                });
-            },
-        )
+                }
+            });
+        })
         .catch(err => {
             adapter.log.debug('Could not retrieve Servers from Plex!');
             adapter.log.debug(err);
@@ -1451,8 +1451,8 @@ function internalConvert(json) {
  * If started as allInOne/compact mode => return function to create instance
  *
  */
-if (module && module.parent) {
+if (require.main !== module) {
     module.exports = startAdapter;
 } else {
     startAdapter();
-} // or start the instance directly
+}

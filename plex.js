@@ -1451,8 +1451,10 @@ function internalConvert(json) {
  * If started as allInOne/compact mode => return function to create instance
  *
  */
-if (require.main !== module) {
+if (module.parent) {
+    // Export startAdapter in compact mode
     module.exports = startAdapter;
 } else {
+    // otherwise start the instance directly
     startAdapter();
 }

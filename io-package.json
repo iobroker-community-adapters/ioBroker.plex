@@ -35,8 +35,8 @@
       "media"
     ],
     "licenseInformation": {
-        "license": "MIT",
-        "type": "free"
+      "license": "MIT",
+      "type": "free"
     },
     "localLinks": {
       "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
@@ -47,6 +47,19 @@
     "mode": "daemon",
     "name": "plex",
     "news": {
+      "1.1.5": {
+        "en": "State _playing.*.Metadata.viewOffset is created.\nDependencies updated\nAdapter requires nodejs >= 18 now",
+        "de": "State _playing.* Metadata.view Offset wird erstellt.\nAusgaben aktualisiert\nAdapter benötigt jetzt Nodejs >= 18",
+        "ru": "State _playing.*. Metadata.view Создается офсет.\nОбновленные данные о зависимостях\nАдаптер требует nodejs >= 18 сейчас",
+        "pt": "Estado _playing.*. Metadata.view Offset é criado.\nDependências atualizadas\nAdapter requer nodejs >= 18 agora",
+        "nl": "Staat _spelen.*. Metadata.view Offset is aangemaakt.\nAfhankelijkheden bijgewerkt\nVoor de adapter zijn nodejs < 18 nu nodig",
+        "fr": "État _jouant.*. Métadonnées.view L'offset est créé.\nDépendances actualisées\nAdaptateur nécessite nodejs >= 18 maintenant",
+        "it": "State _playing.* Metadata.view Offset è creato.\nDipendenze aggiornate\nAdattatore richiede nodejs >= 18 ora",
+        "es": "Estado _playing.*. Metadatos.view Se crea Offset.\nActualización de las dependencias\nAdaptador requiere nodejs ю= 18 ahora",
+        "pl": "State _ playing. Metadata.view Offset jest tworzony.\nAktualizacja zależności\nAdapter wymaga węzłów > = 18",
+        "uk": "Стан _playing.*. Метадані.view Офсет створений.\nЗалежність оновлено\nАдаптер вимагає nodejs >= 18 тепер",
+        "zh-cn": "状态 _ playing.*. 元数据。 视图 偏移被创建 .\n更新的依赖关系\n适配器现在需要节点18"
+      },
       "1.1.4": {
         "en": "move logmessage into debug",
         "de": "logmessing in debug verschieben",
@@ -124,19 +137,6 @@
         "ru": "Исправлено: Контроль не работал с Plexamp.\nнекоторые незначительные улучшения.",
         "uk": "Виправлено: Контроль не працює з Plexamp.\nдеякі незначні поліпшення.",
         "zh-cn": "固定:控制没有与Plexamp合作。.\n略有改进。."
-      },
-      "1.1.0": {
-        "de": "Hinzugefügt: Lyrics werden als Link und Text in _playing.device.Metadata.Music.Lyric geschrieben\nHinzugefügt: Verbindung zu Playern mit Aktualisierung von Playerdetails\nHinzugefügt: Neue Zustände mit Playerdaten.\nHinzugefügt: Aktualisierung des Players kann durch aktiviert von _Controls.timeline.refreshDetails gesteuert werden",
-        "en": "Added: Lyrics are written as link and text in _playing.device.Metadata.Music.Lyric\nAdded: Connection to players with refresh of playerdetail\nAdded: New states with player data.\nAdded: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
-        "es": "Añadido: Las letras están escritas como enlace y texto en _playing.device.Metadatos.Música.Lírica\nAñadido: Conexión a los jugadores con refrigerio de playerdetail\nAñadido: Nuevos estados con datos del reproductor.\nAñadido: Refresh of player can be activate by set _Controls.timeline.refreshDetails to true",
-        "fr": "Ajouté: Lyrics sont écrits comme lien et texte dans _playing.device.Metadata.Music.Lyric\nAjouté: Connexion aux joueurs avec rafraîchissement de la gamme\nAjouté : Nouveaux états avec les données du lecteur.\nAjouté : Rafraîchissement du joueur peut être activé par set _Controls.timeline.refreshDétails à true",
-        "it": "Aggiunto: I testi sono scritti come link e testo in _playing.device.Metadata.Music.Lyric\nAggiunto: Connessione ai giocatori con aggiornamento di giocatoredetail\nAggiunto: Nuovi stati con i dati del giocatore.\nAggiunto: Refresh of player può essere attivato da set _Controls.timeline.refreshDettagli a true",
-        "nl": "Lyrics zijn geschreven als link en tekst in het uitspelen\nVerbinding met spelers met verfrissing van spelerdetail\nNieuwe staten met spelersgegevens.\nVerfrissing van de speler kan worden geactiveerd door de tijdlijn",
-        "pl": "Added: Lyrics są zapisywane jako link i tekst w _playing.device.Metadata\nAdded: Połączenie do graczy z odświeżonym odświeżeniem\nW: Nowe państwa z danymi gracza.\nAdded: Refresh gracz może być aktywowany przez _Controls.timeline.refreshDetails",
-        "pt": "Adicionado: Lyrics são escritos como link e texto em _playing.device.Metadata.Music.Lyric\nAdicionado: Ligação aos jogadores com atualização de jogadordetail\nAdicionado: Novos estados com dados do jogador.\nAdicionado: Refresh do jogador pode ser ativado por set _Controls.timeline.refreshDetails to true",
-        "ru": "Добавлено: Тексты написаны как ссылка и текст в _playing.device.Metadata.Music.Lyric\nДобавлена: Подключение к игрокам с осведомлением игрокаdetail\nДобавлена: Новые состояния с данными игрока.\nДобавлена: Refresh of player можно активировать с помощью набора _Controls.timeline.refreshDetails to true",
-        "uk": "Додано: Лірики написані як посилання та текст _playing.device.Metadata.Music.Lyric\nДоданий: Підключення до гравців з освіженням програвача\nДодано: Нові стани з даними програвача.\nДодано: Refresh може бути активовано за допомогою set _Controls.timeline.refreshDetails to true",
-        "zh-cn": "增加:里克人被写成联系和案文,载于“互动.device.Metadata.Music.Lyricic\n增 编:与投身者进行斗争\n增加:有角色数据的新州。.\n增编:可按规定行事,即:"
       }
     },
     "tier": 3,
@@ -156,7 +156,7 @@
       "zh-cn": "Plex Media Server"
     },
     "type": "multimedia",
-    "version": "1.1.4"
+    "version": "1.1.5"
   },
   "instanceObjects": [],
   "native": {

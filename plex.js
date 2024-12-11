@@ -237,7 +237,6 @@ function startAdapter(options) {
         library.subscribeNode('metadata.viewoffset', (state, prefix) => {
             library.confirmNode({ node: `${prefix}_Control.seekTo` });
         });
-        internalConvert(_NODES);
     });
 
     /*
@@ -1422,14 +1421,25 @@ function refreshViewOffset() {
         playingDevice.forEach(player => {
             let state = `${player.prefix}.Metadata.viewOffset`;
             const value = library.getDeviceState(state) + 1000;
+            let node = library.getNode('playing.metadata.viewOffset', true);
+            library.set(
+                {
+                    node: state,
+                    type: node.type,
+                    role: node.role,
+                    description: node.description,
+                },
+                value,
+            );
             state += 'Seconds';
+            node = library.getNode('playing.metadata.viewOffset', true);
             //adapter.log.debug(Math.floor((Date.now() - player.start)/1000))
             library.set(
                 {
                     node: state,
-                    type: 'number',
-                    role: 'media.elapsed',
-                    description: 'Last viewing position in seconds(refresh)',
+                    type: node.type,
+                    role: node.role,
+                    description: node.description,
                 },
                 value / 1000,
             );
@@ -1437,24 +1447,13 @@ function refreshViewOffset() {
     }
 }
 
-// npm run translate -- -a ./.dataTest/Nodes/admin
-// eslint-disable-next-line
-function internalConvert(json) {
-    if (_fs.existsSync('./.dataTest')) {
-        //writeNodes('Nodes', json);
-        //covertI18n('Nodes', json);
-    }
-    return;
-}
 /*
  * COMPACT MODE
  * If started as allInOne/compact mode => return function to create instance
  *
  */
-if (module.parent) {
-    // Export startAdapter in compact mode
+if (require.main !== module) {
     module.exports = startAdapter;
 } else {
-    // otherwise start the instance directly
     startAdapter();
 }

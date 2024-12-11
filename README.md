@@ -132,6 +132,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (ticaki) State _playing.*.Metadata.viewOffset is created.
 - (ticaki) Dependencies updated
 - (mcm1957) Adapter requires nodejs >= 18 now
 

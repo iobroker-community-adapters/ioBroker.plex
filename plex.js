@@ -672,7 +672,7 @@ function setEvent(data, source, prefix) {
         // get library details plex.0._playing.ipad-10A88133-3762-4948-AF10-9503A37517AC.Metadata.key
         //if (adapter.config.getAllItem && data.Player.title != '_recent') getItemDetails(data.Metadata && data.Metadata.key, prefix)
         if (data.event && data.Player && data.Player.title != '_recent' && playerTemp) {
-            playerTemp.setNotificationData(JSON.parse(JSON.stringify(data))), 100;
+            (playerTemp.setNotificationData(JSON.parse(JSON.stringify(data))), 100);
             data = {};
         }
     } else if (prefix == 'events') {

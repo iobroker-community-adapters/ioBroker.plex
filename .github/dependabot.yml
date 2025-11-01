@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: cron
-      cronjob: 5 4 3 * *
+      cronjob: 5 4 16 * *
       timezone: Europe/Berlin
     open-pull-requests-limit: 15
     versioning-strategy: increase
@@ -13,6 +13,6 @@ updates:
     directory: "/"
     schedule:
       interval: cron
-      cronjob: 5 5 3 * *
+      cronjob: 5 5 16 * *
       timezone: Europe/Berlin
     open-pull-requests-limit: 15

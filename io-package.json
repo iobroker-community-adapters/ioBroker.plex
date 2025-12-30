@@ -1,14 +1,9 @@
 {
   "common": {
     "authors": [
-      {
-        "email": "zefau@mailbox.org",
-        "name": "Zefau"
-      },
-      {
-        "email": "ticaki@renopoint.de",
-        "name": "ticaki"
-      }
+      "Zefau <zefau@mailbox.org>",
+      "ticaki <ticaki@renopoint.de>",
+      "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
     ],
     "compact": true,
     "connectionType": "local",

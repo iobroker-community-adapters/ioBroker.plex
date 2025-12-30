@@ -2,15 +2,10 @@
   "name": "iobroker.plex",
   "version": "1.1.5",
   "description": "Integration of your Plex Media Server and / or your Tautulli",
-  "author": {
-    "name": "zefau",
-    "email": "zefau@mailbox.org"
-  },
+  "author": "zefau <zefau@mailbox.org>",
   "contributors": [
-    {
-      "name": "zefau",
-      "email": "zefau@mailbox.org"
-    }
+    "zefau <zefau@mailbox.org>",
+    "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
   ],
   "homepage": "https://github.com/iobroker-community-adapters/ioBroker.plex",
   "license": "MIT",

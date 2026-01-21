@@ -29,7 +29,7 @@
     "@iobroker/adapter-core": "^3.3.2",
     "axios": "^1.13.2",
     "body-parser": "^2.2.1",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "fast-xml-parser": "^5.3.3",
     "multer": "^2.0.0",
     "plex-api": "^5.3.2",

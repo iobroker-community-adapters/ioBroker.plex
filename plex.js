@@ -3,7 +3,7 @@ const ioPackage = require('./io-package.json');
 const adapterName = ioPackage.common.name;
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 
-const _fs = require('fs');
+const _fs = require('node:fs');
 const _http = require('express')();
 const _parser = require('body-parser');
 const _multer = require('multer');

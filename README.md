@@ -133,6 +133,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 -->
 
 ### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
 - (copilot) Adapter requires admin >= 7.7.22 now
 
 ### 1.1.5 (2024-12-11)

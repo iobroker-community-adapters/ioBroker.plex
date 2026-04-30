@@ -10,7 +10,7 @@ const _multer = require('multer');
 const _axios = require('axios');
 const { v1: _uuid } = require('uuid');
 
-const Plex = require('plex-api');
+const Plex = require(`${__dirname}/lib/plexHttp.js`);
 const Tautulli = require('tautulli-api');
 
 /*
@@ -18,9 +18,18 @@ const Tautulli = require('tautulli-api');
  */
 const Library = require(`${__dirname}/lib/library.js`);
 const PlexPinAuth = require(`${__dirname}/lib/plexPinAuth.js`);
-const _NODES = JSON.parse(_fs.readFileSync('./_NODES.json').toString());
-const _ACTIONS = JSON.parse(_fs.readFileSync('./_ACTIONS.json').toString());
-const _PLAYERDETAILS = JSON.parse(_fs.readFileSync('./_PLAYERDETAILS.json').toString());
+
+function loadJsonFile(path) {
+    try {
+        return JSON.parse(_fs.readFileSync(`${__dirname}/${path}`).toString());
+    } catch (err) {
+        console.error(`[plex] FATAL: failed to load ${path}: ${err.message}. Adapter cannot start.`);
+        process.exit(1);
+    }
+}
+const _NODES = loadJsonFile('_NODES.json');
+const _ACTIONS = loadJsonFile('_ACTIONS.json');
+const _PLAYERDETAILS = loadJsonFile('_PLAYERDETAILS.json');
 const { Controller } = require(`${__dirname}/lib/players.js`);
 
 /*
@@ -30,7 +39,8 @@ let adapter;
 let library;
 let controller;
 let unloaded;
-let retryCycle, refreshCycle;
+let retryCycle, refreshCycle, healthCheckInterval;
+let lastConnectionOk = null;
 
 // Temp Json only for new Data
 
@@ -53,7 +63,17 @@ const players = [];
 
 let history = [];
 const notifications = {};
-const upload = _multer({ dest: '/tmp/' });
+// Plex webhook attaches a `thumb` image. Cap size, restrict to images, enforce single file.
+const upload = _multer({
+    dest: '/tmp/',
+    limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+    fileFilter: (_req, file, cb) => {
+        if (!file.mimetype || !file.mimetype.startsWith('image/')) {
+            return cb(null, false);
+        }
+        cb(null, true);
+    },
+});
 let refreshInterval = null;
 
 const watched = ['01-last_24h', '02-last_7d', '03-last_30d', '00-all_time'];
@@ -110,43 +130,47 @@ function startAdapter(options) {
         library.AXIOS_OPTIONS._protocol = 'http:';
         library.AXIOS_OPTIONS.timeout = 3000;
 
-        if (adapter.config.secureConnection && adapter.config.certPublicVal && adapter.config.certPrivateVal) {
+        if (adapter.config.secureConnection) {
             adapter.log.info('Establishing secure connection to Plex Media Server...');
 
-            try {
-                library.AXIOS_OPTIONS = {
-                    ...library.AXIOS_OPTIONS,
-                    cert:
+            // Always trust the PMS over HTTPS – it usually presents a self-signed or plex.direct
+            // wildcard certificate that does not validate against the IP/hostname used by ioBroker.
+            library.AXIOS_OPTIONS.secureConnection = true;
+            library.AXIOS_OPTIONS._protocol = 'https:';
+            library.AXIOS_OPTIONS.rejectUnauthorized = false;
+
+            // Optional client certificate (mutual TLS) – only loaded if explicitly configured.
+            if (adapter.config.certPublicVal && adapter.config.certPrivateVal) {
+                try {
+                    library.AXIOS_OPTIONS.cert =
                         adapter.config.certPublicVal.indexOf('.') === -1
                             ? adapter.config.certPublicVal
-                            : _fs.readFileSync(adapter.config.certPublicVal),
-                    key:
+                            : _fs.readFileSync(adapter.config.certPublicVal);
+                    library.AXIOS_OPTIONS.key =
                         adapter.config.certPrivateVal.indexOf('.') === -1
                             ? adapter.config.certPrivateVal
-                            : _fs.readFileSync(adapter.config.certPrivateVal),
-                    rejectUnauthorized: false,
-                    secureConnection: true,
-                    _protocol: 'https:',
-                };
+                            : _fs.readFileSync(adapter.config.certPrivateVal);
 
-                if (adapter.config.certChainedVal) {
-                    library.AXIOS_OPTIONS.ca =
-                        adapter.config.certChainedVal.indexOf('.') === -1
-                            ? adapter.config.certChainedVal
-                            : _fs.readFileSync(adapter.config.certChainedVal);
+                    if (adapter.config.certChainedVal) {
+                        library.AXIOS_OPTIONS.ca =
+                            adapter.config.certChainedVal.indexOf('.') === -1
+                                ? adapter.config.certChainedVal
+                                : _fs.readFileSync(adapter.config.certChainedVal);
+                    }
+
+                    if (library.AXIOS_OPTIONS.key.indexOf('ENCRYPTED') > -1) {
+                        library.AXIOS_OPTIONS.passphrase = adapter.config.passphrase;
+                    }
+                } catch (err) {
+                    adapter.log.warn(
+                        'Failed loading client certificates! Continuing with HTTPS but without client authentication.',
+                    );
+                    adapter.log.debug(err.message);
+                    delete library.AXIOS_OPTIONS.cert;
+                    delete library.AXIOS_OPTIONS.key;
+                    delete library.AXIOS_OPTIONS.ca;
+                    delete library.AXIOS_OPTIONS.passphrase;
                 }
-
-                if (library.AXIOS_OPTIONS.key.indexOf('ENCRYPTED') > -1) {
-                    library.AXIOS_OPTIONS.passphrase = adapter.config.passphrase;
-                }
-            } catch (err) {
-                adapter.log.warn(
-                    'Failed loading certificates! Falling back to insecure connection to Plex Media Server...',
-                );
-                adapter.log.debug(err.message);
-
-                library.AXIOS_OPTIONS.secureConnection = false;
-                library.AXIOS_OPTIONS._protocol = 'http:';
             }
         } else {
             adapter.log.info('Establishing insecure connection to Plex Media Server...');
@@ -217,7 +241,13 @@ function startAdapter(options) {
 
                     // set history
                     if (state.indexOf('events.history') > -1) {
-                        history = JSON.parse(states[state].val);
+                        try {
+                            const parsed = JSON.parse(states[state].val);
+                            history = Array.isArray(parsed) ? parsed : [];
+                        } catch (err) {
+                            adapter.log.warn(`Stored history state is corrupted, starting fresh: ${err.message}`);
+                            history = [];
+                        }
                     }
                 }
             }
@@ -369,6 +399,7 @@ function startAdapter(options) {
             _http.close(() => adapter.log.debug('Server for listener closed.'));
             adapter.clearTimeout(retryCycle);
             adapter.clearTimeout(refreshCycle);
+            adapter.clearInterval(healthCheckInterval);
             adapter.clearInterval(refreshInterval);
             callback();
         } catch {
@@ -393,6 +424,38 @@ function startAdapter(options) {
  * - Retrieves and sets the server ID if available.
  * - Handles errors related to server connectivity and retries initialization if necessary.
  */
+
+// Periodic health check against the local Plex Media Server. Sets the CONNECTION state
+// and only writes to the log when the connection state actually changes, to avoid log spam.
+function startHealthCheck() {
+    adapter.clearInterval(healthCheckInterval);
+    const intervalMs = 5 * 60 * 1000;
+    healthCheckInterval = adapter.setInterval(async () => {
+        if (unloaded) {
+            return;
+        }
+        try {
+            await plex.query('/');
+            if (lastConnectionOk === false) {
+                adapter.log.info('Plex Media Server connection restored.');
+            } else {
+                adapter.log.debug('Plex health check OK.');
+            }
+            if (lastConnectionOk !== true) {
+                library.set(Library.CONNECTION, true);
+                lastConnectionOk = true;
+            }
+        } catch (err) {
+            if (lastConnectionOk !== false) {
+                adapter.log.warn(`Plex Media Server connection lost: ${err.message}`);
+            } else {
+                adapter.log.debug(`Plex health check still failing: ${err.message}`);
+            }
+            library.set(Library.CONNECTION, false);
+            lastConnectionOk = false;
+        }
+    }, intervalMs);
+}
 
 function init() {
     plex.query('/status/sessions')
@@ -481,30 +544,36 @@ function init() {
                     );
                 } catch {
                     adapter.log.error(
-                        `Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:${library.decode(encryptionKey, adapter.config.tautulliToken)}`,
+                        `Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:[REDACTED]`,
                     );
                 }
             }
 
             // retrieve data
-            if (!adapter.config.refresh) {
+            const refreshSec = parseInt(adapter.config.refresh, 10);
+            if (!refreshSec || isNaN(refreshSec) || refreshSec <= 0) {
                 adapter.config.refresh = 0;
-            } else if (adapter.config.refresh > 0 && adapter.config.refresh < 10) {
+            } else if (refreshSec < 10) {
                 adapter.log.warn(
                     'Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now.',
                 );
                 adapter.config.refresh = 10;
+            } else {
+                adapter.config.refresh = refreshSec;
             }
 
             refreshCycle = adapter.setTimeout(function updater() {
                 retrieveData();
                 if (adapter.config.refresh > 0 && !unloaded) {
-                    refreshCycle = adapter.setTimeout(updater, Math.floor(parseInt(adapter.config.refresh) * 1000));
+                    refreshCycle = adapter.setTimeout(updater, adapter.config.refresh * 1000);
                 }
             }, 1000);
 
             // listen to events from Plex
             startListener();
+            // periodic health check against the local PMS – sets CONNECTION state, logs only on transitions
+            lastConnectionOk = true;
+            startHealthCheck();
             // connection is ok get server id
             plex.query('/')
                 .then(res => {
@@ -517,17 +586,49 @@ function init() {
                 });
         })
         .catch(err => {
-            adapter.log.debug(`Configuration: ${JSON.stringify(adapter.config)}`);
-            adapter.log.debug(`Request-Options: ${JSON.stringify(library.AXIOS_OPTIONS)}`);
+            const safeConfig = { ...adapter.config };
+            for (const k of ['plexToken', 'tautulliToken', 'plexPassword', 'passphrase', 'encryptionKey']) {
+                if (safeConfig[k]) {
+                    safeConfig[k] = '[REDACTED]';
+                }
+            }
+            const safeOpts = { ...library.AXIOS_OPTIONS };
+            for (const k of ['cert', 'key', 'ca', 'passphrase']) {
+                if (safeOpts[k]) {
+                    safeOpts[k] = '[REDACTED]';
+                }
+            }
+            adapter.log.debug(`Configuration: ${JSON.stringify(safeConfig)}`);
+            adapter.log.debug(`Request-Options: ${JSON.stringify(safeOpts)}`);
             adapter.log.debug(`Stack-Trace: ${JSON.stringify(err.stack)}`);
 
-            if (err.message.indexOf('EHOSTUNREACH') > -1) {
+            if (
+                err.message.indexOf('EHOSTUNREACH') > -1 ||
+                err.message.indexOf('ECONNREFUSED') > -1 ||
+                err.message.indexOf('ETIMEDOUT') > -1 ||
+                err.message.indexOf('ENOTFOUND') > -1
+            ) {
                 adapter.config.retry = 60;
                 adapter.log.info(
                     `Plex Media Server(${adapter.config.plexIp}:${adapter.config.plexPort}) not reachable! Will try again in ${adapter.config.retry} minutes...`,
                 );
-
                 library.set(Library.CONNECTION, false);
+                lastConnectionOk = false;
+                retryCycle = adapter.setTimeout(init, adapter.config.retry * 60 * 1000);
+            } else if (
+                err.message.indexOf('Permission denied') > -1 ||
+                err.message.indexOf('401') > -1 ||
+                err.message.indexOf('Unauthorized') > -1 ||
+                err.message.indexOf('unauthorized') > -1
+            ) {
+                // Auth error from PMS. Don't terminate – stay offline and retry so the adapter recovers
+                // automatically once the token works again (e.g. after the user updates it in settings).
+                adapter.config.retry = 60;
+                adapter.log.warn(
+                    `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${adapter.config.retry} minutes.`,
+                );
+                library.set(Library.CONNECTION, false);
+                lastConnectionOk = false;
                 retryCycle = adapter.setTimeout(init, adapter.config.retry * 60 * 1000);
             } else {
                 library.terminate(err.message);
@@ -734,11 +835,14 @@ function setEvent(data, source, prefix) {
             }
 
             if (addNotification) {
-                // add event to history
+                // add event to history – cap in-memory array to last 1000 entries (the persisted state was already capped, but the in-memory copy was not)
                 history.push(notification);
+                if (history.length > 1000) {
+                    history = history.slice(-1000);
+                }
 
                 data = Object.assign({}, notification); // copy object
-                data.history = JSON.stringify(history.slice(-1000));
+                data.history = JSON.stringify(history);
             }
         } else {
             adapter.log.debug(`No message defined for ${data.media} ${event}`);
@@ -1056,7 +1160,7 @@ function getLibraries() {
                         })
                         .catch(err => {
                             adapter.log.error(
-                                `Tautulli configuration is incorrect. IP: ${adapter.config.tautulliIp} Port: ${adapter.config.tautulliPort} Api-Key: ${library.decode(encryptionKey, adapter.config.tautulliToken)} Error: ${err}`,
+                                `Tautulli configuration is incorrect. IP: ${adapter.config.tautulliIp} Port: ${adapter.config.tautulliPort} Api-Key: [REDACTED] Error: ${err}`,
                             );
                         });
                 }
@@ -1325,9 +1429,13 @@ function getPlayers() {
         .then(res => {
             const data = res.MediaContainer.Server || [];
             adapter.log.debug(`Retrieved Players from Plex. JSON: ${JSON.stringify(res)}`);
+            // reset to current set – getPlayers() is called periodically, otherwise the array grows forever
+            players.length = 0;
             data.forEach(player => {
                 // group by player
-                players.push(player.machineIdentifier);
+                if (!players.includes(player.machineIdentifier)) {
+                    players.push(player.machineIdentifier);
+                }
                 //let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
 
                 // create player
@@ -1352,18 +1460,31 @@ function getPlayers() {
  *
  */
 function startListener() {
-    _http.use(_parser.json());
-    _http.use(_parser.urlencoded({ extended: false }));
+    _http.use(_parser.json({ limit: '100kb' }));
+    _http.use(_parser.urlencoded({ extended: false, limit: '100kb' }));
 
     _http.post('/plex', upload.single('thumb'), (req, res) => {
-        let payload;
+        const cleanupTempFile = () => {
+            if (req.file && req.file.path) {
+                _fs.unlink(req.file.path, () => {
+                    /* best-effort cleanup */
+                });
+            }
+        };
         try {
             adapter.log.debug(`Incoming data from plex with ip: ${req.ip.replace('::ffff:', '')}`);
-            payload = JSON.parse(req.body.payload);
+            if (!req.body || typeof req.body.payload !== 'string') {
+                res.sendStatus(400);
+                cleanupTempFile();
+                return;
+            }
+            const payload = JSON.parse(req.body.payload);
             res.sendStatus(200);
-            res.end();
 
-            // write payload to states
+            if (!payload || !payload.event) {
+                cleanupTempFile();
+                return;
+            }
 
             if (
                 ['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(
@@ -1376,20 +1497,25 @@ function startListener() {
             setEvent(payload, 'plex', 'events');
         } catch (e) {
             adapter.log.warn(`startListener: ${e.message}`);
-            //res.sendStatus(500);
+            if (!res.headersSent) {
+                res.sendStatus(400);
+            }
+        } finally {
+            cleanupTempFile();
         }
     });
 
     // listen to events from Tautulli
     _http.post('/tautulli', (req, res) => {
-        let payload;
         try {
             adapter.log.debug(`Incoming data from tautulli with ip: ${req.ip.replace('::ffff:', '')}`);
-            payload = req.body;
+            const payload = req.body;
+            if (!payload || !payload.event) {
+                res.sendStatus(400);
+                return;
+            }
             res.sendStatus(200);
-            res.end();
 
-            // write payload to states
             if (
                 ['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(
                     payload.event,
@@ -1403,11 +1529,18 @@ function startListener() {
             adapter.log.warn(
                 `Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`,
             );
-            //res.sendStatus(500);
+            if (!res.headersSent) {
+                res.sendStatus(400);
+            }
         }
     });
 
-    _http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
+    const httpServer = _http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
+    httpServer.on('error', err => {
+        adapter.log.error(
+            `Failed to start webhook listener on ${adapter.config.webhookIp || '0.0.0.0'}:${adapter.config.webhookPort || 41891} - ${err.message}`,
+        );
+    });
 }
 
 /**

@@ -133,7 +133,8 @@ This adapter would not have been possible without the great work of @Zefau (http
 -->
 
 ### **WORK IN PROGRESS**
-- (copilot) Adapter requires admin >= 7.7.22 now
+- (ticaki) Settings UI overhauled; the token wizard now shows a red button when the adapter cannot reach Plex with the current token and a green one for an optional renewal.
+- (copilot) Adapter requires admin >= 7.8.0 now
 - (ticaki) Improved stability and connection reliability; reduced memory growth on long runtimes.
 
 ### 1.1.5 (2024-12-11)
@@ -289,7 +290,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2023-2025 iobroker-community-adapters  
+Copyright (c) 2023-2026 iobroker-community-adapters  
 Copyright (c) 2019-2020 Zefau <zefau@mailbox.org>  
 
 

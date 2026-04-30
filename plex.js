@@ -41,6 +41,9 @@ let controller;
 let unloaded;
 let retryCycle, refreshCycle, healthCheckInterval;
 let lastConnectionOk = null;
+// Last categorized failure kind for the admin TokenWizard custom component.
+// 'unauthorized' = PMS rejected the token (401), 'network' = host unreachable, null = ok / unknown.
+let lastErrorKind = null;
 
 // Temp Json only for new Data
 
@@ -140,22 +143,18 @@ function startAdapter(options) {
             library.AXIOS_OPTIONS.rejectUnauthorized = false;
 
             // Optional client certificate (mutual TLS) – only loaded if explicitly configured.
-            if (adapter.config.certPublicVal && adapter.config.certPrivateVal) {
+            // *Val fields are legacy from the old Materialize admin (resolved cert content).
+            // The new jsonConfig admin writes path or PEM directly into the unsuffixed field.
+            const certPub = adapter.config.certPublicVal || adapter.config.certPublic;
+            const certKey = adapter.config.certPrivateVal || adapter.config.certPrivate;
+            const certCa = adapter.config.certChainedVal || adapter.config.certChained;
+            if (certPub && certKey) {
                 try {
-                    library.AXIOS_OPTIONS.cert =
-                        adapter.config.certPublicVal.indexOf('.') === -1
-                            ? adapter.config.certPublicVal
-                            : _fs.readFileSync(adapter.config.certPublicVal);
-                    library.AXIOS_OPTIONS.key =
-                        adapter.config.certPrivateVal.indexOf('.') === -1
-                            ? adapter.config.certPrivateVal
-                            : _fs.readFileSync(adapter.config.certPrivateVal);
+                    library.AXIOS_OPTIONS.cert = certPub.indexOf('.') === -1 ? certPub : _fs.readFileSync(certPub);
+                    library.AXIOS_OPTIONS.key = certKey.indexOf('.') === -1 ? certKey : _fs.readFileSync(certKey);
 
-                    if (adapter.config.certChainedVal) {
-                        library.AXIOS_OPTIONS.ca =
-                            adapter.config.certChainedVal.indexOf('.') === -1
-                                ? adapter.config.certChainedVal
-                                : _fs.readFileSync(adapter.config.certChainedVal);
+                    if (certCa) {
+                        library.AXIOS_OPTIONS.ca = certCa.indexOf('.') === -1 ? certCa : _fs.readFileSync(certCa);
                     }
 
                     if (library.AXIOS_OPTIONS.key.indexOf('ENCRYPTED') > -1) {
@@ -340,6 +339,24 @@ function startAdapter(options) {
      */
     adapter.on('message', function (msg) {
         adapter.log.debug(`Message: ${JSON.stringify(msg)}`);
+
+        // Lightweight status query for the admin TokenWizard component – no Plex API call,
+        // just reports what we already know about the current adapter state.
+        if (msg.command === 'getConnectionStatus') {
+            library.msg(
+                msg.from,
+                msg.command,
+                {
+                    connected: lastConnectionOk === true,
+                    lastError: lastErrorKind,
+                    hasToken: !!adapter.config.plexToken,
+                    hasIp: !!adapter.config.plexIp,
+                },
+                msg.callback,
+            );
+            return;
+        }
+
         const plexPin = new PlexPinAuth(plexOptions);
 
         switch (msg.command) {
@@ -445,6 +462,7 @@ function startHealthCheck() {
                 library.set(Library.CONNECTION, true);
                 lastConnectionOk = true;
             }
+            lastErrorKind = null;
         } catch (err) {
             if (lastConnectionOk !== false) {
                 adapter.log.warn(`Plex Media Server connection lost: ${err.message}`);
@@ -453,6 +471,12 @@ function startHealthCheck() {
             }
             library.set(Library.CONNECTION, false);
             lastConnectionOk = false;
+            const m = err && err.message ? err.message : '';
+            if (m.indexOf('401') > -1 || m.indexOf('Unauthorized') > -1 || m.indexOf('unauthorized') > -1) {
+                lastErrorKind = 'unauthorized';
+            } else {
+                lastErrorKind = 'network';
+            }
         }
     }, intervalMs);
 }
@@ -535,12 +559,21 @@ function init() {
                 );
                 tautulli = { get: () => Promise.reject('Not connected!') };
             } else {
-                // initialize Tautulli API
+                // initialize Tautulli API. The token is expected to be plain text in jsonConfig.
+                // For backward compatibility with the old XOR-encoded value: if it contains
+                // non-printable bytes, run the legacy decode once. The user should re-save.
+                let tautulliApiKey = adapter.config.tautulliToken;
+                if (typeof tautulliApiKey === 'string' && /[^\x20-\x7e]/.test(tautulliApiKey)) {
+                    adapter.log.warn(
+                        'Tautulli token appears to be in the legacy XOR-encrypted format. Decoding once — please open the adapter settings and save the configuration so the token is stored as plain text.',
+                    );
+                    tautulliApiKey = library.decode(encryptionKey, tautulliApiKey);
+                }
                 try {
                     tautulli = new Tautulli(
                         adapter.config.tautulliIp,
                         adapter.config.tautulliPort || 8181,
-                        library.decode(encryptionKey, adapter.config.tautulliToken),
+                        tautulliApiKey,
                     );
                 } catch {
                     adapter.log.error(
@@ -573,6 +606,7 @@ function init() {
             startListener();
             // periodic health check against the local PMS – sets CONNECTION state, logs only on transitions
             lastConnectionOk = true;
+            lastErrorKind = null;
             startHealthCheck();
             // connection is ok get server id
             plex.query('/')
@@ -614,6 +648,7 @@ function init() {
                 );
                 library.set(Library.CONNECTION, false);
                 lastConnectionOk = false;
+                lastErrorKind = 'network';
                 retryCycle = adapter.setTimeout(init, adapter.config.retry * 60 * 1000);
             } else if (
                 err.message.indexOf('Permission denied') > -1 ||
@@ -629,6 +664,7 @@ function init() {
                 );
                 library.set(Library.CONNECTION, false);
                 lastConnectionOk = false;
+                lastErrorKind = 'unauthorized';
                 retryCycle = adapter.setTimeout(init, adapter.config.retry * 60 * 1000);
             } else {
                 library.terminate(err.message);
@@ -1276,7 +1312,7 @@ function getUsers() {
                         })
                         .catch(err => {
                             adapter.log.error(
-                                `Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:${library.decode(encryptionKey, adapter.config.tautulliToken)} Error: ${err}`,
+                                `Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:[REDACTED] Error: ${err}`,
                             );
                         });
                 }

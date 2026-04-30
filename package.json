@@ -37,15 +37,16 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@alcalzone/release-script": "^5.0.0",
-    "@alcalzone/release-script-plugin-iobroker": "^4.0.0",
-    "@alcalzone/release-script-plugin-license": "^4.0.0",
-    "@alcalzone/release-script-plugin-manual-review": "^4.0.0",
+    "@alcalzone/release-script": "^5.1.1",
+    "@alcalzone/release-script-plugin-iobroker": "^5.1.2",
+    "@alcalzone/release-script-plugin-license": "^5.1.1",
+    "@alcalzone/release-script-plugin-manual-review": "^5.1.1",
     "@iobroker/adapter-dev": "^1.5.0",
     "@iobroker/eslint-config": "^2.2.0",
     "@iobroker/testing": "^5.2.2",
     "@tsconfig/node20": "^20.1.8",
     "@types/node": "^24.10.1",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3"
   },
   "main": "plex.js",
@@ -56,7 +57,12 @@
     "test": "npm run test:js && npm run test:package",
     "check": "tsc --noEmit -p tsconfig.check.json",
     "lint": "eslint -c eslint.config.mjs .",
+    "lint:admin": "cd src-admin && npm run lint",
     "translate": "translate-adapter",
+    "npm:admin": "cd src-admin && npm i",
+    "build:admin": "cd src-admin && npm run build",
+    "build:all": "npm run build:admin",
+    "dev:admin": "npm run build:admin && dev-server upload && dev-server watch",
     "release": "release-script"
   },
   "files": [

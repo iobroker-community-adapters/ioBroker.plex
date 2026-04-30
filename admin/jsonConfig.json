@@ -1,0 +1,430 @@
+{
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "_plexTab": {
+            "type": "panel",
+            "label": "tab_plex",
+            "items": {
+                "_plexHeader": {
+                    "type": "header",
+                    "text": "plexAuth",
+                    "size": 4,
+                    "newLine": true
+                },
+                "plexIp": {
+                    "type": "text",
+                    "label": "plexIp",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 5,
+                    "xl": 4
+                },
+                "plexPort": {
+                    "type": "number",
+                    "label": "plexPort",
+                    "min": 1,
+                    "max": 65535,
+                    "default": 32400,
+                    "xs": 6,
+                    "sm": 4,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "_tokenWizard": {
+                    "type": "custom",
+                    "name": "ConfigCustomPlexSet/Components/TokenWizard",
+                    "url": "custom/customComponents.js",
+                    "i18n": true,
+                    "bundlerType": "module",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "plexToken": {
+                    "type": "text",
+                    "label": "plexToken",
+                    "expertMode": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 9,
+                    "lg": 8,
+                    "xl": 6
+                },
+                "_sslHeader": {
+                    "type": "header",
+                    "text": "secureConnection",
+                    "size": 4,
+                    "newLine": true
+                },
+                "secureConnection": {
+                    "type": "checkbox",
+                    "label": "secureConnection",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "certPublic": {
+                    "type": "text",
+                    "label": "certPublic",
+                    "help": "certPublicHelp",
+                    "newLine": true,
+                    "disabled": "!data.secureConnection",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "certPrivate": {
+                    "type": "text",
+                    "label": "certPrivate",
+                    "help": "certPrivateHelp",
+                    "disabled": "!data.secureConnection",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "certChained": {
+                    "type": "text",
+                    "label": "certChained",
+                    "help": "certChainedHelp",
+                    "newLine": true,
+                    "disabled": "!data.secureConnection",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "passphrase": {
+                    "type": "text",
+                    "label": "passphrase",
+                    "help": "passphraseHelp",
+                    "disabled": "!data.secureConnection",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 6,
+                    "xl": 6
+                }
+            }
+        },
+        "_tautulliTab": {
+            "type": "panel",
+            "label": "tab_tautulli",
+            "items": {
+                "_tautulliHeader": {
+                    "type": "header",
+                    "text": "tautulliAuth",
+                    "size": 4,
+                    "newLine": true
+                },
+                "_tautulliInfo": {
+                    "type": "staticText",
+                    "text": "tautulliAuthInfo",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "tautulliIp": {
+                    "type": "text",
+                    "label": "tautulliIp",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 5,
+                    "xl": 4
+                },
+                "tautulliPort": {
+                    "type": "number",
+                    "label": "tautulliPort",
+                    "min": 1,
+                    "max": 65535,
+                    "default": 8181,
+                    "xs": 6,
+                    "sm": 4,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "tautulliToken": {
+                    "type": "text",
+                    "label": "tautulliToken",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 9,
+                    "lg": 8,
+                    "xl": 6
+                }
+            }
+        },
+        "_dataTab": {
+            "type": "panel",
+            "label": "tab_data",
+            "items": {
+                "_refreshHeader": {
+                    "type": "header",
+                    "text": "refreshHeader",
+                    "size": 4,
+                    "newLine": true
+                },
+                "refresh": {
+                    "type": "number",
+                    "label": "refresh",
+                    "help": "refreshInfo",
+                    "min": 0,
+                    "max": 86400,
+                    "default": 0,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getPlayerRefresh": {
+                    "type": "number",
+                    "label": "getPlayerRefresh",
+                    "help": "getPlayerRefreshInfo",
+                    "min": 1,
+                    "max": 60,
+                    "default": 1,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "_retrieveHeader": {
+                    "type": "header",
+                    "text": "retrieveHeader",
+                    "size": 4,
+                    "newLine": true
+                },
+                "getServers": {
+                    "type": "checkbox",
+                    "label": "getServers",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getLibraries": {
+                    "type": "checkbox",
+                    "label": "getLibraries",
+                    "default": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getPlaylists": {
+                    "type": "checkbox",
+                    "label": "getPlaylists",
+                    "default": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getSettings": {
+                    "type": "checkbox",
+                    "label": "getSettings",
+                    "default": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getAllItems": {
+                    "type": "checkbox",
+                    "label": "getAllItems",
+                    "help": "allItemsInfo",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getUsers": {
+                    "type": "checkbox",
+                    "label": "getUsers",
+                    "default": false,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "getStatistics": {
+                    "type": "checkbox",
+                    "label": "getStatistics",
+                    "default": false,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
+        },
+        "_eventsTab": {
+            "type": "panel",
+            "label": "tab_events",
+            "items": {
+                "_webhookHeader": {
+                    "type": "header",
+                    "text": "events",
+                    "size": 4,
+                    "newLine": true
+                },
+                "_webhookInfo": {
+                    "type": "staticText",
+                    "text": "eventsInfo",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "webhookIp": {
+                    "type": "text",
+                    "label": "webhookIp",
+                    "help": "webhookIpInfo",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 8,
+                    "md": 6,
+                    "lg": 5,
+                    "xl": 4
+                },
+                "webhookPort": {
+                    "type": "number",
+                    "label": "webhookPort",
+                    "min": 1,
+                    "max": 65535,
+                    "default": 41891,
+                    "xs": 6,
+                    "sm": 4,
+                    "md": 2,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "resetMedia": {
+                    "type": "checkbox",
+                    "label": "resetMedia",
+                    "help": "resetMediaInfo",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
+        },
+        "_notificationsTab": {
+            "type": "panel",
+            "label": "tab_notifications",
+            "items": {
+                "_notificationsHeader": {
+                    "type": "header",
+                    "text": "notifications",
+                    "size": 4,
+                    "newLine": true
+                },
+                "_notificationsInfo": {
+                    "type": "staticText",
+                    "text": "notificationsInfo",
+                    "newLine": true,
+                    "xs": 12
+                },
+                "notifications": {
+                    "type": "table",
+                    "label": "notifications",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "items": [
+                        {
+                            "type": "select",
+                            "attr": "media",
+                            "title": "media",
+                            "default": "any",
+                            "options": [
+                                { "value": "any", "label": "any" },
+                                { "value": "movie", "label": "Movie" },
+                                { "value": "episode", "label": "Serie" },
+                                { "value": "track", "label": "Music" },
+                                { "value": "system", "label": "System" }
+                            ]
+                        },
+                        {
+                            "type": "select",
+                            "attr": "event",
+                            "title": "event",
+                            "default": "any",
+                            "options": [
+                                { "value": "any", "label": "any" },
+                                { "value": "media.play", "label": "Play" },
+                                { "value": "media.pause", "label": "Pause" },
+                                { "value": "media.stop", "label": "Stop" },
+                                { "value": "media.resume", "label": "Resume" },
+                                { "value": "media.rate", "label": "Rated" },
+                                { "value": "media.watched", "label": "Watched" },
+                                { "value": "library.on.deck", "label": "new item added on deck" },
+                                { "value": "library.new", "label": "new item added to library" },
+                                { "value": "admin.database.backup", "label": "Database backup" },
+                                { "value": "admin.database.corrupted", "label": "Database corrupted" },
+                                { "value": "device.new", "label": "new device streaming" },
+                                { "value": "playback.started", "label": "playback by shared user" }
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "attr": "message",
+                            "title": "message",
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "caption",
+                            "title": "caption",
+                            "default": ""
+                        },
+                        {
+                            "type": "text",
+                            "attr": "thumb",
+                            "title": "thumb",
+                            "default": ""
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

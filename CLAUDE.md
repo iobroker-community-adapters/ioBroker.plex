@@ -7,6 +7,16 @@ Project-specific guidance for Claude Code. Read this before making changes.
 - **Do not add `WORK IN PROGRESS` entries for regressions introduced and fixed within the same dev session.** A bullet in the changelog describes what changes between releases. If feature X worked before the last release, you broke it during development, and you fixed it before pushing — that round-trip is invisible to users and must stay out of the README and `io-package.json` news. The changelog is for users, not a development diary.
 - Bullets in WORK IN PROGRESS should be 1–2 short, user-facing lines. No implementation detail (internal module names, library swaps, etc.) unless it affects how the user configures or operates the adapter.
 
+## Release preparation
+
+When the user asks to "prepare a release" / "release vorbereiten":
+
+1. **`README.md` `### **WORK IN PROGRESS**` section must exist and be non-empty.** Bullets must be user-relevant only, terse (1–2 lines each), no implementation detail. If missing/empty, stop and ask.
+2. **Decide bump kind from the WIP bullets** (semver): new feature → minor, fix-only → patch, incompatible change → major.
+3. **Add a news entry** to `io-package.json` under `common.news`, keyed by the new version, as the *first* (newest) key. Translate into all eleven languages already present there: `en, de, ru, pt, nl, fr, it, es, pl, uk, zh-cn`. Multiple bullets are joined with `\n`. Reuse the README WIP wording (condense if needed).
+4. **Do NOT touch the `version` field** in `io-package.json` or `package.json` — the release workflow bumps both. Only the news *key* gets the new version number.
+5. **Keep README WIP and io-package.json news content in sync** (same bullets in same order). Also verify that any version constraints mentioned in WIP bullets match the actual values in `io-package.json` (e.g. `globalDependencies.admin`).
+
 ## Plex domain knowledge
 
 - **X-Plex-Tokens from the PIN flow do not normally expire.** Don't write log messages or code comments suggesting "the token has expired, please renew" without evidence. Other Plex clients (Home Assistant, Plexamp, …) run for years on the same token. If the adapter goes offline, look for the real cause first — token expiry is almost never it.

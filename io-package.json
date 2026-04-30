@@ -1,57 +1,19 @@
 {
   "common": {
-    "authors": [
-      "Zefau <zefau@mailbox.org>",
-      "ticaki <ticaki@renopoint.de>",
-      "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
-    ],
-    "compact": true,
-    "connectionType": "local",
-    "dataSource": "push",
-    "desc": {
-      "de": "Integration des Plex Media Servers und Tautulli",
-      "en": "Integration of your Plex Media Server and your Tautulli",
-      "es": "La integración de su Plex Media Server y / o su Tautulli",
-      "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
-      "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
-      "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
-      "pl": "Integracja Plex media serwer i / lub Tautulli",
-      "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
-      "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
-      "uk": "Інтеграція медіасервера Plex і Tautulli",
-      "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
-    },
-    "dependencies": [
-      {
-        "js-controller": ">=6.0.11"
-      }
-    ],
-    "globalDependencies": [
-      {
-        "admin": ">=7.7.22"
-      }
-    ],
-    "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
-    "icon": "plex.jpg",
-    "keywords": [
-      "tautulli",
-      "plex",
-      "media"
-    ],
-    "licenseInformation": {
-      "license": "MIT",
-      "type": "free"
-    },
-    "localLinks": {
-      "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
-    },
-    "loglevel": "info",
-    "materialize": true,
-    "messagebox": true,
-    "mode": "daemon",
-    "name": "plex",
     "news": {
+      "1.2.0": {
+        "en": "Added: Token wizard for guided Plex authentication via PIN code, with a status indicator showing whether the current token works.\nImproved: Stability and Plex connection reliability; reduced memory growth on long runtimes.\nAdapter requires admin >= 7.8.0 now.",
+        "de": "Neu: Token-Assistent für die geführte Plex-Authentifizierung per PIN, mit Statusanzeige, ob der aktuelle Token funktioniert.\nVerbessert: Stabilität und Plex-Verbindung; geringeres Speicherwachstum im Dauerbetrieb.\nAdapter benötigt jetzt admin >= 7.8.0.",
+        "ru": "Добавлено: мастер получения токена через PIN-код Plex с индикатором, работает ли текущий токен.\nУлучшено: стабильность и надёжность соединения с Plex; меньший рост потребления памяти при длительной работе.\nАдаптер требует admin >= 7.8.0.",
+        "pt": "Adicionado: assistente de token para autenticação guiada com Plex via PIN, com indicador do estado do token atual.\nMelhorado: estabilidade e fiabilidade da ligação ao Plex; menor crescimento de memória em execuções prolongadas.\nO adaptador requer agora admin >= 7.8.0.",
+        "nl": "Toegevoegd: tokenwizard voor geleide Plex-authenticatie via PIN, met statusindicator of de huidige token werkt.\nVerbeterd: stabiliteit en betrouwbaarheid van de Plex-verbinding; minder geheugengroei bij lange looptijden.\nAdapter vereist nu admin >= 7.8.0.",
+        "fr": "Ajouté : assistant de jeton pour l'authentification Plex guidée par code PIN, avec un indicateur d'état du jeton actuel.\nAmélioré : stabilité et fiabilité de la connexion Plex ; moindre croissance mémoire en fonctionnement prolongé.\nL'adaptateur nécessite maintenant admin >= 7.8.0.",
+        "it": "Aggiunto: procedura guidata per ottenere il token Plex tramite PIN, con indicatore dello stato del token attuale.\nMigliorato: stabilità e affidabilità della connessione Plex; minore crescita della memoria nell'uso prolungato.\nL'adattatore richiede ora admin >= 7.8.0.",
+        "es": "Añadido: asistente de token para autenticación guiada con Plex mediante PIN, con indicador del estado del token actual.\nMejorado: estabilidad y fiabilidad de la conexión con Plex; menor crecimiento de memoria en ejecuciones prolongadas.\nEl adaptador requiere ahora admin >= 7.8.0.",
+        "pl": "Dodano: kreator tokenu do uwierzytelniania Plex za pomocą kodu PIN, ze wskaźnikiem stanu bieżącego tokenu.\nUlepszono: stabilność i niezawodność połączenia z Plex; mniejszy wzrost zużycia pamięci przy długim działaniu.\nAdapter wymaga teraz admin >= 7.8.0.",
+        "uk": "Додано: майстер токена для керованої автентифікації Plex через PIN-код, з індикатором стану поточного токена.\nПокращено: стабільність і надійність з'єднання з Plex; менше зростання використання пам'яті при тривалій роботі.\nАдаптер тепер вимагає admin >= 7.8.0.",
+        "zh-cn": "新增：通过 PIN 码引导式 Plex 认证的令牌向导，并显示当前令牌的工作状态。\n改进：Plex 连接的稳定性和可靠性；长时间运行时内存增长更少。\n适配器现在需要 admin >= 7.8.0。"
+      },
       "1.1.5": {
         "en": "State _playing.*.Metadata.viewOffset is created.\nDependencies updated\nAdapter requires nodejs >= 18 now",
         "de": "State _playing.* Metadata.view Offset wird erstellt.\nAusgaben aktualisiert\nAdapter benötigt jetzt Nodejs >= 18",
@@ -144,6 +106,60 @@
         "zh-cn": "固定:控制没有与Plexamp合作。.\n略有改进。."
       }
     },
+    "authors": [
+      "Zefau <zefau@mailbox.org>",
+      "ticaki <ticaki@renopoint.de>",
+      "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
+    ],
+    "compact": true,
+    "connectionType": "local",
+    "dataSource": "push",
+    "desc": {
+      "de": "Integration des Plex Media Servers und Tautulli",
+      "en": "Integration of your Plex Media Server and your Tautulli",
+      "es": "La integración de su Plex Media Server y / o su Tautulli",
+      "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
+      "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
+      "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
+      "pl": "Integracja Plex media serwer i / lub Tautulli",
+      "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
+      "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
+      "uk": "Інтеграція медіасервера Plex і Tautulli",
+      "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.8.0"
+      }
+    ],
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
+    "icon": "plex.jpg",
+    "keywords": [
+      "tautulli",
+      "plex",
+      "media"
+    ],
+    "licenseInformation": {
+      "license": "MIT",
+      "type": "free"
+    },
+    "localLinks": {
+      "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
+    },
+    "loglevel": "info",
+    "adminUI": {
+      "config": "json"
+    },
+    "messagebox": true,
+    "mode": "daemon",
+    "name": "plex",
+    
     "tier": 3,
     "platform": "Javascript/Node.js",
     "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",

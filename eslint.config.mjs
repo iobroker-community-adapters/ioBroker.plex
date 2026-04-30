@@ -10,14 +10,16 @@ export default [
         ignores: [
             '.dev-server/',
             '.vscode/',
-            '*.test.js', 
-            'test/**/*.js', 
-            '*.config.mjs', 
-            'build', 
+            '*.test.js',
+            'test/**/*.js',
+            '*.config.mjs',
+            'build',
             'admin',
+            'src-admin/',
+            'tasks.ts',
             'www',
-            '**/adapter-config.d.ts'     
-        ] 
+            '**/adapter-config.d.ts'
+        ]
     },
 
     {

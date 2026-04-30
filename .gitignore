@@ -4,6 +4,9 @@
 /node_modules
 /.idea
 /tmp
+src-admin/node_modules
+src-admin/build
+src-admin/.__mf__temp
 # local data
 .dataTest/
 # ioBroker dev-server

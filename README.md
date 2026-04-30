@@ -131,7 +131,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.2.0-alpha.1 (2026-04-30)
 - (ticaki) Fixed: recurring "Tautulli configuration is incorrect" errors in the log when Tautulli was not reachable but user/statistics retrieval was enabled — those retrievals are now skipped automatically when Tautulli is unavailable.
 - (ticaki) New: optional toggle on the Tautulli tab to fully disable the Tautulli integration; dependent fields are greyed out when disabled.
 
@@ -151,9 +151,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ### 1.1.3 (2023-10-05)
 - (ticaki) fixed: bug in readable offset
-
-### 1.1.2 (2023-09-16)
-- (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
 
 ## License
 The MIT License (MIT)

@@ -28,7 +28,7 @@
                     "min": 1,
                     "max": 65535,
                     "default": 32400,
-                    "xs": 6,
+                    "xs": 12,
                     "sm": 4,
                     "md": 2,
                     "lg": 2,
@@ -137,7 +137,11 @@
                     "type": "staticText",
                     "text": "tautulliAuthInfo",
                     "newLine": true,
-                    "xs": 12
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "tautulliIp": {
                     "type": "text",
@@ -155,7 +159,7 @@
                     "min": 1,
                     "max": 65535,
                     "default": 8181,
-                    "xs": 6,
+                    "xs": 12,
                     "sm": 4,
                     "md": 2,
                     "lg": 2,
@@ -305,7 +309,11 @@
                     "type": "staticText",
                     "text": "eventsInfo",
                     "newLine": true,
-                    "xs": 12
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "webhookIp": {
                     "type": "text",
@@ -324,7 +332,7 @@
                     "min": 1,
                     "max": 65535,
                     "default": 41891,
-                    "xs": 6,
+                    "xs": 12,
                     "sm": 4,
                     "md": 2,
                     "lg": 2,
@@ -358,7 +366,11 @@
                     "type": "staticText",
                     "text": "notificationsInfo",
                     "newLine": true,
-                    "xs": 12
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "notifications": {
                     "type": "table",

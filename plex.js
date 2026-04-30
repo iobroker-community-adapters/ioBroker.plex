@@ -112,7 +112,6 @@ function startAdapter(options) {
 
         // set encryption key
         if (adapter.config.encryptionKey === undefined || adapter.config.encryptionKey === '') {
-            //let key = encryptor.getEncryptionKey();
             encryptionKey = library.getKey(20);
             adapter.getForeignObject(`system.adapter.plex.${adapter.instance}`, (err, obj) => {
                 if (err || obj === undefined) {
@@ -821,8 +820,6 @@ function setEvent(data, source, prefix) {
                 ['media.play', 'media.resume'].indexOf(data.event) > -1,
             );
         }
-        // get library details plex.0._playing.ipad-10A88133-3762-4948-AF10-9503A37517AC.Metadata.key
-        //if (adapter.config.getAllItem && data.Player.title != '_recent') getItemDetails(data.Metadata && data.Metadata.key, prefix)
         if (data.event && data.Player && data.Player.title != '_recent' && playerTemp) {
             (playerTemp.setNotificationData(JSON.parse(JSON.stringify(data))), 100);
             data = {};
@@ -1401,7 +1398,6 @@ function getPlaylists() {
                     role: 'channel',
                     description: `Playlist ${entry['title']}`,
                 });
-                //if (adapter.config.getPlaylistsDetails) getPlaylistsDetails(entry.key, 'playlists.' + playlistId)
                 // index all keys as states
                 for (const key in entry) {
                     const node = library.getNode(`playlists.${key.toLowerCase()}`);
@@ -1488,7 +1484,6 @@ function getPlayers() {
                 if (!players.includes(player.machineIdentifier)) {
                     players.push(player.machineIdentifier);
                 }
-                //let groupBy = library.clean(player.name, true) + '-' + player.machineIdentifier;
 
                 // create player
                 const playerTemp = controller.createPlayerIfNotExist({
@@ -1620,7 +1615,6 @@ function refreshViewOffset() {
             );
             state += 'Seconds';
             node = library.getNode('playing.metadata.viewOffset', true);
-            //adapter.log.debug(Math.floor((Date.now() - player.start)/1000))
             library.set(
                 {
                     node: state,

@@ -33,7 +33,7 @@
     "fast-xml-parser": "^5.3.3",
     "multer": "^2.0.0",
     "tautulli-api": "^1.0.2",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {

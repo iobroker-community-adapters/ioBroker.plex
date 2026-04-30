@@ -559,6 +559,7 @@ function init() {
             if (adapter.config.tautulliEnabled === undefined) {
                 adapter.config.tautulliEnabled = !!(adapter.config.tautulliIp && adapter.config.tautulliToken);
             }
+            let tautulliReady = false;
             if (!adapter.config.tautulliEnabled) {
                 adapter.log.debug('Tautulli integration is disabled in adapter settings.');
                 tautulli = { get: () => Promise.reject('Tautulli disabled') };
@@ -584,12 +585,17 @@ function init() {
                         adapter.config.tautulliPort || 8181,
                         tautulliApiKey,
                     );
+                    tautulliReady = true;
                 } catch {
                     adapter.log.error(
                         `Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:[REDACTED]`,
                     );
                 }
             }
+            // Tautulli-only retrievals are silently disabled when Tautulli is unavailable —
+            // no point in calling the reject-stub once per library/user just to log an error.
+            adapter.config.getUsers = adapter.config.getUsers && tautulliReady;
+            adapter.config.getStatistics = adapter.config.getStatistics && tautulliReady;
 
             // retrieve data
             const refreshSec = parseInt(adapter.config.refresh, 10);
@@ -1014,12 +1020,8 @@ function retrieveData() {
     }
 
     // GET USERS (https://github.com/Tautulli/Tautulli/blob/master/API.md#get_users)
-    if (
-        adapter.config.tautulliEnabled &&
-        adapter.config.tautulliIp &&
-        adapter.config.tautulliToken &&
-        adapter.config.getUsers
-    ) {
+    // getUsers is normalized in onReady to false unless Tautulli is actually reachable.
+    if (adapter.config.getUsers) {
         getUsers();
     }
 
@@ -1150,12 +1152,7 @@ function getLibraries() {
 
                 // get statistics / watch time
                 // https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
-                if (
-                    adapter.config.tautulliEnabled &&
-                    adapter.config.tautulliIp &&
-                    adapter.config.tautulliToken &&
-                    adapter.config.getStatistics
-                ) {
+                if (adapter.config.getStatistics) {
                     tautulli
                         .get('get_library_watch_time_stats', { section_id: entry['key'] })
                         .then(res => {
@@ -1278,12 +1275,7 @@ function getUsers() {
                 // get statistics / watch time
                 //
                 // https://github.com/Tautulli/Tautulli/blob/master/API.md#get_user_watch_time_stats
-                if (
-                    adapter.config.tautulliEnabled &&
-                    adapter.config.tautulliIp &&
-                    adapter.config.tautulliToken &&
-                    adapter.config.getStatistics
-                ) {
+                if (adapter.config.getStatistics) {
                     tautulli
                         .get('get_user_watch_time_stats', { user_id: entry['user_id'] })
                         .then(res => {

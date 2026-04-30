@@ -31,7 +31,7 @@
     "body-parser": "^2.2.1",
     "express": "^5.2.1",
     "fast-xml-parser": "^5.7.1",
-    "multer": "^2.0.0",
+    "multer": "^2.1.1",
     "tautulli-api": "^1.0.2",
     "uuid": "^14.0.0",
     "xml2js": "^0.6.2"

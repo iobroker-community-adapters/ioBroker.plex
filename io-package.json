@@ -1,7 +1,7 @@
 {
   "common": {
     "news": {
-      "1.2.0": {
+      "1.2.0-alpha.0": {
         "en": "Added: Token wizard for guided Plex authentication via PIN code, with a status indicator showing whether the current token works.\nImproved: Stability and Plex connection reliability; reduced memory growth on long runtimes.\nAdapter requires admin >= 7.8.0 now.\nAdapter requires Node.js >= 22 now.",
         "de": "Neu: Token-Assistent für die geführte Plex-Authentifizierung per PIN, mit Statusanzeige, ob der aktuelle Token funktioniert.\nVerbessert: Stabilität und Plex-Verbindung; geringeres Speicherwachstum im Dauerbetrieb.\nAdapter benötigt jetzt admin >= 7.8.0.\nAdapter benötigt jetzt Node.js >= 22.",
         "ru": "Добавлено: мастер получения токена через PIN-код Plex с индикатором, работает ли текущий токен.\nУлучшено: стабильность и надёжность соединения с Plex; меньший рост потребления памяти при длительной работе.\nАдаптер требует admin >= 7.8.0.\nАдаптер требует Node.js >= 22.",
@@ -146,7 +146,6 @@
     "messagebox": true,
     "mode": "daemon",
     "name": "plex",
-    
     "tier": 3,
     "platform": "Javascript/Node.js",
     "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
@@ -164,7 +163,7 @@
       "zh-cn": "Plex Media Server"
     },
     "type": "multimedia",
-    "version": "1.1.5"
+    "version": "1.2.0-alpha.0"
   },
   "instanceObjects": [],
   "native": {

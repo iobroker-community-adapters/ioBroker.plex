@@ -81,6 +81,7 @@
     "tab_info": "Informacje",
     "tautulliAuth": "Parametry instancji Tautulli związku ",
     "tautulliAuthInfo": "Ustawienia połączenia dla instancji Tautulli. Znajdziesz klucz API w desce rozdzielczej Tautulli poprzez ustawienia -> interfejs www w dziale API-interfejs (na końcu strony).",
+    "tautulliEnabled": "Włącz integrację Tautulli",
     "tautulliIp": "Adres IP",
     "tautulliPort": "Port",
     "tautulliToken": "Token API ",

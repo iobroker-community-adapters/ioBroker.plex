@@ -143,9 +143,21 @@
                     "lg": 12,
                     "xl": 12
                 },
+                "tautulliEnabled": {
+                    "type": "checkbox",
+                    "label": "tautulliEnabled",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
                 "tautulliIp": {
                     "type": "text",
                     "label": "tautulliIp",
+                    "disabled": "!data.tautulliEnabled",
                     "newLine": true,
                     "xs": 12,
                     "sm": 8,
@@ -159,6 +171,7 @@
                     "min": 1,
                     "max": 65535,
                     "default": 8181,
+                    "disabled": "!data.tautulliEnabled",
                     "xs": 12,
                     "sm": 4,
                     "md": 2,
@@ -168,6 +181,7 @@
                 "tautulliToken": {
                     "type": "text",
                     "label": "tautulliToken",
+                    "disabled": "!data.tautulliEnabled",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -277,6 +291,7 @@
                     "type": "checkbox",
                     "label": "getUsers",
                     "default": false,
+                    "disabled": "!data.tautulliEnabled",
                     "xs": 12,
                     "sm": 6,
                     "md": 4,
@@ -287,6 +302,7 @@
                     "type": "checkbox",
                     "label": "getStatistics",
                     "default": false,
+                    "disabled": "!data.tautulliEnabled",
                     "xs": 12,
                     "sm": 6,
                     "md": 4,

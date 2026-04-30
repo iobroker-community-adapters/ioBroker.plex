@@ -81,6 +81,7 @@
     "tab_info": "Інформація",
     "tautulliAuth": "Параметри підключення екземпляра Tautulli",
     "tautulliAuthInfo": "Параметри підключення для екземпляра Tautulli. Ви знайдете ключ API на інформаційній панелі Tautulli через налаштування -> веб-інтерфейс у розділі API (в кінці сторінки).",
+    "tautulliEnabled": "Увімкнути інтеграцію Tautulli",
     "tautulliIp": "IP-адреса",
     "tautulliPort": "Порт",
     "tautulliToken": "Маркер API",

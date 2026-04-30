@@ -81,6 +81,7 @@
     "tab_info": "Informations",
     "tautulliAuth": "Paramètres de connexion de la Tautulli exemple",
     "tautulliAuthInfo": "Les paramètres de connexion pour le Tautulli instance. Vous trouverez la clé API dans le Tautulli tableau de bord via paramètres -> interface web dans la rubrique API (à la fin de la page).",
+    "tautulliEnabled": "Activer l'intégration de Tautulli",
     "tautulliIp": "Adresse IP",
     "tautulliPort": "Port",
     "tautulliToken": "Clé API",

@@ -93,6 +93,7 @@
     "passphraseHelp": "Nur erforderlich, wenn die Datei mit dem privaten Schlüssel verschlüsselt ist.",
     "tautulliAuth": "Die Verbindungseinstellungen der Tautulli Instanz",
     "tautulliAuthInfo": "Die IP-Adresse und der Port von Tautulli sowie der API Token. Dieser ist im Tautulli Dashboard über Einstellungen -> Web-Schnittstelle im Abschnitt \"API\" (am Ende der Seite) zu finden.",
+    "tautulliEnabled": "Tautulli-Integration aktivieren",
     "tautulliIp": "IP-Adresse",
     "tautulliPort": "Port",
     "tautulliToken": "API Token",

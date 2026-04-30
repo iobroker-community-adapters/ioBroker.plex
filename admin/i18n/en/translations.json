@@ -93,6 +93,7 @@
     "passphraseHelp": "Required only when the private key file is encrypted.",
     "tautulliAuth": "Connection settings of the Tautulli instance",
     "tautulliAuthInfo": "The connection settings for the Tautulli instance. You will find the API key in the Tautulli dashboard via settings -> web interface in the API section (at the end of the page).",
+    "tautulliEnabled": "Enable Tautulli integration",
     "tautulliIp": "IP address",
     "tautulliPort": "Port",
     "tautulliToken": "API Token",

@@ -81,6 +81,7 @@
     "tab_info": "Informatie",
     "tautulliAuth": "Instellingen voor de verbinding van de Tautulli exemplaar",
     "tautulliAuthInfo": "De verbindingsinstellingen voor de Tautulli exemplaar. Vind je de API key in de Tautulli dashboard via instellingen -> web interface in de API-gedeelte (aan het einde van de pagina).",
+    "tautulliEnabled": "Tautulli-integratie inschakelen",
     "tautulliIp": "IP-adres",
     "tautulliPort": "Poort",
     "tautulliToken": "API Token",

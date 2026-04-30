@@ -1,6 +1,19 @@
 {
   "common": {
     "news": {
+      "1.2.0-alpha.1": {
+        "en": "New: Tautulli integration can now be turned off completely via a new toggle on the Tautulli tab; new adapter instances start with it disabled.\nFixed: recurring \"Tautulli configuration is incorrect\" errors in the log when Tautulli was not configured but user/statistics retrieval was enabled.",
+        "de": "Neu: Die Tautulli-Integration kann jetzt vollständig über einen neuen Schalter im Tautulli-Tab deaktiviert werden; neue Adapter-Instanzen starten standardmäßig deaktiviert.\nBehoben: wiederkehrende „Tautulli configuration is incorrect“-Fehler im Log, wenn Tautulli nicht konfiguriert war, aber Benutzer-/Statistikabruf aktiviert war.",
+        "ru": "Новое: интеграцию с Tautulli теперь можно полностью отключить новым переключателем на вкладке Tautulli; новые экземпляры адаптера запускаются с отключенной интеграцией.\nИсправлено: повторяющиеся ошибки «Tautulli configuration is incorrect» в логе, когда Tautulli не был настроен, но получение пользователей/статистики было включено.",
+        "pt": "Novo: a integração com o Tautulli pode agora ser desativada completamente através de um novo interruptor no separador Tautulli; novas instâncias do adaptador iniciam com a integração desativada.\nCorrigido: erros recorrentes «Tautulli configuration is incorrect» no registo quando o Tautulli não estava configurado mas a obtenção de utilizadores/estatísticas estava ativa.",
+        "nl": "Nieuw: Tautulli-integratie kan nu volledig worden uitgeschakeld via een nieuwe schakelaar op het Tautulli-tabblad; nieuwe adapter-instances starten standaard uitgeschakeld.\nVerholpen: terugkerende ‘Tautulli configuration is incorrect’-fouten in het logboek wanneer Tautulli niet was geconfigureerd, maar gebruikers-/statistiekenophalen was ingeschakeld.",
+        "fr": "Nouveau : l'intégration Tautulli peut désormais être complètement désactivée via un nouveau commutateur dans l'onglet Tautulli ; les nouvelles instances d'adaptateur démarrent désactivées par défaut.\nCorrigé : erreurs récurrentes « Tautulli configuration is incorrect » dans le journal lorsque Tautulli n'était pas configuré mais que la récupération des utilisateurs/statistiques était activée.",
+        "it": "Nuovo: l'integrazione Tautulli ora può essere disattivata completamente tramite un nuovo interruttore nella scheda Tautulli; le nuove istanze dell'adattatore partono disattivate.\nCorretto: errori ricorrenti «Tautulli configuration is incorrect» nel log quando Tautulli non era configurato ma il recupero di utenti/statistiche era attivo.",
+        "es": "Nuevo: la integración con Tautulli ahora puede desactivarse por completo mediante un nuevo conmutador en la pestaña Tautulli; las nuevas instancias del adaptador se inician con la integración desactivada.\nCorregido: errores recurrentes «Tautulli configuration is incorrect» en el registro cuando Tautulli no estaba configurado pero la obtención de usuarios/estadísticas estaba activada.",
+        "pl": "Nowość: integrację z Tautulli można teraz całkowicie wyłączyć nowym przełącznikiem na karcie Tautulli; nowe instancje adaptera startują z wyłączoną integracją.\nNaprawiono: powtarzające się błędy „Tautulli configuration is incorrect” w logu, gdy Tautulli nie było skonfigurowane, ale pobieranie użytkowników/statystyk było aktywne.",
+        "uk": "Нове: інтеграцію з Tautulli тепер можна повністю вимкнути новим перемикачем на вкладці Tautulli; нові екземпляри адаптера стартують вимкненими.\nВиправлено: повторювані помилки «Tautulli configuration is incorrect» у журналі, коли Tautulli не було налаштовано, але отримання користувачів/статистики було активним.",
+        "zh-cn": "新增：现在可在 Tautulli 选项卡通过新开关完全关闭 Tautulli 集成；新建适配器实例默认处于关闭状态。\n修复：当 Tautulli 未配置但启用了用户/统计抓取时，日志中重复出现的 \"Tautulli configuration is incorrect\" 错误。"
+      },
       "1.2.0-alpha.0": {
         "en": "Added: Token wizard for guided Plex authentication via PIN code, with a status indicator showing whether the current token works.\nImproved: Stability and Plex connection reliability; reduced memory growth on long runtimes.\nAdapter requires admin >= 7.8.0 now.\nAdapter requires Node.js >= 22 now.",
         "de": "Neu: Token-Assistent für die geführte Plex-Authentifizierung per PIN, mit Statusanzeige, ob der aktuelle Token funktioniert.\nVerbessert: Stabilität und Plex-Verbindung; geringeres Speicherwachstum im Dauerbetrieb.\nAdapter benötigt jetzt admin >= 7.8.0.\nAdapter benötigt jetzt Node.js >= 22.",
@@ -177,6 +190,7 @@
     "getSettings": true,
     "getStatistics": false,
     "getUsers": false,
+    "tautulliEnabled": false,
     "notifications": [
       {
         "caption": "",

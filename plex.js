@@ -552,8 +552,17 @@ function init() {
                 }
             });
 
-            // verify Tautulli settings
-            if (!adapter.config.tautulliIp || !adapter.config.tautulliToken) {
+            // verify Tautulli settings.
+            // Backward compatibility: if `tautulliEnabled` is undefined (legacy instances
+            // saved before this option existed), treat Tautulli as enabled when IP+Token
+            // are present. New instances default tautulliEnabled to false.
+            if (adapter.config.tautulliEnabled === undefined) {
+                adapter.config.tautulliEnabled = !!(adapter.config.tautulliIp && adapter.config.tautulliToken);
+            }
+            if (!adapter.config.tautulliEnabled) {
+                adapter.log.debug('Tautulli integration is disabled in adapter settings.');
+                tautulli = { get: () => Promise.reject('Tautulli disabled') };
+            } else if (!adapter.config.tautulliIp || !adapter.config.tautulliToken) {
                 adapter.log.info(
                     `Tautulli ${!adapter.config.tautulliIp ? ' IP/ ' : ''}${!adapter.config.tautulliToken ? 'API token ' : ''}missing!`,
                 );
@@ -1005,7 +1014,12 @@ function retrieveData() {
     }
 
     // GET USERS (https://github.com/Tautulli/Tautulli/blob/master/API.md#get_users)
-    if (adapter.config.getUsers) {
+    if (
+        adapter.config.tautulliEnabled &&
+        adapter.config.tautulliIp &&
+        adapter.config.tautulliToken &&
+        adapter.config.getUsers
+    ) {
         getUsers();
     }
 
@@ -1136,7 +1150,12 @@ function getLibraries() {
 
                 // get statistics / watch time
                 // https://github.com/Tautulli/Tautulli/blob/master/API.md#get_library_watch_time_stats
-                if (adapter.config.getStatistics) {
+                if (
+                    adapter.config.tautulliEnabled &&
+                    adapter.config.tautulliIp &&
+                    adapter.config.tautulliToken &&
+                    adapter.config.getStatistics
+                ) {
                     tautulli
                         .get('get_library_watch_time_stats', { section_id: entry['key'] })
                         .then(res => {
@@ -1195,8 +1214,8 @@ function getLibraries() {
                             });
                         })
                         .catch(err => {
-                            adapter.log.error(
-                                `Tautulli configuration is incorrect. IP: ${adapter.config.tautulliIp} Port: ${adapter.config.tautulliPort} Api-Key: [REDACTED] Error: ${err}`,
+                            adapter.log.debug(
+                                `Could not retrieve library watch statistics from Tautulli (${adapter.config.tautulliIp}:${adapter.config.tautulliPort}): ${err}`,
                             );
                         });
                 }
@@ -1259,7 +1278,12 @@ function getUsers() {
                 // get statistics / watch time
                 //
                 // https://github.com/Tautulli/Tautulli/blob/master/API.md#get_user_watch_time_stats
-                if (adapter.config.getStatistics) {
+                if (
+                    adapter.config.tautulliEnabled &&
+                    adapter.config.tautulliIp &&
+                    adapter.config.tautulliToken &&
+                    adapter.config.getStatistics
+                ) {
                     tautulli
                         .get('get_user_watch_time_stats', { user_id: entry['user_id'] })
                         .then(res => {
@@ -1311,8 +1335,8 @@ function getUsers() {
                             });
                         })
                         .catch(err => {
-                            adapter.log.error(
-                                `Tautulli configuration is incorrect. IP:${adapter.config.tautulliIp} Port:${adapter.config.tautulliPort} Api-Key:[REDACTED] Error: ${err}`,
+                            adapter.log.debug(
+                                `Could not retrieve user watch statistics from Tautulli (${adapter.config.tautulliIp}:${adapter.config.tautulliPort}): ${err}`,
                             );
                         });
                 }
@@ -1541,35 +1565,37 @@ function startListener() {
         }
     });
 
-    // listen to events from Tautulli
-    _http.post('/tautulli', (req, res) => {
-        try {
-            adapter.log.debug(`Incoming data from tautulli with ip: ${req.ip.replace('::ffff:', '')}`);
-            const payload = req.body;
-            if (!payload || !payload.event) {
-                res.sendStatus(400);
-                return;
-            }
-            res.sendStatus(200);
+    // listen to events from Tautulli (only when integration is enabled)
+    if (adapter.config.tautulliEnabled) {
+        _http.post('/tautulli', (req, res) => {
+            try {
+                adapter.log.debug(`Incoming data from tautulli with ip: ${req.ip.replace('::ffff:', '')}`);
+                const payload = req.body;
+                if (!payload || !payload.event) {
+                    res.sendStatus(400);
+                    return;
+                }
+                res.sendStatus(200);
 
-            if (
-                ['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(
-                    payload.event,
-                ) > -1
-            ) {
-                setEvent(payload, 'tautulli', '_playing');
-            }
+                if (
+                    ['media.play', 'media.pause', 'media.stop', 'media.resume', 'media.rate', 'media.scrobble'].indexOf(
+                        payload.event,
+                    ) > -1
+                ) {
+                    setEvent(payload, 'tautulli', '_playing');
+                }
 
-            setEvent(payload, 'tautulli', 'events');
-        } catch (e) {
-            adapter.log.warn(
-                `Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`,
-            );
-            if (!res.headersSent) {
-                res.sendStatus(400);
+                setEvent(payload, 'tautulli', 'events');
+            } catch (e) {
+                adapter.log.warn(
+                    `Tautulli notification ${e.message} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`,
+                );
+                if (!res.headersSent) {
+                    res.sendStatus(400);
+                }
             }
-        }
-    });
+        });
+    }
 
     const httpServer = _http.listen(adapter.config.webhookPort || 41891, adapter.config.webhookIp);
     httpServer.on('error', err => {

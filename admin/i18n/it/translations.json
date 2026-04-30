@@ -81,6 +81,7 @@
     "tab_info": "Informazioni",
     "tautulliAuth": "Impostazioni di connessione di Tautulli istanza",
     "tautulliAuthInfo": "Le impostazioni di connessione per il Tautulli istanza. Troverete la chiave API in Tautulli dashboard tramite impostazioni -> interfaccia web nella sezione API (alla fine della pagina).",
+    "tautulliEnabled": "Abilita l'integrazione di Tautulli",
     "tautulliIp": "Indirizzo IP",
     "tautulliPort": "Porta",
     "tautulliToken": "API Token",

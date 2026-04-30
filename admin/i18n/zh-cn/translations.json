@@ -81,6 +81,7 @@
     "tab_info": "的信息",
     "tautulliAuth": "连接设置的Tautulli实例",
     "tautulliAuthInfo": "连接设置Tautulli的实例。 你会找到API关键在Tautulli仪表板通过设置->网络界面在API部分(在结束页)。",
+    "tautulliEnabled": "启用 Tautulli 集成",
     "tautulliIp": "IP地址",
     "tautulliPort": "口",
     "tautulliToken": "API令牌",

@@ -131,6 +131,10 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) New: Tautulli integration can now be turned off completely via a new toggle on the Tautulli tab; new adapter instances start with it disabled.
+- (ticaki) Fixed: recurring "Tautulli configuration is incorrect" errors in the log when Tautulli was not configured but user/statistics retrieval was enabled.
+
 ### 1.2.0-alpha.0 (2026-04-30)
 - (ticaki) Settings UI overhauled; the token wizard now shows a red button when the adapter cannot reach Plex with the current token and a green one for an optional renewal.
 - (copilot) Adapter requires admin >= 7.8.0 now

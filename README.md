@@ -135,7 +135,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 ### **WORK IN PROGRESS**
 - (copilot) Adapter requires admin >= 7.7.22 now
 - (ticaki) Improved stability and connection reliability; reduced memory growth on long runtimes.
-- (ticaki) HTTPS connections to the Plex server now support self-signed certificates.
 
 ### 1.1.5 (2024-12-11)
 - (ticaki) State _playing.*.Metadata.viewOffset is created.

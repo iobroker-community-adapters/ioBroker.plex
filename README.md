@@ -136,6 +136,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 - (ticaki) Settings UI overhauled; the token wizard now shows a red button when the adapter cannot reach Plex with the current token and a green one for an optional renewal.
 - (copilot) Adapter requires admin >= 7.8.0 now
 - (ticaki) Improved stability and connection reliability; reduced memory growth on long runtimes.
+- (ticaki) Adapter requires Node.js >= 22 now
 
 ### 1.1.5 (2024-12-11)
 - (ticaki) State _playing.*.Metadata.viewOffset is created.

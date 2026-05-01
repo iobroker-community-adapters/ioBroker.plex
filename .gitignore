@@ -5,7 +5,6 @@
 /node_modules
 /.idea
 /tmp
-/build
 .eslintcache
 src-admin/node_modules
 src-admin/build

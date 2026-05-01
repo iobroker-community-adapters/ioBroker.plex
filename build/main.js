@@ -1,0 +1,1834 @@
+"use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var utils = __toESM(require("@iobroker/adapter-core"));
+var fs = __toESM(require("node:fs"));
+var import_express = __toESM(require("express"));
+var import_body_parser = __toESM(require("body-parser"));
+var import_multer = __toESM(require("multer"));
+var import_axios = __toESM(require("axios"));
+var import_uuid = require("uuid");
+var import_NODES = __toESM(require("../_NODES.json"));
+var import_ACTIONS = __toESM(require("../_ACTIONS.json"));
+var import_PLAYERDETAILS = __toESM(require("../_PLAYERDETAILS.json"));
+var import_plexHttp = require("./lib/plexHttp");
+var import_plexNotifications = require("./lib/plexNotifications");
+var import_plexPinAuth = require("./lib/plexPinAuth");
+var import_library = require("./lib/library");
+var import_players = require("./lib/players");
+const Tautulli = require("tautulli-api");
+const _NODES = import_NODES.default;
+const _ACTIONS = import_ACTIONS.default;
+const _PLAYERDETAILS = import_PLAYERDETAILS.default;
+function pickBestConnection(connections) {
+  if (!connections || !connections.length) {
+    return void 0;
+  }
+  const score = (c) => {
+    let s = 0;
+    if (c.local) {
+      s += 100;
+    } else if (c.relay) {
+      s += 10;
+    } else {
+      s += 50;
+    }
+    if (c.protocol === "https") {
+      s += 5;
+    }
+    return s;
+  };
+  return [...connections].sort((a, b) => score(b) - score(a))[0];
+}
+const RETRY_BACKOFF_MIN = [1, 5, 15];
+function nextBackoff(retryIndex) {
+  return RETRY_BACKOFF_MIN[Math.min(retryIndex, RETRY_BACKOFF_MIN.length - 1)];
+}
+const PLEX_OPTIONS = {
+  identifier: "5cc42810-6dc0-44b1-8c70-747152d4f7f9",
+  product: "Plex for ioBroker",
+  version: "1.0",
+  deviceName: "ioBroker",
+  platform: "ioBroker",
+  platformVersion: process.versions.node,
+  language: "en"
+};
+const WATCHED = ["01-last_24h", "02-last_7d", "03-last_30d", "00-all_time"];
+class Plex extends utils.Adapter {
+  library;
+  controller;
+  plex;
+  tautulli;
+  encryptionKey = "";
+  unloaded = false;
+  lastConnectionOk = null;
+  lastErrorKind = null;
+  networkRetryCount = 0;
+  authRetryCount = 0;
+  detailsCounter = 0;
+  playing = [];
+  streams = 0;
+  playingDevice = [];
+  playerIds = [];
+  /**
+   * UUIDs (Plex `machineIdentifier` / `clientIdentifier`) of players that have been
+   * confirmed as players in past adapter runs (object tree carries `native.isPlayer=true`).
+   * Loaded once at startup by `loadKnownPlayers()`. Used in `getPlayers()` to promote
+   * /devices.xml candidates whose `provides` is empty but who were seen as real players
+   * before — so they don't need an active session for re-discovery on every restart.
+   */
+  knownPlayerIds = /* @__PURE__ */ new Set();
+  alertsClient;
+  /** Dedupe rapid bursts of `playing` events (Plex sends ~1/s during playback). */
+  alertsRefreshTimer = null;
+  history = [];
+  notifications = {};
+  retryCycle;
+  refreshCycle;
+  refreshInterval;
+  healthCheckInterval;
+  httpServer = null;
+  upload;
+  constructor(options = {}) {
+    super({ ...options, name: "plex" });
+    this.upload = (0, import_multer.default)({
+      dest: "/tmp/",
+      limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+      fileFilter: (_req, file, cb) => {
+        if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+          cb(null, false);
+          return;
+        }
+        cb(null, true);
+      }
+    });
+    this.on("ready", this.onReady.bind(this));
+    this.on("stateChange", this.onStateChange.bind(this));
+    this.on("message", this.onMessage.bind(this));
+    this.on("unload", this.onUnload.bind(this));
+  }
+  async onReady() {
+    this.library = new import_library.Library(this, {
+      nodes: _NODES,
+      actions: _ACTIONS,
+      updatesInLog: this.config.debug || false
+    });
+    this.unloaded = false;
+    this.refreshInterval = this.setInterval(this.refreshViewOffset, 1e3);
+    if (this.config.encryptionKey === void 0 || this.config.encryptionKey === "") {
+      this.encryptionKey = this.library.getKey(20);
+      void this.getForeignObject(`system.adapter.plex.${this.instance}`, (err, obj) => {
+        if (err || obj === void 0 || !obj) {
+          return;
+        }
+        obj.native.encryptionKey = this.encryptionKey;
+        void this.setForeignObject(obj._id, obj);
+      });
+      this.log.debug("Generated new encryption key for password encryption.");
+    } else {
+      this.encryptionKey = this.config.encryptionKey;
+    }
+    this.library.AXIOS_OPTIONS.secureConnection = false;
+    this.library.AXIOS_OPTIONS._protocol = "http:";
+    this.library.AXIOS_OPTIONS.timeout = 3e3;
+    if (this.config.secureConnection) {
+      this.log.info("Establishing secure connection to Plex Media Server...");
+      this.library.AXIOS_OPTIONS.secureConnection = true;
+      this.library.AXIOS_OPTIONS._protocol = "https:";
+      this.library.AXIOS_OPTIONS.rejectUnauthorized = false;
+      const certPub = this.config.certPublicVal || this.config.certPublic;
+      const certKey = this.config.certPrivateVal || this.config.certPrivate;
+      const certCa = this.config.certChainedVal || this.config.certChained;
+      if (certPub && certKey) {
+        try {
+          this.library.AXIOS_OPTIONS.cert = certPub.indexOf(".") === -1 ? certPub : fs.readFileSync(certPub);
+          this.library.AXIOS_OPTIONS.key = certKey.indexOf(".") === -1 ? certKey : fs.readFileSync(certKey);
+          if (certCa) {
+            this.library.AXIOS_OPTIONS.ca = certCa.indexOf(".") === -1 ? certCa : fs.readFileSync(certCa);
+          }
+          if (typeof this.library.AXIOS_OPTIONS.key === "string" && this.library.AXIOS_OPTIONS.key.indexOf("ENCRYPTED") > -1) {
+            this.library.AXIOS_OPTIONS.passphrase = this.config.passphrase;
+          }
+        } catch (err) {
+          this.log.warn(
+            "Failed loading client certificates! Continuing with HTTPS but without client authentication."
+          );
+          this.log.debug(err instanceof Error ? err.message : String(err));
+          delete this.library.AXIOS_OPTIONS.cert;
+          delete this.library.AXIOS_OPTIONS.key;
+          delete this.library.AXIOS_OPTIONS.ca;
+          delete this.library.AXIOS_OPTIONS.passphrase;
+        }
+      }
+    } else {
+      this.log.info("Establishing insecure connection to Plex Media Server...");
+    }
+    if (this.config.notifications) {
+      this.config.notifications.forEach((notification) => {
+        if (!this.notifications[notification.media]) {
+          this.notifications[notification.media] = {};
+        }
+        this.notifications[notification.media][notification.event] = {
+          message: notification.message,
+          caption: notification.caption,
+          thumb: notification.thumb
+        };
+      });
+    }
+    if (!this.config.plexIp || !this.config.plexToken) {
+      this.library.terminate(
+        "Plex IP and Plex Token not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token."
+      );
+      return;
+    }
+    this.config.plexPort = this.config.plexPort || 32400;
+    this.plex = new import_plexHttp.PlexHttp({
+      hostname: this.config.plexIp,
+      port: this.config.plexPort,
+      https: this.library.AXIOS_OPTIONS.secureConnection,
+      token: this.config.plexToken,
+      requestOptions: this.library.AXIOS_OPTIONS,
+      options: PLEX_OPTIONS
+    });
+    this.library._plex = this.plex;
+    this.controller = new import_players.Controller(
+      this,
+      {
+        controllerIdentifier: PLEX_OPTIONS.identifier,
+        plexToken: this.config.plexToken,
+        plex: this.plex,
+        actions: _ACTIONS,
+        nodes: _NODES,
+        playerdetails: _PLAYERDETAILS
+      },
+      this.library
+    );
+    this.getStates(`${this.name}.${this.instance}.*`, async (_err, states) => {
+      void this.library.set(import_library.Library.CONNECTION, true);
+      for (const state in states) {
+        void this.library.extendState(state);
+        if (states[state] !== null && states[state] !== void 0) {
+          this.library.setDeviceState(state.replace(`${this.name}.${this.instance}.`, ""), states[state].val);
+          if (state.indexOf("events.history") > -1) {
+            try {
+              const parsed = JSON.parse(String(states[state].val));
+              this.history = Array.isArray(parsed) ? parsed : [];
+            } catch (err) {
+              this.log.warn(
+                `Stored history state is corrupted, starting fresh: ${err instanceof Error ? err.message : String(err)}`
+              );
+              this.history = [];
+            }
+          }
+        }
+      }
+      void this.extendObject("events.settings", {
+        type: "state",
+        common: { name: "WWW UI settings", role: "json", type: "string", read: true, write: true },
+        native: {}
+      });
+      if (this.config.resetMedia) {
+        void this.library.del("_playing", true, () => this.log.debug("Plex Media flushed!"));
+      }
+    });
+    void this.subscribeForeignStatesAsync("iot.0.services.custom_plex");
+    void this.subscribeForeignStatesAsync("cloud.0.services.custom_plex");
+    this.log.debug("Initialization complete, starting data retrieval and event listener...");
+    this.init();
+    this.library.subscribeNode("metadata.viewoffset", (_state, prefix) => {
+      this.library.confirmNode({ node: `${prefix}_Control.seekTo` });
+    });
+  }
+  onStateChange(id, state) {
+    if (!state || state.ack === true) {
+      return;
+    }
+    this.log.debug(`State of ${id} has changed ${JSON.stringify(state)}.`);
+    let action = id.slice(id.lastIndexOf(".") + 1);
+    let val = state.val;
+    let stateId = id;
+    if (action == "custom_plex") {
+      try {
+        if (!state.val || typeof state.val !== "string") {
+          return;
+        }
+        const parts = state.val.split("_");
+        const playerNamespace = parts[0];
+        action = parts[1];
+        val = parts[2];
+        stateId = `_playing.${playerNamespace}._Controls.playback.${action}`;
+      } catch (err) {
+        this.log.warn(err instanceof Error ? err.message : String(err));
+        return;
+      }
+    }
+    if (action == "_refresh") {
+      const libId = stateId.substring(stateId.indexOf("libraries.") + 10, stateId.indexOf("-"));
+      const options = {
+        ...this.library.AXIOS_OPTIONS,
+        url: `${this.library.AXIOS_OPTIONS._protocol}//${this.config.plexIp}:${this.config.plexPort}/library/sections/${libId}/refresh?force=1`,
+        method: "POST",
+        headers: {
+          "X-Plex-Token": this.config.plexToken
+        }
+      };
+      (0, import_axios.default)(options).then((res) => {
+        this.log.info(`Successfully triggered refresh on library with ID ${libId}.`);
+        this.log.debug(JSON.stringify(res.data));
+      }).catch((err) => {
+        this.log.warn(`Error triggering refresh on library with ID ${libId}! See debug log for details.`);
+        this.log.debug(err instanceof Error ? err.message : String(err));
+      });
+    } else {
+      const path = stateId.replace(`${this.name}.${this.instance}.`, "").split(".");
+      action = path.pop() || "";
+      const mode = path.pop() || "";
+      path.splice(-1);
+      const p = this.controller.existPlayer(path.join("."));
+      if (p) {
+        void p.action({ mode, action, val, id: `${path.join(".")}._Controls` });
+      }
+    }
+  }
+  onMessage(msg) {
+    this.log.debug(`Message: ${JSON.stringify(msg)}`);
+    if (msg.command === "listKnownPlayers") {
+      void this.handleListKnownPlayers(msg);
+      return;
+    }
+    if (msg.command === "cleanupPlayers") {
+      void this.handleCleanupPlayers(msg);
+      return;
+    }
+    if (msg.command === "getConnectionStatus") {
+      this.library.msg(
+        msg.from,
+        msg.command,
+        {
+          connected: this.lastConnectionOk === true,
+          lastError: this.lastErrorKind,
+          hasToken: !!this.config.plexToken,
+          hasIp: !!this.config.plexIp
+        },
+        msg.callback
+      );
+      return;
+    }
+    const plexPin = new import_plexPinAuth.PlexPinAuth(PLEX_OPTIONS);
+    switch (msg.command) {
+      case "getPin":
+        plexPin.getPin().then((pin) => {
+          this.log.debug(`Successfully retrieved PIN: ${pin.code}`);
+          this.library.msg(msg.from, msg.command, { result: true, pin }, msg.callback);
+        }).catch((err) => {
+          const m = err instanceof Error ? err.message : String(err);
+          this.log.warn(m);
+          this.library.msg(msg.from, msg.command, { result: false, error: m }, msg.callback);
+        });
+        break;
+      case "getToken":
+        plexPin.getToken(msg.message.pinId).then((res) => {
+          if (res.token === true) {
+            this.log.debug("Successfully retrieved token.");
+            this.library.msg(
+              msg.from,
+              msg.command,
+              { result: true, token: res.auth_token },
+              msg.callback
+            );
+          } else {
+            this.library.msg(
+              msg.from,
+              msg.command,
+              { result: false, error: "No token retrieved!" },
+              msg.callback
+            );
+          }
+        }).catch((err) => {
+          const m = err instanceof Error ? err.message : String(err);
+          this.log.warn(m);
+          this.library.msg(msg.from, msg.command, { result: false, error: m }, msg.callback);
+        });
+        break;
+    }
+  }
+  /**
+   * Build a list of all `_playing.<title>-<uuid>` channels from the object tree.
+   * Returns metadata from `native` (uuid, lastSeenAt, product, platform, device) plus
+   * the channel id and human title — enough for the admin UI to render and decide
+   * what to delete.
+   *
+   * @param msg
+   */
+  async handleListKnownPlayers(msg) {
+    var _a;
+    try {
+      const objs = await this.getAdapterObjectsAsync();
+      const prefix = `${this.name}.${this.instance}._playing.`;
+      const players = [];
+      for (const id in objs) {
+        if (!id.startsWith(prefix)) {
+          continue;
+        }
+        const rest = id.slice(prefix.length);
+        if (rest.includes(".")) {
+          continue;
+        }
+        const obj = objs[id];
+        if (!obj || obj.type !== "channel") {
+          continue;
+        }
+        const native = obj.native || {};
+        if (native.isPlayer !== true || typeof native.uuid !== "string" || !native.uuid) {
+          continue;
+        }
+        players.push({
+          id,
+          uuid: native.uuid,
+          title: (typeof ((_a = obj.common) == null ? void 0 : _a.name) === "string" ? obj.common.name : rest) || rest,
+          product: typeof native.product === "string" ? native.product : void 0,
+          platform: typeof native.platform === "string" ? native.platform : void 0,
+          device: typeof native.device === "string" ? native.device : void 0,
+          lastSeenAt: typeof native.lastSeenAt === "string" ? native.lastSeenAt : void 0,
+          lastSeenSource: typeof native.lastSeenSource === "string" ? native.lastSeenSource : void 0
+        });
+      }
+      this.library.msg(msg.from, msg.command, { result: true, players }, msg.callback);
+    } catch (err) {
+      const m = err instanceof Error ? err.message : String(err);
+      this.log.warn(`listKnownPlayers failed: ${m}`);
+      this.library.msg(msg.from, msg.command, { result: false, error: m }, msg.callback);
+    }
+  }
+  /**
+   * Delete the given player-channel subtrees (`_playing.<title>-<uuid>` and everything below).
+   * Idempotent — channels that no longer exist are silently skipped.
+   *
+   * @param msg
+   */
+  async handleCleanupPlayers(msg) {
+    const ids = msg.message && msg.message.ids;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      this.library.msg(msg.from, msg.command, { result: false, error: "no ids" }, msg.callback);
+      return;
+    }
+    const prefix = `${this.name}.${this.instance}._playing.`;
+    let deleted = 0;
+    const errors = [];
+    for (const id of ids) {
+      if (typeof id !== "string" || !id.startsWith(prefix) || id.slice(prefix.length).includes(".")) {
+        errors.push(`reject: ${id}`);
+        continue;
+      }
+      try {
+        await this.delObjectAsync(id.slice(`${this.name}.${this.instance}.`.length), { recursive: true });
+        deleted++;
+        this.knownPlayerIds.forEach((uuid) => {
+          if (id.endsWith(`-${uuid}`)) {
+            this.knownPlayerIds.delete(uuid);
+          }
+        });
+      } catch (err) {
+        errors.push(`${id}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    this.log.info(`Cleanup: deleted ${deleted} player(s)${errors.length ? `, ${errors.length} error(s)` : ""}`);
+    if (errors.length > 0) {
+      this.log.debug(`Cleanup errors: ${errors.join(" | ")}`);
+    }
+    this.library.msg(msg.from, msg.command, { result: true, deleted, errors }, msg.callback);
+  }
+  onUnload(callback) {
+    var _a;
+    try {
+      this.log.info(`Plex Adapter stopped und unloaded.`);
+      this.unloaded = true;
+      if (this.controller) {
+      }
+      if (this.alertsClient) {
+        this.alertsClient.stop();
+        this.alertsClient = void 0;
+      }
+      if (this.alertsRefreshTimer) {
+        clearTimeout(this.alertsRefreshTimer);
+        this.alertsRefreshTimer = null;
+      }
+      if (this.retryCycle) {
+        this.clearTimeout(this.retryCycle);
+      }
+      if (this.refreshCycle) {
+        this.clearTimeout(this.refreshCycle);
+      }
+      if (this.healthCheckInterval) {
+        this.clearInterval(this.healthCheckInterval);
+      }
+      if (this.refreshInterval) {
+        this.clearInterval(this.refreshInterval);
+      }
+      if (this.httpServer) {
+        const srv = this.httpServer;
+        this.httpServer = null;
+        (_a = srv.closeAllConnections) == null ? void 0 : _a.call(srv);
+        srv.close(() => {
+          this.log.debug("Server for listener closed.");
+          callback();
+        });
+      } else {
+        callback();
+      }
+    } catch {
+      callback();
+    }
+  }
+  /**
+   * Periodic health check against the local Plex Media Server. Sets the CONNECTION state
+   * and only logs when the connection state actually changes, to avoid log spam.
+   */
+  startHealthCheck() {
+    if (this.healthCheckInterval) {
+      this.clearInterval(this.healthCheckInterval);
+    }
+    const intervalMs = 5 * 60 * 1e3;
+    this.healthCheckInterval = this.setInterval(async () => {
+      if (this.unloaded) {
+        return;
+      }
+      try {
+        await this.plex.query("/");
+        if (this.lastConnectionOk === false) {
+          this.log.info("Plex Media Server connection restored.");
+        } else {
+          this.log.debug("Plex health check OK.");
+        }
+        if (this.lastConnectionOk !== true) {
+          await this.library.set(import_library.Library.CONNECTION, true);
+          this.lastConnectionOk = true;
+        }
+        this.lastErrorKind = null;
+      } catch (err) {
+        const m = err instanceof Error ? err.message : String(err);
+        if (this.lastConnectionOk !== false) {
+          this.log.warn(`Plex Media Server connection lost: ${m}`);
+        } else {
+          this.log.debug(`Plex health check still failing: ${m}`);
+        }
+        await this.library.set(import_library.Library.CONNECTION, false);
+        this.lastConnectionOk = false;
+        if (m.indexOf("401") > -1 || m.indexOf("Unauthorized") > -1 || m.indexOf("unauthorized") > -1) {
+          this.lastErrorKind = "unauthorized";
+        } else {
+          this.lastErrorKind = "network";
+        }
+      }
+    }, intervalMs);
+  }
+  init() {
+    this.plex.query("/status/sessions").then(async (res) => {
+      const mc = res && res.MediaContainer;
+      const sessions = mc && Array.isArray(mc.Metadata) ? mc.Metadata : [];
+      const summary = sessions.length === 0 ? "empty" : sessions.map((s) => {
+        const p = s && s.Player;
+        return p ? `${p.title || "?"}/${p.product || "?"}/${p.state || "?"}` : "?";
+      }).join(", ");
+      this.log.debug(`Retrieved playing now from plex server: ${sessions.length} sessions [${summary}]`);
+      await this.library.set(import_library.Library.CONNECTION, true);
+      this.getStates(`${this.name}.${this.instance}.*`, async (err, states) => {
+        if (err || !states) {
+          return;
+        }
+        for (const state in states) {
+          this.library.setDeviceState(
+            state.replace(`${this.name}.${this.instance}.`, ""),
+            states[state] && states[state].val
+          );
+        }
+        const playersState = this.library.getDeviceState("_playing.players");
+        this.playing = typeof playersState === "string" && playersState.split(",") || [];
+        this.streams = this.library.getDeviceState("_playing.streams") || 0;
+      });
+      if (this.config.tautulliEnabled === void 0) {
+        this.config.tautulliEnabled = !!(this.config.tautulliIp && this.config.tautulliToken);
+      }
+      let tautulliReady = false;
+      if (!this.config.tautulliEnabled) {
+        this.log.debug("Tautulli integration is disabled in adapter settings.");
+        this.tautulli = { get: () => Promise.reject(new Error("Tautulli disabled")) };
+      } else if (!this.config.tautulliIp || !this.config.tautulliToken) {
+        this.log.info(
+          `Tautulli ${!this.config.tautulliIp ? " IP/ " : ""}${!this.config.tautulliToken ? "API token " : ""}missing!`
+        );
+        this.tautulli = { get: () => Promise.reject(new Error("Not connected!")) };
+      } else {
+        let tautulliApiKey = this.config.tautulliToken;
+        if (typeof tautulliApiKey === "string" && /[^\x20-\x7e]/.test(tautulliApiKey)) {
+          this.log.warn(
+            "Tautulli token appears to be in the legacy XOR-encrypted format. Decoding once \u2014 please open the adapter settings and save the configuration so the token is stored as plain text."
+          );
+          tautulliApiKey = this.library.decode(this.encryptionKey, tautulliApiKey);
+        }
+        try {
+          this.tautulli = new Tautulli(
+            this.config.tautulliIp,
+            this.config.tautulliPort || 8181,
+            tautulliApiKey
+          );
+          tautulliReady = true;
+        } catch {
+          this.log.error(
+            `Tautulli configuration is incorrect. IP:${this.config.tautulliIp} Port:${this.config.tautulliPort} Api-Key:[REDACTED]`
+          );
+        }
+      }
+      this.config.getUsers = this.config.getUsers && tautulliReady;
+      this.config.getStatistics = this.config.getStatistics && tautulliReady;
+      const refreshSec = parseInt(String(this.config.refresh), 10);
+      if (!refreshSec || isNaN(refreshSec) || refreshSec <= 0) {
+        this.config.refresh = 0;
+      } else if (refreshSec < 10) {
+        this.log.warn(
+          "Due to performance reasons, the refresh rate can not be set to less than 10 seconds. Using 10 seconds now."
+        );
+        this.config.refresh = 10;
+      } else {
+        this.config.refresh = refreshSec;
+      }
+      await this.loadKnownPlayers();
+      this.refreshCycle = this.setTimeout(this.retrieveDataLoop, 1e3);
+      void this.startListener();
+      this.startPlexNotifications();
+      this.lastConnectionOk = true;
+      this.lastErrorKind = null;
+      this.networkRetryCount = 0;
+      this.authRetryCount = 0;
+      this.startHealthCheck();
+      this.plex.query("/").then((res2) => {
+        if (res2 && res2.MediaContainer && res2.MediaContainer.machineIdentifier) {
+          this.controller.setServerId(res2.MediaContainer.machineIdentifier);
+        }
+      }).catch((err) => {
+        this.log.debug(err instanceof Error ? err.message : String(err));
+      });
+    }).catch(async (err) => {
+      const safeConfig = { ...this.config };
+      for (const k of ["plexToken", "tautulliToken", "plexPassword", "passphrase", "encryptionKey"]) {
+        if (safeConfig[k]) {
+          safeConfig[k] = "[REDACTED]";
+        }
+      }
+      const safeOpts = { ...this.library.AXIOS_OPTIONS };
+      for (const k of ["cert", "key", "ca", "passphrase"]) {
+        if (safeOpts[k]) {
+          safeOpts[k] = "[REDACTED]";
+        }
+      }
+      this.log.debug(`Configuration: ${JSON.stringify(safeConfig)}`);
+      this.log.debug(`Request-Options: ${JSON.stringify(safeOpts)}`);
+      this.log.debug(`Stack-Trace: ${JSON.stringify(err instanceof Error ? err.stack : String(err))}`);
+      const m = err instanceof Error ? err.message : String(err);
+      if (m.indexOf("EHOSTUNREACH") > -1 || m.indexOf("ECONNREFUSED") > -1 || m.indexOf("ETIMEDOUT") > -1 || m.indexOf("ENOTFOUND") > -1) {
+        const wait = nextBackoff(this.networkRetryCount++);
+        this.config.retry = wait;
+        this.log.info(
+          `Plex Media Server(${this.config.plexIp}:${this.config.plexPort}) not reachable! Will try again in ${wait} minute(s)...`
+        );
+        await this.library.set(import_library.Library.CONNECTION, false);
+        this.lastConnectionOk = false;
+        this.lastErrorKind = "network";
+        this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
+      } else if (m.indexOf("Permission denied") > -1 || m.indexOf("401") > -1 || m.indexOf("Unauthorized") > -1 || m.indexOf("unauthorized") > -1) {
+        const wait = nextBackoff(this.authRetryCount++);
+        this.config.retry = wait;
+        this.log.warn(
+          `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${wait} minute(s).`
+        );
+        await this.library.set(import_library.Library.CONNECTION, false);
+        this.lastConnectionOk = false;
+        this.lastErrorKind = "unauthorized";
+        this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
+      } else {
+        this.library.terminate(m);
+      }
+    });
+  }
+  retrieveDataLoop = () => {
+    this.retrieveData();
+    if (this.config.refresh > 0 && !this.unloaded) {
+      this.refreshCycle = this.setTimeout(this.retrieveDataLoop, this.config.refresh * 1e3);
+    }
+  };
+  retrieveData() {
+    if (this.config.getServers) {
+      this.getServers();
+    }
+    if (this.config.getLibraries) {
+      this.getLibraries();
+    }
+    if (this.config.getUsers) {
+      this.getUsers();
+    }
+    if (this.config.getSettings) {
+      this.getSettings();
+    }
+    if (this.config.getPlaylists) {
+      this.getPlaylists();
+    }
+    void this.getPlayers();
+  }
+  /**
+   * Receive event from webhook.
+   *
+   * @param dataIn The event data received from the webhook
+   * @param source The source of the event
+   * @param prefixIn The prefix of the event
+   */
+  async setEvent(dataIn, source, prefixIn) {
+    var _a, _b, _c, _d, _e, _f, _g;
+    let data = dataIn;
+    let prefix = prefixIn;
+    this.log.debug(
+      `Received ${prefix} playload - ${data.event || "unknown"} - from ${source}: ${JSON.stringify(data)}`
+    );
+    if (Object.keys(data).length === 0 || !data.event) {
+      this.log.warn(`Empty payload received from ${source}! Please go to ${source} and configure payload!`);
+      return false;
+    }
+    data.media = data.Metadata && data.Metadata.type;
+    data.source = source;
+    data.timestamp = Math.floor(Date.now() / 1e3);
+    data.datetime = this.library.getDateTime(Date.now());
+    data.playing = data.event.indexOf("play") > -1 || data.event.indexOf("resume") > -1;
+    this.log.debug(`Enriched payload: ${JSON.stringify(((_a = data.Metadata) == null ? void 0 : _a.Media) || {})}`);
+    if (!this.config.getMetadataTrees && data.Metadata) {
+      delete data.Metadata.Media;
+    }
+    if (prefix == "_playing") {
+      if (data.Player && data.Player.title != "_recent") {
+        await this.setEvent(
+          { ...data, Player: { title: "_recent", uuid: "player", local: false, publicAddress: "" } },
+          source,
+          prefix
+        );
+      }
+      const groupBy = data.Player && data.Player.title && data.Player.uuid !== void 0 ? `${this.library.clean(data.Player.title, true)}-${data.Player.uuid}` : "unknown";
+      void this.library.set({
+        node: prefix,
+        role: this.library.getNode("plexplayers", true).role,
+        description: this.library.getNode("plexplayers", true).description
+      });
+      void this.library.set({
+        node: `${prefix}.${groupBy}`,
+        role: "channel",
+        description: this.library.appendToDescription(
+          (_b = this.library.getNode("plex.player", true).description) != null ? _b : "",
+          ` ${((_c = data.Player) == null ? void 0 : _c.title) || this.library.getNode("plex.player.unknown", true).description}`
+        )
+      });
+      prefix = `${prefix}.${groupBy}`;
+      let playerTemp;
+      if ((data == null ? void 0 : data.event) && data.Player && data.Player.title != "_recent") {
+        const playerIp = this.library.getDeviceState(`${prefix}.Player.localAddress`);
+        const playerPort = this.library.getDeviceState(`${prefix}.Player.port`);
+        playerTemp = this.controller.createPlayerIfNotExist({
+          address: playerIp,
+          port: playerPort,
+          config: {
+            title: data.Player.title,
+            uuid: data.Player.uuid
+          }
+        });
+        if (["media.play", "media.resume"].indexOf(data.event) > -1) {
+          if (this.playing.indexOf(data.Player.title) == -1) {
+            this.playing.push(data.Player.title);
+          }
+          if (this.playingDevice.findIndex((player) => player.prefix == prefix) == -1) {
+            this.playingDevice.push({
+              prefix,
+              title: data.Player.title,
+              local: data.Player.local,
+              playerIp,
+              playerPort,
+              playerIdentifier: data.Player.uuid
+            });
+          }
+          this.streams++;
+        } else if (["media.stop", "media.pause"].indexOf(data.event) > -1) {
+          this.playing = this.playing.filter((player) => {
+            var _a2;
+            return player !== ((_a2 = data == null ? void 0 : data.Player) == null ? void 0 : _a2.title);
+          });
+          this.playingDevice = this.playingDevice.filter((player) => player.prefix !== prefix);
+          if (this.streams > 0) {
+            this.streams--;
+          }
+        }
+        void this.library.set(
+          {
+            node: "_playing.players",
+            role: this.library.getNode("playing.players", true).role,
+            type: this.library.getNode("playing.players", true).type,
+            description: this.library.getNode("playing.players", true).description
+          },
+          this.playing.join(",")
+        );
+        await this.library.set(
+          {
+            node: "_playing.streams",
+            role: this.library.getNode("playing.streams", true).role,
+            type: this.library.getNode("playing.streams", true).type,
+            description: this.library.getNode("plex.player", true).description
+          },
+          this.streams
+        );
+      }
+      if (data.Player && data.Player.uuid && this.playerIds.indexOf(data.Player.uuid) == -1 && data.Player.title != "_recent") {
+        void this.getPlayers();
+      } else if (data.Player && data.Player.title != "_recent" && ["media.play", "media.resume", "media.stop", "media.pause"].indexOf(data.event) > -1) {
+        this.library.confirmNode(
+          { node: `${prefix}._Controls.playback.play_switch` },
+          ["media.play", "media.resume"].indexOf(data.event) > -1
+        );
+      }
+      if (data.event && data.Player && data.Player.title != "_recent" && playerTemp) {
+        playerTemp.setNotificationData(JSON.parse(JSON.stringify(data)));
+        if (["media.play", "media.resume"].indexOf(data.event) > -1) {
+          playerTemp.getMetadataUpdate().catch(
+            (err) => this.log.debug(
+              `getMetadataUpdate failed: ${err instanceof Error ? err.message : String(err)}`
+            )
+          );
+        }
+        data = null;
+      }
+    } else if (prefix == "events") {
+      await this.library.set(
+        {
+          node: prefix,
+          role: this.library.getNode("plex.events", true).role,
+          description: this.library.getNode("plex.events", true).description
+        },
+        void 0
+      );
+      const event = data.event && data.event.replace("media.", "");
+      const lookup = (mediaKey, eventKey) => this.notifications[mediaKey] && this.notifications[mediaKey][eventKey];
+      const message = lookup(data.media, data.event) || lookup(data.media, event) || lookup("any", data.event) || lookup("any", event) || lookup(data.media, "any") || lookup("any", "any") || {
+        message: "",
+        caption: "",
+        thumb: "",
+        notExist: true
+      };
+      if (!message.notExist) {
+        const eventData = JSON.parse(JSON.stringify(data));
+        const notification = {
+          id: (0, import_uuid.v1)(),
+          timestamp: data.timestamp,
+          datetime: data.datetime,
+          account: (_d = data.Account) == null ? void 0 : _d.title,
+          player: (_e = data.Player) == null ? void 0 : _e.title,
+          media: data.media,
+          event,
+          ...data.media === "episode" && ((_f = data.Metadata) == null ? void 0 : _f.parentIndex) != null ? { season: data.Metadata.parentIndex } : {},
+          ...data.media === "episode" && ((_g = data.Metadata) == null ? void 0 : _g.index) != null ? { episode: data.Metadata.index } : {},
+          thumb: message.thumb ? `${this.library.AXIOS_OPTIONS._protocol}//${this.config.plexIp}:${this.config.plexPort}${this.replacePlaceholders(message.thumb, eventData)}?X-Plex-Token=${this.config.plexToken}` : "",
+          message: this.replacePlaceholders(message.message, eventData),
+          caption: this.replacePlaceholders(message.caption, eventData),
+          source: data.source
+        };
+        let addNotification = true;
+        for (let i = this.history.length - 1; i >= 0; i--) {
+          const lastItem = this.history[i];
+          if (lastItem.source != notification.source && lastItem.media == notification.media && lastItem.account == notification.account) {
+            addNotification = lastItem.media != notification.media || lastItem.timestamp + 1e3 <= notification.timestamp;
+            break;
+          }
+        }
+        if (addNotification) {
+          this.history.push(notification);
+          if (this.history.length > 1e3) {
+            this.history = this.history.slice(-1e3);
+          }
+          const combined = {
+            ...notification,
+            history: JSON.stringify(this.history)
+          };
+          for (const key in combined) {
+            await this.library.readData(`${prefix}.${key}`, combined[key], prefix);
+          }
+        }
+      } else {
+        this.log.debug(`No message defined for ${data.media} ${event}`);
+      }
+    }
+    if (data) {
+      for (const key in data) {
+        await this.library.readData(`${prefix}.${key}`, data[key], prefix);
+      }
+    }
+    if (prefix.indexOf("_playing") > -1 && (data == null ? void 0 : data.event) == "media.play") {
+      void this.library.runGarbageCollector(prefix, false, 3e4, [...import_players.Controller.garbageExcluded, "_Controls"]);
+    }
+    return true;
+  }
+  replacePlaceholders(message, data) {
+    let pos;
+    let variable;
+    let tmp;
+    let path;
+    let index;
+    while (message.indexOf("%") > -1) {
+      pos = message.indexOf("%");
+      variable = message.substring(pos, message.indexOf("%", pos + 1) + 1).replace(/%/g, "");
+      tmp = JSON.parse(JSON.stringify(data));
+      path = variable;
+      while (path.indexOf(".") > -1) {
+        try {
+          index = path.slice(0, path.indexOf("."));
+          path = path.slice(path.indexOf(".") + 1);
+          tmp = tmp[index];
+        } catch (err) {
+          this.log.debug(`catch: 30 ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+      if (tmp === void 0 || tmp[path] === void 0 || tmp === null || tmp[path] === null) {
+        message = message.replace(RegExp(`%${variable}%`, "gi"), `(${variable} not found!)`);
+      } else {
+        message = message.replace(RegExp(`%${variable}%`, "gi"), tmp[path]);
+      }
+    }
+    return message;
+  }
+  isValidApiResponse(res) {
+    if (res === void 0 || res.response === void 0 || res.response.result === void 0 || res.response.result !== "success") {
+      this.log.warn("API response invalid!");
+      this.log.debug(`debug 23 ${JSON.stringify(res)}`);
+      return false;
+    } else if (res.response.message === "Invalid apikey") {
+      this.log.warn("Invalid API key. No results retrieved!");
+      return false;
+    }
+    return true;
+  }
+  getItems(path, key, node) {
+    if (!this.config.getAllItems) {
+      return;
+    }
+    this.plex.query(path).then(async (res) => {
+      await this.library.set(
+        {
+          node: `${node}.itemsCount`,
+          type: this.library.getNode(`${key.toLowerCase()}.itemscount`).type,
+          role: this.library.getNode(`${key.toLowerCase()}.itemscount`).role,
+          description: this.library.getNode(`${key.toLowerCase()}.itemscount`).description
+        },
+        res.MediaContainer.size
+      );
+    }).catch((err) => {
+      this.log.debug(`Could not retrieve items for ${key} from Plex!`);
+      this.log.debug(err instanceof Error ? err.message : String(err));
+    });
+  }
+  getServers() {
+    this.plex.query("/servers").then((res) => {
+      this.log.debug("Retrieved Servers from Plex.");
+      void this.library.set(
+        {
+          node: "servers",
+          role: this.library.getNode("servers").role,
+          description: this.library.getNode("servers").description
+        },
+        void 0
+      );
+      const data = res.MediaContainer.Server || [];
+      data.forEach((entry) => {
+        var _a;
+        const serverId = entry.name.toLowerCase();
+        void this.library.set(
+          {
+            node: `servers.${serverId}`,
+            role: this.library.getNode("server").role,
+            description: this.library.replaceDescription(
+              (_a = this.library.getNode("server").description) != null ? _a : "",
+              "%server%",
+              entry.name
+            )
+          },
+          void 0
+        );
+        for (const key in entry) {
+          void this.library.set(
+            {
+              node: `servers.${serverId}.${key}`,
+              role: this.library.getNode(`servers.${key.toLowerCase()}`).role,
+              type: this.library.getNode(`servers.${key.toLowerCase()}`).type,
+              description: this.library.getNode(`servers.${key.toLowerCase()}`).description
+            },
+            entry[key]
+          );
+        }
+      });
+    }).catch((err) => {
+      this.log.debug("Could not retrieve Servers from Plex!");
+      this.log.debug(err instanceof Error ? err.message : String(err));
+    });
+  }
+  getLibraries() {
+    this.plex.query("/library/sections").then((res) => {
+      this.log.debug("Retrieved Libraries from Plex.");
+      void this.library.set({
+        node: "libraries",
+        role: this.library.getNode("libraries").role,
+        description: this.library.getNode("libraries").description
+      });
+      const data = res.MediaContainer.Directory || [];
+      data.forEach((entry) => {
+        var _a;
+        const libId = `${entry.key}-${entry.title.toLowerCase()}`;
+        void this.library.set(
+          {
+            node: `libraries.${libId}`,
+            role: this.library.getNode("library").role,
+            description: this.library.replaceDescription(
+              (_a = this.library.getNode("library").description) != null ? _a : "",
+              "%library%",
+              entry.title
+            )
+          },
+          void 0
+        );
+        void this.library.set(
+          {
+            node: `libraries.${libId}._refresh`,
+            type: this.library.getNode("plex.events", true).type,
+            role: this.library.getNode("plex.events", true).role,
+            description: this.library.getNode("plex.events", true).description
+          },
+          false
+        );
+        void this.subscribeStatesAsync(`libraries.${libId}._refresh`);
+        for (const key in entry) {
+          void this.library.set(
+            {
+              node: `libraries.${libId}.${key.toLowerCase()}`,
+              type: this.library.getNode(`libraries.${key.toLowerCase()}`).type,
+              role: this.library.getNode(`libraries.${key.toLowerCase()}`).role,
+              description: this.library.getNode(`libraries.${key.toLowerCase()}`).description
+            },
+            typeof entry[key] == "object" ? JSON.stringify(entry[key]) : entry[key]
+          );
+        }
+        this.getItems(`/library/sections/${entry.key}/all`, "libraries", `libraries.${libId}`);
+        if (this.config.getStatistics) {
+          this.tautulli.get("get_library_watch_time_stats", { section_id: entry.key }).then((res2) => {
+            var _a2, _b;
+            if (!this.isValidApiResponse(res2)) {
+              return;
+            }
+            const stats = res2.response.data || [];
+            this.log.debug(`Retrieved Watch Statistics for Library ${entry.title} from Tautulli.`);
+            void this.library.set({
+              node: "statistics",
+              role: this.library.getNode("statistics").role,
+              description: this.library.getNode("statistics").description
+            });
+            void this.library.set({
+              node: "statistics.libraries",
+              role: this.library.getNode("statistics.libraries").role,
+              description: this.library.replaceDescription(
+                (_a2 = this.library.getNode("statistics.libraries").description) != null ? _a2 : "",
+                "%library%",
+                ""
+              )
+            });
+            void this.library.set({
+              node: `statistics.libraries.${libId}`,
+              role: this.library.getNode("statistics.libraries").role,
+              description: this.library.replaceDescription(
+                (_b = this.library.getNode("statistics.libraries").description) != null ? _b : "",
+                "%library%",
+                entry.title
+              )
+            });
+            stats.forEach((statEntry, i) => {
+              const id = WATCHED[i];
+              void this.library.set({
+                node: `statistics.libraries.${libId}.${id}`,
+                type: this.library.getNode(`statistics.${id}`).type,
+                role: this.library.getNode(`statistics.${id}`).role,
+                description: this.library.getNode(`statistics.${id}`).description
+              });
+              for (const key in statEntry) {
+                void this.library.set(
+                  {
+                    node: `statistics.libraries.${libId}.${id}.${key}`,
+                    type: this.library.getNode(`statistics.${key}`).type,
+                    role: this.library.getNode(`statistics.${key}`).role,
+                    description: this.library.getNode(`statistics.${key}`).description
+                  },
+                  statEntry[key]
+                );
+              }
+            });
+          }).catch((err) => {
+            this.log.debug(
+              `Could not retrieve library watch statistics from Tautulli (${this.config.tautulliIp}:${this.config.tautulliPort}): ${err instanceof Error ? err.message : String(err)}`
+            );
+          });
+        }
+      });
+    }).catch((err) => {
+      this.log.debug("Could not retrieve Libraries from Plex!");
+      this.log.debug(err instanceof Error ? err.message : String(err));
+    });
+  }
+  getUsers() {
+    this.tautulli.get("get_users").then((res) => {
+      if (!this.isValidApiResponse(res)) {
+        return;
+      }
+      const data = res.response.data || [];
+      this.log.debug("Retrieved Users from Tautulli.");
+      void this.library.set({
+        node: "users",
+        role: this.library.getNode("users").role,
+        description: this.library.getNode("users").description
+      });
+      data.forEach((entry) => {
+        var _a;
+        const userName = entry.username || entry.friendly_name || entry.email || entry.user_id;
+        const userId = this.library.clean(userName, true).replace(/\./g, "");
+        if (userId === "local") {
+          return;
+        }
+        void this.library.set({
+          node: `users.${userId}`,
+          role: this.library.getNode("user").role,
+          description: this.library.replaceDescription(
+            (_a = this.library.getNode("user").description) != null ? _a : "",
+            "%user%",
+            userName
+          )
+        });
+        for (const key in entry) {
+          if (key === "server_token") {
+            continue;
+          }
+          void this.library.set(
+            {
+              node: `users.${userId}.${key}`,
+              role: this.library.getNode(`users.${key.toLowerCase()}`).role,
+              type: this.library.getNode(`users.${key.toLowerCase()}`).type,
+              description: this.library.getNode(`users.${key.toLowerCase()}`).description
+            },
+            entry[key]
+          );
+        }
+        if (this.config.getStatistics) {
+          this.tautulli.get("get_user_watch_time_stats", { user_id: entry.user_id }).then((res2) => {
+            var _a2, _b;
+            if (!this.isValidApiResponse(res2)) {
+              return;
+            }
+            const stats = res2.response.data || [];
+            this.log.debug(`Retrieved Watch Statistics for User ${userName} from Tautulli.`);
+            void this.library.set({
+              node: "statistics.users",
+              role: this.library.getNode("statistics.users").role,
+              description: this.library.replaceDescription(
+                (_a2 = this.library.getNode("statistics.users").description) != null ? _a2 : "",
+                "%user%",
+                ""
+              )
+            });
+            void this.library.set({
+              node: `statistics.users.${userId}`,
+              role: this.library.getNode("statistics.users").role,
+              description: this.library.replaceDescription(
+                (_b = this.library.getNode("statistics.users").description) != null ? _b : "",
+                "%user%",
+                userName
+              )
+            });
+            stats.forEach((statEntry, i) => {
+              const id = WATCHED[i];
+              void this.library.set({
+                node: `statistics.users.${userId}.${id}`,
+                type: this.library.getNode(`statistics.${id}`).type,
+                role: this.library.getNode(`statistics.${id}`).role,
+                description: this.library.getNode(`statistics.${id}`).description
+              });
+              for (const key in statEntry) {
+                void this.library.set(
+                  {
+                    node: `statistics.users.${userId}.${id}.${key}`,
+                    type: this.library.getNode(`statistics.${key}`).type,
+                    role: this.library.getNode(`statistics.${key}`).role,
+                    description: this.library.getNode(`statistics.${key}`).description
+                  },
+                  statEntry[key]
+                );
+              }
+            });
+          }).catch((err) => {
+            this.log.debug(
+              `Could not retrieve user watch statistics from Tautulli (${this.config.tautulliIp}:${this.config.tautulliPort}): ${err instanceof Error ? err.message : String(err)}`
+            );
+          });
+        }
+      });
+    }).catch((err) => {
+      this.log.debug("Could not retrieve Users from Tautulli!");
+      this.log.debug(err instanceof Error ? err.message : String(err));
+    });
+  }
+  getSettings() {
+    this.plex.query("/:/prefs").then((res) => {
+      const data = res.MediaContainer.Setting || [];
+      this.log.debug("Retrieved Settings from Plex.");
+      void this.library.set({
+        node: "settings",
+        role: this.library.getNode("settings").role,
+        description: this.library.getNode("settings").description
+      });
+      data.forEach((entry) => {
+        entry.group = !entry.group ? "other" : entry.group;
+        void this.library.set({
+          node: `settings.${entry.group}`,
+          role: "channel",
+          description: `Settings ${this.library.ucFirst(entry.group)}`
+        });
+        void this.library.set(
+          {
+            node: `settings.${entry.group}.${entry.id}`,
+            type: entry.type == "bool" ? "boolean" : entry.type == "int" ? "number" : "string",
+            role: entry.type == "bool" ? "indicator" : entry.type == "int" ? "value" : "text",
+            description: entry.label
+          },
+          entry.value
+        );
+      });
+    }).catch((err) => {
+      this.log.debug("Could not retrieve Settings from Plex!");
+      this.log.debug(err instanceof Error ? err.message : String(err));
+    });
+  }
+  getPlaylists() {
+    this.plex.query("/playlists").then((res) => {
+      const data = res.MediaContainer.Metadata || [];
+      this.log.debug("Retrieved Playlists from Plex.");
+      void this.library.set({
+        node: "playlists",
+        role: this.library.getNode("playlists").role,
+        description: this.library.getNode("playlists").description
+      });
+      data.forEach((entry) => {
+        const playlistId = this.library.clean(entry.title, true);
+        void this.library.set({
+          node: `playlists.${playlistId}`,
+          role: "channel",
+          description: `Playlist ${entry.title}`
+        });
+        for (const key in entry) {
+          const node = this.library.getNode(`playlists.${key.toLowerCase()}`);
+          node.key = `playlists.${playlistId}.${key}`;
+          entry[key] = this.library.convertNode(node, entry[key]);
+          void this.library.set(
+            {
+              node: `playlists.${playlistId}.${key}`,
+              type: node.type,
+              role: node.role,
+              description: node.description
+            },
+            entry[key]
+          );
+        }
+        this.getItems(entry.key, "playlists", `playlists.${playlistId}`);
+      });
+    }).catch((err) => {
+      this.log.debug("Could not retrieve Playlists from Plex!");
+      this.log.debug(err instanceof Error ? err.message : String(err));
+    });
+  }
+  /**
+   * Multi-source player discovery. Plex deprecated local GDM client registration:
+   * `/clients` on PMS returns size:0 for modern apps (Plexamp, Plex iOS/Android,
+   * PlexHTPC, newer TVs). The canonical pattern (used by python-plexapi and
+   * Home Assistant) merges three sources, dedupliziert über `machineIdentifier`:
+   *   1. plex.tv/api/v2/resources — primary, account-scoped
+   *   2. /status/sessions on PMS — picks up actively streaming devices
+   *   3. /clients on PMS — legacy GDM-only devices
+   */
+  /**
+   * Read the object tree once at startup to figure out which players were confirmed in past
+   * adapter runs. Populates `knownPlayerIds` from `_playing.*` channels carrying
+   * `native.isPlayer=true`. Idempotent — safe to call again, but really only needed once.
+   */
+  /**
+   * Open the PMS WebSocket notifications stream (`/:/websockets/notifications`).
+   *
+   * Replaces per-player `/player/timeline/poll` for Companion devices, where the legacy
+   * endpoint returns 404. PMS pushes `playing` events whenever a session changes state
+   * (play/pause/seek/stop) — we react by re-running `getPlayers()` (which reads
+   * `/status/sessions`) so the existing player-update plumbing picks up the new state.
+   *
+   * No-op if the notifications client is already running.
+   */
+  startPlexNotifications() {
+    if (this.alertsClient) {
+      return;
+    }
+    if (!this.config.plexIp || !this.config.plexToken) {
+      return;
+    }
+    this.alertsClient = new import_plexNotifications.PlexNotifications({
+      hostname: this.config.plexIp,
+      port: this.config.plexPort || 32400,
+      https: !!this.library.AXIOS_OPTIONS.secureConnection,
+      token: this.config.plexToken,
+      log: {
+        debug: (m) => this.log.debug(m),
+        info: (m) => this.log.info(m),
+        warn: (m) => this.log.warn(m),
+        error: (m) => this.log.error(m)
+      },
+      rejectUnauthorized: this.library.AXIOS_OPTIONS.rejectUnauthorized === true,
+      // Identity headers — same set we send on REST. Some Plex setups (especially behind
+      // reverse proxies) don't deliver notifications without a recognizable client identity.
+      headers: {
+        "X-Plex-Client-Identifier": PLEX_OPTIONS.identifier,
+        "X-Plex-Product": PLEX_OPTIONS.product,
+        "X-Plex-Version": PLEX_OPTIONS.version,
+        "X-Plex-Device-Name": PLEX_OPTIONS.deviceName,
+        "X-Plex-Platform": PLEX_OPTIONS.platform,
+        "X-Plex-Platform-Version": PLEX_OPTIONS.platformVersion,
+        "X-Plex-Provides": "controller"
+      }
+    });
+    this.alertsClient.setHandler(({ type, payload }) => this.handlePlexNotification(type, payload));
+    this.alertsClient.start();
+  }
+  /**
+   * Dispatch a single `NotificationContainer` to the relevant downstream handler.
+   * Keep this fast — Plex sends `playing` ~1/s during active playback, plus library
+   * updates can be heavy. We schedule a debounced sessions refresh rather than
+   * reacting per frame.
+   *
+   * @param type
+   * @param _payload
+   */
+  handlePlexNotification(type, _payload) {
+    if (this.unloaded) {
+      return;
+    }
+    switch (type) {
+      case "playing": {
+        if (this.alertsRefreshTimer) {
+          return;
+        }
+        this.alertsRefreshTimer = setTimeout(() => {
+          this.alertsRefreshTimer = null;
+          void this.getPlayers();
+        }, 500);
+        break;
+      }
+      // Other types (activity, progress, transcodeSession.*, library.update) — currently
+      // not consumed. Add cases here when we wire them up.
+      default:
+        break;
+    }
+  }
+  async loadKnownPlayers() {
+    try {
+      const objs = await this.getAdapterObjectsAsync();
+      this.knownPlayerIds.clear();
+      const prefix = `${this.name}.${this.instance}._playing.`;
+      for (const id in objs) {
+        if (!id.startsWith(prefix)) {
+          continue;
+        }
+        const obj = objs[id];
+        if (!obj || obj.type !== "channel") {
+          continue;
+        }
+        const native = obj.native || {};
+        if (native.isPlayer === true && typeof native.uuid === "string" && native.uuid) {
+          this.knownPlayerIds.add(native.uuid);
+        }
+      }
+      this.log.debug(`loadKnownPlayers: ${this.knownPlayerIds.size} known player(s) restored from object tree`);
+    } catch (err) {
+      this.log.debug(`loadKnownPlayers failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  async getPlayers() {
+    const found = /* @__PURE__ */ new Map();
+    const candidates = /* @__PURE__ */ new Map();
+    try {
+      const resources = await this.plex.fetchPlexTvResources(this.config.plexToken);
+      this.log.debug(`plex.tv/resources returned ${resources.length} entries`);
+      const provideSummary = [];
+      let acceptedCount = 0;
+      let droppedNoProvides = 0;
+      let droppedNotPlayer = 0;
+      let droppedNoConn = 0;
+      for (const r of resources) {
+        if (!r || !r.clientIdentifier || !r.provides) {
+          droppedNoProvides++;
+          continue;
+        }
+        provideSummary.push(`${r.name || r.device || "?"}=[${r.provides}]`);
+        const provides = r.provides.split(",").map((s) => s.trim());
+        if (!provides.includes("player") && !provides.includes("pubsub-player")) {
+          droppedNotPlayer++;
+          continue;
+        }
+        const conn = pickBestConnection(r.connections);
+        if (!conn) {
+          droppedNoConn++;
+          continue;
+        }
+        acceptedCount++;
+        found.set(r.clientIdentifier, {
+          uuid: r.clientIdentifier,
+          title: r.name || r.device || "Plex Player",
+          address: conn.address,
+          port: conn.port,
+          provides: r.provides,
+          // /resources doesn't expose protocolCapabilities. Companion-only players
+          // (Plexamp, mobile, newer TVs) reach PMS via pubsub-websocket, not the
+          // HTTP `/player/...` proxy — only `playback` commands are reliably
+          // forwarded that way. `navigation`/`mirror`/`playqueues` would create
+          // ghost folders that never get populated, so synthesize the minimal set.
+          // `timeline` stays in for the internal `refreshDetails` flag.
+          // `/clients` discoveries below override this with the real value when
+          // available; that path keeps full capability coverage for GDM devices.
+          protocolCapabilities: "timeline,playback",
+          sources: ["plex.tv/resources"],
+          raw: { ...r },
+          publicAddress: r.publicAddress,
+          local: conn.local,
+          relay: conn.relay,
+          product: r.product,
+          platform: r.platform,
+          device: r.device
+        });
+      }
+      this.log.debug(
+        `plex.tv/resources filter: accepted=${acceptedCount}, droppedNoProvides=${droppedNoProvides}, droppedNotPlayer=${droppedNotPlayer}, droppedNoConn=${droppedNoConn}`
+      );
+      if (provideSummary.length > 0) {
+        this.log.debug(`plex.tv/resources provides: ${provideSummary.join(" | ")}`);
+      }
+    } catch (err) {
+      const code = err.code;
+      if (code === "PLEX_TV_UNAUTHORIZED") {
+        this.log.info(
+          "plex.tv rejected the token for /api/v2/resources \u2014 falling back to PMS-only discovery. If modern Plex apps are missing, regenerate the token via the wizard."
+        );
+      } else {
+        this.log.debug(`plex.tv/resources unavailable: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    try {
+      const devices = await this.plex.fetchPlexTvDevices(this.config.plexToken);
+      this.log.debug(`plex.tv/devices returned ${devices.length} entries`);
+      const acceptedSummary = [];
+      const candidateSummary = [];
+      const droppedSummary = [];
+      let acceptedCount = 0;
+      let candidateCount = 0;
+      let droppedNotPlayer = 0;
+      let droppedDuplicate = 0;
+      for (const d of devices) {
+        if (!d || !d.clientIdentifier) {
+          continue;
+        }
+        const desc = `${d.name || d.device || "?"}/${d.product || "?"}=[${d.provides || ""}]`;
+        if (!d.provides) {
+          candidates.set(d.clientIdentifier, d);
+          candidateSummary.push(desc);
+          candidateCount++;
+          continue;
+        }
+        const provides = d.provides.split(",").map((s) => s.trim());
+        const isPlayer = provides.includes("player") || provides.includes("pubsub-player");
+        if (!isPlayer) {
+          droppedNotPlayer++;
+          droppedSummary.push(desc);
+          continue;
+        }
+        if (found.has(d.clientIdentifier)) {
+          const existing = found.get(d.clientIdentifier);
+          if (!existing.sources.includes("plex.tv/devices")) {
+            existing.sources.push("plex.tv/devices");
+          }
+          droppedDuplicate++;
+          continue;
+        }
+        acceptedSummary.push(desc);
+        const conn = d.connections.find((c) => c.local) || d.connections[0];
+        found.set(d.clientIdentifier, {
+          uuid: d.clientIdentifier,
+          title: d.name || d.device || "Plex Player",
+          address: (conn == null ? void 0 : conn.address) || "",
+          port: (conn == null ? void 0 : conn.port) || 0,
+          protocolCapabilities: "timeline,playback",
+          sources: ["plex.tv/devices"],
+          raw: { ...d },
+          publicAddress: d.publicAddress,
+          local: conn == null ? void 0 : conn.local,
+          product: d.product,
+          platform: d.platform,
+          device: d.device,
+          provides: d.provides
+        });
+        acceptedCount++;
+      }
+      this.log.debug(
+        `plex.tv/devices filter: accepted=${acceptedCount}, candidates=${candidateCount}, droppedNotPlayer=${droppedNotPlayer}, droppedDuplicate=${droppedDuplicate}`
+      );
+      if (acceptedSummary.length > 0) {
+        this.log.debug(`plex.tv/devices accepted: ${acceptedSummary.join(" | ")}`);
+      }
+      if (candidateSummary.length > 0) {
+        this.log.debug(
+          `plex.tv/devices candidates (need session confirmation): ${candidateSummary.join(" | ")}`
+        );
+      }
+      if (droppedSummary.length > 0) {
+        this.log.debug(`plex.tv/devices dropped: ${droppedSummary.join(" | ")}`);
+      }
+    } catch (err) {
+      const code = err.code;
+      if (code === "PLEX_TV_UNAUTHORIZED") {
+        this.log.debug("plex.tv/devices rejected token (already logged for /resources).");
+      } else {
+        this.log.debug(`plex.tv/devices unavailable: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    try {
+      const sess = await this.plex.query("/status/sessions");
+      const items = sess && sess.MediaContainer && sess.MediaContainer.Metadata || [];
+      for (const m of items) {
+        const p = m && m.Player;
+        if (!p || !p.machineIdentifier) {
+          continue;
+        }
+        const existing = found.get(p.machineIdentifier);
+        if (existing) {
+          if (!existing.address && p.address) {
+            existing.address = p.address;
+          }
+          if (existing.local === void 0 && typeof p.local === "boolean") {
+            existing.local = p.local;
+          }
+          if (!existing.sources.includes("/status/sessions")) {
+            existing.sources.push("/status/sessions");
+          }
+        } else {
+          const cand = candidates.get(p.machineIdentifier);
+          const sources = cand ? ["plex.tv/devices", "/status/sessions"] : ["/status/sessions"];
+          found.set(p.machineIdentifier, {
+            uuid: p.machineIdentifier,
+            title: cand && cand.name || p.title || "Plex Player",
+            address: p.address || "",
+            port: 0,
+            protocolCapabilities: "timeline,playback",
+            sources,
+            raw: cand ? { ...cand, ...p } : { ...p },
+            publicAddress: cand && cand.publicAddress || p.remotePublicAddress,
+            local: p.local,
+            product: cand && cand.product || p.product,
+            platform: cand && cand.platform || p.platform,
+            device: cand && cand.device || p.device,
+            // Promoted candidates inherit the (empty) provides from /devices.xml — keep it
+            // explicitly so isControllable() can decide. Pure /status/sessions players
+            // also have no `provides`, which is correct: they're Companion-only.
+            provides: cand ? cand.provides : ""
+          });
+          if (cand) {
+            candidates.delete(p.machineIdentifier);
+          }
+        }
+      }
+    } catch (err) {
+      this.log.debug(
+        `/status/sessions unavailable during getPlayers: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+    try {
+      const cli = await this.plex.query("/clients");
+      const items = cli && cli.MediaContainer && cli.MediaContainer.Server || [];
+      for (const c of items) {
+        if (!c || !c.machineIdentifier) {
+          continue;
+        }
+        const existing = found.get(c.machineIdentifier);
+        if (existing) {
+          if (c.protocolCapabilities) {
+            existing.protocolCapabilities = c.protocolCapabilities;
+          }
+          if (!existing.address && c.address) {
+            existing.address = c.address;
+          }
+          if (!existing.port && c.port) {
+            existing.port = Number(c.port);
+          }
+          if (!existing.sources.includes("/clients")) {
+            existing.sources.push("/clients");
+          }
+          Object.assign(existing.raw, c);
+        } else {
+          const cand = candidates.get(c.machineIdentifier);
+          const sources = cand ? ["plex.tv/devices", "/clients"] : ["/clients"];
+          found.set(c.machineIdentifier, {
+            uuid: c.machineIdentifier,
+            title: c.name || cand && cand.name || "Plex Player",
+            address: c.address || "",
+            port: Number(c.port) || 0,
+            protocolCapabilities: c.protocolCapabilities || "none",
+            sources,
+            raw: cand ? { ...cand, ...c } : { ...c },
+            product: c.product || cand && cand.product,
+            platform: c.platform || cand && cand.platform,
+            device: c.device || cand && cand.device,
+            // /clients devices are GDM — implicitly controllable via HTTP regardless of provides.
+            provides: "player"
+          });
+          if (cand) {
+            candidates.delete(c.machineIdentifier);
+          }
+        }
+      }
+    } catch (err) {
+      this.log.debug(`/clients unavailable: ${err instanceof Error ? err.message : String(err)}`);
+    }
+    if (candidates.size > 0 && this.knownPlayerIds.size > 0) {
+      const promoted = [];
+      for (const [uuid, cand] of candidates) {
+        if (!this.knownPlayerIds.has(uuid)) {
+          continue;
+        }
+        const conn = cand.connections.find((c) => c.local) || cand.connections[0];
+        found.set(uuid, {
+          uuid,
+          title: cand.name || cand.device || "Plex Player",
+          address: (conn == null ? void 0 : conn.address) || "",
+          port: (conn == null ? void 0 : conn.port) || 0,
+          protocolCapabilities: "timeline,playback",
+          sources: ["plex.tv/devices", "native"],
+          raw: { ...cand },
+          publicAddress: cand.publicAddress,
+          local: conn == null ? void 0 : conn.local,
+          product: cand.product,
+          platform: cand.platform,
+          device: cand.device,
+          provides: cand.provides
+        });
+        promoted.push(`${cand.name || cand.device || "?"}/${cand.product || "?"}`);
+        candidates.delete(uuid);
+      }
+      if (promoted.length > 0) {
+        this.log.debug(`plex.tv/devices candidates promoted via known-player history: ${promoted.join(" | ")}`);
+      }
+    }
+    if (candidates.size > 0) {
+      const unconfirmed = [...candidates.values()].map((d) => `${d.name || d.device || "?"}/${d.product || "?"}`).join(" | ");
+      this.log.debug(
+        `plex.tv/devices candidates not confirmed by sessions/clients/native (skipped): ${unconfirmed}`
+      );
+    }
+    this.log.debug(
+      `getPlayers: discovered ${found.size} player(s) from ${[...found.values()].map((p) => p.sources.join("+")).join(", ") || "(none)"}`
+    );
+    this.playerIds.length = 0;
+    for (const player of found.values()) {
+      if (!player.title || !player.uuid) {
+        continue;
+      }
+      this.playerIds.push(player.uuid);
+      const playerTemp = this.controller.createPlayerIfNotExist({
+        address: player.address,
+        port: player.port,
+        config: {
+          title: player.title,
+          uuid: player.uuid,
+          name: player.title,
+          protocolCapabilities: player.protocolCapabilities,
+          publicAddress: player.publicAddress,
+          product: player.product,
+          platform: player.platform,
+          device: player.device
+        }
+      });
+      playerTemp.setClientData({
+        ...player.raw,
+        machineIdentifier: player.uuid,
+        name: player.title,
+        title: player.title,
+        address: player.address,
+        port: player.port,
+        protocolCapabilities: player.protocolCapabilities,
+        remotePublicAddress: player.publicAddress,
+        _sources: player.sources,
+        _provides: player.provides
+      });
+      void this.extendObject(playerTemp.prefix, {
+        native: {
+          uuid: player.uuid,
+          isPlayer: true,
+          lastSeenAt: (/* @__PURE__ */ new Date()).toISOString(),
+          lastSeenSource: player.sources.join("+"),
+          product: player.product,
+          platform: player.platform,
+          device: player.device
+        }
+      });
+      this.knownPlayerIds.add(player.uuid);
+    }
+  }
+  async startListener() {
+    const app = (0, import_express.default)();
+    app.use(import_body_parser.default.json({ limit: "100kb" }));
+    app.use(import_body_parser.default.urlencoded({ extended: false, limit: "100kb" }));
+    app.post("/plex", this.upload.single("thumb"), async (req, res) => {
+      const cleanupTempFile = () => {
+        if (req.file && req.file.path) {
+          fs.unlink(req.file.path, () => {
+          });
+        }
+      };
+      try {
+        this.log.debug(`Incoming data from plex with ip: ${(req.ip || "").replace("::ffff:", "")}`);
+        if (!req.body || typeof req.body.payload !== "string") {
+          res.sendStatus(400);
+          cleanupTempFile();
+          return;
+        }
+        const payload = JSON.parse(req.body.payload);
+        res.sendStatus(200);
+        if (!payload || !payload.event) {
+          cleanupTempFile();
+          return;
+        }
+        if (["media.play", "media.pause", "media.stop", "media.resume", "media.rate", "media.scrobble"].indexOf(
+          payload.event
+        ) > -1) {
+          await this.setEvent(payload, "plex", "_playing");
+        }
+        await this.setEvent(payload, "plex", "events");
+      } catch (e) {
+        this.log.warn(`startListener: ${e instanceof Error ? e.message : String(e)}`);
+        if (!res.headersSent) {
+          res.sendStatus(400);
+        }
+      } finally {
+        cleanupTempFile();
+      }
+    });
+    if (this.config.tautulliEnabled) {
+      app.post("/tautulli", (req, res) => {
+        try {
+          this.log.debug(`Incoming data from tautulli with ip: ${(req.ip || "").replace("::ffff:", "")}`);
+          const payload = req.body;
+          if (!payload || !payload.event) {
+            res.sendStatus(400);
+            return;
+          }
+          res.sendStatus(200);
+          if ([
+            "media.play",
+            "media.pause",
+            "media.stop",
+            "media.resume",
+            "media.rate",
+            "media.scrobble"
+          ].indexOf(payload.event) > -1) {
+            void this.setEvent(payload, "tautulli", "_playing");
+          }
+          void this.setEvent(payload, "tautulli", "events");
+        } catch (e) {
+          this.log.warn(
+            `Tautulli notification ${e instanceof Error ? e.message : String(e)} - check the webhook data configuration page in Tautulli. https://forum.iobroker.net/post/1029571`
+          );
+          if (!res.headersSent) {
+            res.sendStatus(400);
+          }
+        }
+      });
+    }
+    if (this.httpServer) {
+      this.log.error("HTTP Server already running!");
+      const helper = async (params) => {
+        await new Promise((resolve) => {
+          params == null ? void 0 : params.close(() => {
+            resolve(true);
+          });
+        });
+      };
+      await helper(this.httpServer);
+    }
+    this.httpServer = app.listen(this.config.webhookPort || 41891, this.config.webhookIp);
+    this.httpServer.on("error", (err) => {
+      this.log.error(
+        `Failed to start webhook listener on ${this.config.webhookIp || "0.0.0.0"}:${this.config.webhookPort || 41891} - ${err.message}`
+      );
+    });
+  }
+  refreshViewOffset = () => {
+    if (!this.unloaded) {
+      if (this.detailsCounter++ > 15) {
+        this.detailsCounter = 0;
+      }
+      this.playingDevice.forEach((player) => {
+        let state = `${player.prefix}.Metadata.viewOffset`;
+        const value = (this.library.getDeviceState(state) || 0) + 1e3;
+        let node = this.library.getNode("playing.metadata.viewOffset", true);
+        void this.library.set(
+          {
+            node: state,
+            type: node.type,
+            role: node.role,
+            description: node.description
+          },
+          value
+        );
+        state += "Seconds";
+        node = this.library.getNode("playing.metadata.viewOffset", true);
+        void this.library.set(
+          {
+            node: state,
+            type: node.type,
+            role: node.role,
+            description: node.description
+          },
+          value / 1e3
+        );
+      });
+    }
+  };
+}
+if (require.main !== module) {
+  module.exports = (options) => new Plex(options);
+} else {
+  (() => new Plex())();
+}
+//# sourceMappingURL=main.js.map

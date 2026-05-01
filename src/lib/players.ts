@@ -683,14 +683,12 @@ export class Player {
             this._controller._adapter.log.debug(
                 `setControls skipped for ${this.prefix}: not HTTP-controllable (provides="${this.provides}", sources=${this.sources.join('+') || '?'}); pruning _Controls subtree.`,
             );
-            void this._controller._adapter
-                .delObjectAsync(controls, { recursive: true })
-                .catch((err: unknown) => {
-                    const m = err instanceof Error ? err.message : String(err);
-                    if (!/Not exists/i.test(m)) {
-                        this._controller._adapter.log.debug(`prune _Controls failed for ${this.prefix}: ${m}`);
-                    }
-                });
+            void this._controller._adapter.delObjectAsync(controls, { recursive: true }).catch((err: unknown) => {
+                const m = err instanceof Error ? err.message : String(err);
+                if (!/Not exists/i.test(m)) {
+                    this._controller._adapter.log.debug(`prune _Controls failed for ${this.prefix}: ${m}`);
+                }
+            });
             return;
         }
         this.config.protocolCapabilities.split(',').forEach(mode => {
@@ -862,8 +860,7 @@ export class Player {
                 //   - `commandID=N` — monotonically increasing per Companion session; pubsub orders
                 //     by it.
                 const mtypeRaw = this.details && this.details.type;
-                const mtype =
-                    mtypeRaw === 'video' || mtypeRaw === 'music' || mtypeRaw === 'photo' ? mtypeRaw : 'video';
+                const mtype = mtypeRaw === 'video' || mtypeRaw === 'music' || mtypeRaw === 'photo' ? mtypeRaw : 'video';
                 const cid = `commandID=${this.commandID++}`;
                 const attr = attribute != undefined ? attribute : '';
                 const sep = attr && !attr.endsWith('&') ? '&' : '';

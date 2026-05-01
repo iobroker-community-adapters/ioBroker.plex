@@ -372,7 +372,9 @@ export class PlexHttp {
         }
 
         const body = typeof response.data === 'string' ? response.data : '';
-        const ct = String(response.headers?.['content-type'] || '').toLowerCase();
+        const ct = (
+            typeof response.headers?.['content-type'] === 'string' ? response.headers['content-type'] : ''
+        ).toLowerCase();
         if (ct.includes('json') && body.trim().startsWith('{')) {
             return parseDevicesJson(body);
         }
@@ -383,6 +385,8 @@ export class PlexHttp {
 /**
  * Parse plex.tv `/devices.xml` JSON response (when Plex honors Accept: application/json).
  * Shape is roughly `{ MediaContainer: { Device: [{ ...attributes, Connection: [{ uri }] }] } }`.
+ *
+ * @param body - Raw JSON response body
  */
 function parseDevicesJson(body: string): Plex.Tv.Device[] {
     try {
@@ -401,6 +405,8 @@ function parseDevicesJson(body: string): Plex.Tv.Device[] {
 /**
  * Best-effort XML parser for the small `<Device .../>` subset we need from /devices.xml.
  * Avoids pulling in xml2js for a single endpoint with a stable, well-known shape.
+ *
+ * @param body - Raw XML response body
  */
 function parseDevicesXml(body: string): Plex.Tv.Device[] {
     const result: Plex.Tv.Device[] = [];
@@ -434,7 +440,7 @@ function parseDevicesXml(body: string): Plex.Tv.Device[] {
 function normalizeDevice(d: Record<string, unknown>): Plex.Tv.Device {
     const conns = Array.isArray(d.Connection) ? (d.Connection as Array<Record<string, unknown>>) : [];
     return {
-        clientIdentifier: String(d.clientIdentifier || ''),
+        clientIdentifier: typeof d.clientIdentifier === 'string' ? d.clientIdentifier : '',
         name: typeof d.name === 'string' ? d.name : undefined,
         product: typeof d.product === 'string' ? d.product : undefined,
         productVersion: typeof d.productVersion === 'string' ? d.productVersion : undefined,
@@ -447,7 +453,7 @@ function normalizeDevice(d: Record<string, unknown>): Plex.Tv.Device {
         publicAddress: typeof d.publicAddress === 'string' ? d.publicAddress : undefined,
         lastSeenAt: typeof d.lastSeenAt === 'string' ? d.lastSeenAt : undefined,
         connections: conns.map(c => ({
-            uri: String(c.uri || ''),
+            uri: typeof c.uri === 'string' ? c.uri : '',
             address: typeof c.address === 'string' ? c.address : undefined,
             port: c.port !== undefined ? Number(c.port) : undefined,
             protocol: typeof c.protocol === 'string' ? c.protocol : undefined,

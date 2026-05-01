@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 
 const WS_PATH = '/:/websockets/notifications';
-const RECONNECT_DELAYS_MS = [1_000, 2_000, 5_000, 15_000, 30_000] as const;
+const RECONNECT_DELAYS_MS = [1000, 2000, 5000, 15_000, 30_000] as const;
 /**
  * If no frame arrives for this long, the connection is presumed dead and we force
  * a reconnect. Plex pushes frames regularly even at idle (status, activity), so 5min
@@ -164,7 +164,7 @@ export class PlexNotifications {
         } else if (Array.isArray(raw)) {
             text = Buffer.concat(raw).toString('utf8');
         } else {
-            text = Buffer.from(raw as ArrayBuffer).toString('utf8');
+            text = Buffer.from(raw).toString('utf8');
         }
         if (!text) {
             return;
@@ -259,8 +259,7 @@ export class PlexNotifications {
         if (this.stopped) {
             return;
         }
-        const delay =
-            RECONNECT_DELAYS_MS[Math.min(this.reconnectAttempt, RECONNECT_DELAYS_MS.length - 1)];
+        const delay = RECONNECT_DELAYS_MS[Math.min(this.reconnectAttempt, RECONNECT_DELAYS_MS.length - 1)];
         this.reconnectAttempt++;
         this.opts.log.debug(`PlexNotifications: reconnecting in ${delay}ms (attempt ${this.reconnectAttempt})`);
         this.reconnectTimer = setTimeout(() => {

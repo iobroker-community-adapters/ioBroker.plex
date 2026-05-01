@@ -150,7 +150,7 @@
       "zh-cn": "Plex Media Server"
     },
     "type": "multimedia",
-    "version": "1.2.0-alpha.1"
+    "version": "2.0.0-alpha.0"
   },
   "instanceObjects": [],
   "native": {

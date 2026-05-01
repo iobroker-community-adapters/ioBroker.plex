@@ -1,7 +1,4 @@
 {
-    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
-    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
-    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
@@ -15,26 +12,24 @@
             ]
         },
         {
+            "name": "Launch Adapter (dev-server watch -n)",
             "type": "node",
             "request": "launch",
-            "name": "Launch ioBroker Adapter",
-            "skipFiles": ["<node_internals>/**"],
+            "program": "${workspaceFolder}/.dev-server/default/node_modules/iobroker.plex/build/main.js",
             "args": ["--debug", "0"],
-            "program": "node_modules/iobroker.weather-warnings/main.js",
-            "cwd": "${workspaceFolder}/.dev-server/default"
-        },
-        {
-            "type": "node",
-            "request": "attach",
-            "name": "attach to ioBroker-Adapter",
-            "address": "127.0.0.1",
-            "port": 9229,
-            "localRoot": "${workspaceFolder}",
-            "remoteRoot": "${workspaceFolder}/.dev-server/default/node_modules/iobroker.weather-warnings",
-            "smartStep": true,
-            "skipFiles": [
-              "<node_internals>/**"
+            "cwd": "${workspaceFolder}/.dev-server/default",
+            "console": "internalConsole",
+            "outputCapture": "std",
+            "attachSimplePort": 9230,
+            "runtimeArgs": ["--inspect-brk=9230"],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/.dev-server/default/node_modules/iobroker.plex/build/**/*.js"
+            ],
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/.dev-server/default/node_modules/iobroker.plex/build/**"
             ]
-          }
+        }
     ]
 }

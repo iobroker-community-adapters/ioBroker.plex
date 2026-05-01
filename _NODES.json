@@ -9695,5 +9695,13 @@
         },
         "role": "text",
         "type": "string"
+    },
+    "events.settings": {
+        "description": {
+            "en": "WWW UI settings",
+            "de": "WWW-UI-Einstellungen"
+        },
+        "role": "json",
+        "type": "json"
     }
 }

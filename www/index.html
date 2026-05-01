@@ -1,190 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<title>ioBroker.plex</title>
-	
-	<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
-	<link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
-	
-	<script src="../../lib/js/jquery-3.2.1.min.js"></script>
-	<script src="../../socket.io/socket.io.js"></script>
-	<script src="conn.js"></script>
-	<script src="modernizr-custom.js"></script>
-	<script src="vertical-timeline.js"></script>
-	<script src="ICONS.js"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ioBroker.plex</title>
+        <link rel="icon" type="image/jpeg" href="./plex.jpg" />
+        <script>
+            // Tell @iobroker/socket-client (Connection.isWeb()) we run as a web-adapter
+            // client. Without this the socket.io path becomes "/plex/socket.io" which the
+            // web adapter does not route to the socket.io listener (the rewrite middleware
+            // only fires after engine.io has already bypassed the request) — resulting in
+            // 404 on every poll. Setting socketUrl makes Connection strip the "/plex/" so
+            // the polling URL becomes "/socket.io/…", which is what the OLD plex used too.
+            (function () {
+                var isDev = window.location.port === '4174';
+                window.socketUrl = isDev
+                    ? window.location.protocol + '//' + window.location.hostname + ':8081'
+                    : window.location.origin;
+            })();
 
-	<script src="../../lib/js/materialize.js"></script>
-	<script>
-	<!--
-	var lang = (navigator.languages != undefined ? navigator.languages[0] : navigator.language).substr(0, 2);
-	console.log('LANGUAGE: ' + lang);
-	
-	var logIDs = [], timeline = [];
-	var socketConnected;
-	var tl;
-	
-	// add entries
-	function addTimeline(entries)
-	{
-		// compare payload to existing entries
-		let added = false;
-		let entry;
-		
-		for (let i = 0; i < entries.length; i++)
-		{
-			entry = entries[i];
-			entry.id = entry.id || entry.source + '_' + entry.event + '_' + entry.timestamp;
-			
-			if (logIDs.indexOf(entry.id) === -1)
-			{
-				added = true;
-				logIDs.push(entry.id);
-				
-				// 
-				entry.date = new Date(entry.timestamp*1000);
-				entry.dateFormatted = entry.date.toLocaleDateString(lang, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
-				entry.timeFormatted = entry.date.toLocaleTimeString(lang, {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-				
-				// add to timeline
-				timeline.push(entry);
-			}
-		}
-		
-		if (added)
-		{
-			// sort
-			/*
-			timeline.sort(function(a, b)
-			{
-				return b.date - a.date
-			});
-			*/
-			
-			// show timeline
-			showTimeline(timeline);
-		}
-	}
-	
-	// show entries
-	function showTimeline(entries)
-	{
-		console.log("Show timeline with " + timeline.length + " entries.");
-		console.log(JSON.stringify(timeline));
-		
-		$('.cd-timeline-block').not('.template').remove();
-		entries.forEach(function(entry) {addLog(entry)});
-		
-		tl.hideBlocks();
-		$(window).trigger('scroll');
-	}
-	
-	// add log entry
-	function addLog(entry)
-	{
-		var icon = !ICONS[entry.event] ? 'unknown' : entry.event;
-		var tpl = $('.template').clone().removeClass('template hidden');
-		
-		tpl.find('.cd-message').html(entry.message);
-		tpl.find('.cd-caption').html(entry.caption);
-		if (entry.thumb)
-			tpl.find('.cd-thumb').attr('src', entry.thumb);
-		else
-			tpl.find('.cd-thumb').remove();
-		
-		tpl.find('.cd-icon').addClass('action-' + entry.event).css({'background-color': ICONS[icon].color, 'background-image': 'url(' + ICONS[icon].img + ')', 'background-color': ICONS[icon].color});
-		tpl.find('.cd-date').html(entry.dateFormatted + ', ' + entry.timeFormatted);
-		
-		$('#cd-timeline .cd-timeline-block').first().before(tpl);
-	}
-	
-	//
-	
-	
-	// page loaded
-	$(window).on('load', function()
-	{
-		// config
-		servConn.namespace = 'plex.0';
-		var states = ['events.history'];
-		
-		//
-		// Vertical Timeline
-		tl = new Timeline();
-		tl.bindScroll();
-		
-		//
-		// Connect Socket
-		servConn.init({
-			connLink: window.location.href.substr(0, window.location.href.indexOf('/', 8))
-		}, {
-			onConnChange: function(socketConnected)
-			{
-				console.log('Socket ' + (socketConnected ? 'connected' : 'disconnected') + '!');
-				
-				// retrieve states
-				var updateData = setTimeout(function getData()
-				{
-					if (socketConnected)
-					{
-						servConn.getStates(states.map(function(state) {return servConn.namespace + '.' + state}), function(err, _states)
-						{
-							if (_states !== null && _states !== undefined)
-							{
-								for (var key in _states)
-								{
-									var content = _states[key] && _states[key].val;
-									var node = key.replace(servConn.namespace + '.', '');
-									if (!content) return;
-									
-									if (node == 'events.history')
-										addTimeline(JSON.parse(content));
-									
-									else
-										$('[data-state="' + node + '"]').html(content);
-									
-								}
-							}
-						});
-					}
-
-					updateData = setTimeout(getData, 10*1000);
-				}, 1000);
-			}
-		});
-	});
-	// -->
-	</script>
-	<link rel="stylesheet" type="text/css" href="vertical-timeline.css"/>
-	<link rel="stylesheet" type="text/css" href="index.css"/>
-	<link rel="stylesheet" type="text/css" href="plex.css"/>
-	
-</head>
-<body>
-
-
-<section id="cd-timeline" class="cd-container">
-
-	<div class="cd-timeline-block template hidden">
-		<div class="cd-timeline-img cd-icon"></div>
-		<div class="cd-timeline-content">
-			<div class="thumb">
-				<img class="cd-thumb" />
-			</div>
-			<div class="information">
-				<h2 class="cd-message"></h2>
-				<p class="cd-caption caption"></p>
-			</div>
-			
-			<span class="cd-date"></span>
-		</div>
-	</div>
-	
-</section>
-
-<div class="copyright">
-	Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
-	is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
-</div>
-
-</body>
+            // Load ioBroker's socket.io client. When opened via the ioBroker web adapter
+            // (http://<host>:8082/plex/), the script lives at ../../lib/js/socket.io.js.
+            // For the local dev server (vite on port 4174), point at the admin instance on 8081.
+            window.registerSocketOnLoad = function (cb) {
+                window.socketLoadedHandler = cb;
+            };
+            (function () {
+                const script = document.createElement('script');
+                script.onload = function () {
+                    if (typeof window.socketLoadedHandler === 'function') {
+                        window.socketLoadedHandler();
+                    }
+                };
+                const isDev = window.location.port === '4174';
+                script.src = isDev
+                    ? `${window.location.protocol}//${window.location.hostname}:8081/lib/js/socket.io.js`
+                    : '../../lib/js/socket.io.js';
+                document.head.appendChild(script);
+            })();
+        </script>
+      <script type="module" crossorigin src="./assets/index-CKj7MwwO.js"></script>
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
 </html>

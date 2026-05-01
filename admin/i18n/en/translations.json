@@ -76,6 +76,7 @@
     "resetMediaInfo": "Reset / delete all states within tree '._playing' on startup.",
     "secureConnection": "Use secure connection to Plex Media Server (https)",
     "tab_alexa": "Alexa integration",
+    "tab_cleanup": "Cleanup",
     "tab_config": "Configuration",
     "tab_data": "Data",
     "tab_donate": "Donation",

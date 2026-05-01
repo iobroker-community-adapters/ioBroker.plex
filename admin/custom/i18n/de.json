@@ -22,5 +22,19 @@
     "tokenDialog_status_success": "Neuer Token abgerufen und in das Formular eingetragen.",
     "tokenDialog_status_success_unchanged": "Token bestätigt — identisch mit dem bereits gespeicherten.",
     "tokenDialog_status_error_pin": "PIN konnte nicht abgerufen werden. Läuft der Adapter?",
-    "tokenDialog_status_error_token": "Token konnte nicht abgerufen werden. PIN auf plex.tv/link eingegeben?"
+    "tokenDialog_status_error_token": "Token konnte nicht abgerufen werden. PIN auf plex.tv/link eingegeben?",
+    "cleanup_days_label": "Tage",
+    "cleanup_button": "Aufräumen (%s)",
+    "cleanup_refresh": "Neu laden",
+    "cleanup_hint": "Player älter als die Schwelle sind vorgewählt. Klick auf eine Karte schaltet ihren Zustand um. Aufräumen löscht nur die roten Karten.",
+    "cleanup_loading": "Lade Player…",
+    "cleanup_empty": "Keine persistierten Player gefunden.",
+    "cleanup_nothing_marked": "Nichts zum Aufräumen markiert.",
+    "cleanup_done": "%s Player gelöscht.",
+    "cleanup_error_load": "Player konnten nicht geladen werden. Läuft der Adapter?",
+    "cleanup_error_delete": "Aufräumen fehlgeschlagen — Details im Adapter-Log.",
+    "cleanup_lastseen_unknown": "Zuletzt gesehen: unbekannt",
+    "cleanup_lastseen_days": "Zuletzt gesehen: vor %sd",
+    "cleanup_lastseen_hours": "Zuletzt gesehen: vor %sh",
+    "cleanup_lastseen_recent": "Zuletzt gesehen: gerade eben"
 }

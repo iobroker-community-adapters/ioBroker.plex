@@ -453,6 +453,25 @@
                     ]
                 }
             }
+        },
+        "_cleanupTab": {
+            "type": "panel",
+            "label": "tab_cleanup",
+            "items": {
+                "_cleanupComponent": {
+                    "type": "custom",
+                    "name": "ConfigCustomPlexSet/Components/PlayerCleanup",
+                    "url": "custom/customComponents.js",
+                    "i18n": true,
+                    "bundlerType": "module",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
         }
     }
 }

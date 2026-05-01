@@ -19,6 +19,7 @@ When the user asks to "prepare a release" / "release vorbereiten":
 
 ## Plex domain knowledge
 
+- **Primary reference for Plex API behavior: `python-plexapi`** (https://github.com/pkkid/python-plexapi, docs at https://python-plexapi.readthedocs.io/). Actively maintained, used by Home Assistant. When Plex API questions come up (which endpoint to call, what a field means, how Plex actually behaves), consult its source before guessing or pulling random forum posts. Plex's own developer docs are sparse and outdated; python-plexapi is the de-facto spec.
 - **X-Plex-Tokens from the PIN flow do not normally expire.** Don't write log messages or code comments suggesting "the token has expired, please renew" without evidence. Other Plex clients (Home Assistant, Plexamp, …) run for years on the same token. If the adapter goes offline, look for the real cause first — token expiry is almost never it.
 - **Plex Media Server HTTPS certs don't validate against IP addresses.** PMS presents either a self-signed cert or a `*.plex.direct` wildcard cert; both fail standard hostname validation when accessed by IP on the LAN. The adapter sets `rejectUnauthorized: false` on the `https.Agent` by design — this is the correct configuration for typical home setups, not a security oversight.
 - **PIN flow uses `https://plex.tv/api/v2/pins` without `strong=true`.** `strong=true` returns a long opaque code for headless clients; the default (omitted) returns the 4-character human-readable code that users enter at `plex.tv/link`.
@@ -27,6 +28,7 @@ When the user asks to "prepare a release" / "release vorbereiten":
 
 - **axios does not accept top-level `cert` / `key` / `ca` / `rejectUnauthorized`.** They must be wrapped in `httpsAgent: new https.Agent({…})`. The legacy `request` package accepted them at the root, which is why this pattern looks fine in code review but silently fails at runtime.
 - **Do not reintroduce `plex-api` (npm) or `request-promise` as a direct dependency.** Plex API access goes through `lib/plexHttp.js`; PIN auth through `lib/plexPinAuth.js`. `request-promise` is still pulled in transitively via `tautulli-api` — that's out of our control until `tautulli-api` is replaced.
+- **ioBroker `Foreign*` APIs are for objects/states OUTSIDE the adapter's own namespace.** For our own `plex.<instance>.*` tree, use the non-Foreign variants: `getObject` / `getObjectAsync` / `setObject` / `extendObject` / `extendObjectAsync` (relative ID, no `<adapter>.<instance>.` prefix); `getStates` / `getState` / `setState` for state values; `getAdapterObjectsAsync()` to enumerate all of the adapter's own objects. Reach for `getForeignObject*` / `extendForeignObject*` / `getForeignStates*` only when touching another adapter's namespace.
 
 ## Reviewing & fixing
 

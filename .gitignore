@@ -5,9 +5,15 @@
 /node_modules
 /.idea
 /tmp
+/build
+.eslintcache
 src-admin/node_modules
 src-admin/build
 src-admin/.__mf__temp
+src-www/node_modules
+src-www/build
+# local scratch files
+/te.txt
 # local data
 .dataTest/
 # ioBroker dev-server

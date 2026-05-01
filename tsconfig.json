@@ -1,40 +1,30 @@
-// Root tsconfig to set the settings and power editor support for all TS files
+// Root tsconfig — settings for editor support and `tsc --noEmit` type checking.
+// Compilation to ./build/ uses tsconfig.build.json (invoked by `build-adapter ts`).
 {
-    // To update the compilation target, install a different version of @tsconfig/node... and reference it here
-    // https://github.com/tsconfig/bases#node-14-tsconfigjson
     "extends": "@tsconfig/node22/tsconfig.json",
     "compilerOptions": {
-        // do not compile anything, this file is just to configure type checking
         "noEmit": true,
-
-        // check JS files
         "allowJs": true,
         "checkJs": true,
-
-        // This is necessary for the automatic typing of the adapter config
+        "outDir": "./build/",
+        "removeComments": false,
         "resolveJsonModule": true,
-
-        // If you want to disable the stricter type checks (not recommended), uncomment the following line
-        // "strict": false,
-        // And enable some of those features for more fine-grained control
-        // "strictNullChecks": true,
-        // "strictPropertyInitialization": true,
-        // "strictBindCallApply": true,
-        "noImplicitAny": false,
-        // "noUnusedLocals": true,
-        // "noUnusedParameters": true,
-        "useUnknownInCatchVariables": false,
-
+        "sourceMap": true,
+        "inlineSourceMap": false,
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "noImplicitAny": true
     },
     "include": [
-        "**/*.js",
-        "**/*.d.ts"
+        "src/**/*.ts",
+        "test/**/*.ts"
     ],
     "exclude": [
+        "build/**",
         "node_modules/**",
-        "admin/**",
         "src-admin/**",
+        "src-www/**",
         "www/**",
-        "test/**"
+        "admin/**"
     ]
 }

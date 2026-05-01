@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ioBroker.plex</title>
+        <link rel="icon" type="image/jpeg" href="./plex.jpg" />
+        <script>
+            // Tell @iobroker/socket-client (Connection.isWeb()) we run as a web-adapter
+            // client. Without this the socket.io path becomes "/plex/socket.io" which the
+            // web adapter does not route to the socket.io listener (the rewrite middleware
+            // only fires after engine.io has already bypassed the request) — resulting in
+            // 404 on every poll. Setting socketUrl makes Connection strip the "/plex/" so
+            // the polling URL becomes "/socket.io/…", which is what the OLD plex used too.
+            (function () {
+                var isDev = window.location.port === '4174';
+                window.socketUrl = isDev
+                    ? window.location.protocol + '//' + window.location.hostname + ':8081'
+                    : window.location.origin;
+            })();
+
+            // Load ioBroker's socket.io client. When opened via the ioBroker web adapter
+            // (http://<host>:8082/plex/), the script lives at ../../lib/js/socket.io.js.
+            // For the local dev server (vite on port 4174), point at the admin instance on 8081.
+            window.registerSocketOnLoad = function (cb) {
+                window.socketLoadedHandler = cb;
+            };
+            (function () {
+                const script = document.createElement('script');
+                script.onload = function () {
+                    if (typeof window.socketLoadedHandler === 'function') {
+                        window.socketLoadedHandler();
+                    }
+                };
+                const isDev = window.location.port === '4174';
+                script.src = isDev
+                    ? `${window.location.protocol}//${window.location.hostname}:8081/lib/js/socket.io.js`
+                    : '../../lib/js/socket.io.js';
+                document.head.appendChild(script);
+            })();
+        </script>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.tsx"></script>
+    </body>
+</html>

@@ -22,5 +22,19 @@
     "tokenDialog_status_success": "New token retrieved and written to the form.",
     "tokenDialog_status_success_unchanged": "Token confirmed — identical to the one already saved.",
     "tokenDialog_status_error_pin": "Could not fetch PIN. Is the adapter running?",
-    "tokenDialog_status_error_token": "Could not retrieve token. Did you enter the PIN at plex.tv/link?"
+    "tokenDialog_status_error_token": "Could not retrieve token. Did you enter the PIN at plex.tv/link?",
+    "cleanup_days_label": "Days",
+    "cleanup_button": "Clean up (%s)",
+    "cleanup_refresh": "Reload",
+    "cleanup_hint": "Players older than the threshold are pre-marked. Click a card to flip its state. Cleanup deletes only red cards.",
+    "cleanup_loading": "Loading players…",
+    "cleanup_empty": "No persisted players found.",
+    "cleanup_nothing_marked": "Nothing marked for cleanup.",
+    "cleanup_done": "%s player(s) deleted.",
+    "cleanup_error_load": "Could not load players. Is the adapter running?",
+    "cleanup_error_delete": "Cleanup failed — see adapter log for details.",
+    "cleanup_lastseen_unknown": "Last seen: unknown",
+    "cleanup_lastseen_days": "Last seen: %sd ago",
+    "cleanup_lastseen_hours": "Last seen: %sh ago",
+    "cleanup_lastseen_recent": "Last seen: just now"
 }

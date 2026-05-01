@@ -131,15 +131,13 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 1.2.0-alpha.1 (2026-04-30)
-- (ticaki) Fixed: recurring "Tautulli configuration is incorrect" errors in the log when Tautulli was not reachable but user/statistics retrieval was enabled — those retrievals are now skipped automatically when Tautulli is unavailable.
-- (ticaki) New: optional toggle on the Tautulli tab to fully disable the Tautulli integration; dependent fields are greyed out when disabled.
-
-### 1.2.0-alpha.0 (2026-04-30)
-- (ticaki) Settings UI overhauled; the token wizard now shows a red button when the adapter cannot reach Plex with the current token and a green one for an optional renewal.
-- (copilot) Adapter requires admin >= 7.8.0 now
-- (ticaki) Improved stability and connection reliability; reduced memory growth on long runtimes.
-- (ticaki) Adapter requires Node.js >= 22 now
+### **WORK IN PROGRESS**
+- (ticaki) **Breaking:** Data points under `_playing.*` have been restructured — existing scripts and Vis widgets need to be updated.
+- (ticaki) Data retrieval from Plex Media Server reworked; which fields are populated now depends on the interface used (local / Plex.tv cloud).
+- (ticaki) Adapter configuration fully migrated to the modern jsonConfig format.
+- (ticaki) Built-in web interface redesigned: timeline of recent events, Now Playing display, and customizable layout.
+- (ticaki) Player detection improved: Plexamp, Plex iOS/Android, PlexHTPC, and newer TV apps are now reliably detected.
+- (ticaki) Reconnect after connection errors accelerated: progressive backoff instead of fixed wait time.
 
 ### 1.1.5 (2024-12-11)
 - (ticaki) State _playing.*.Metadata.viewOffset is created.

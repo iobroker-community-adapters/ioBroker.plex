@@ -34,7 +34,7 @@ module.exports = __toCommonJS(plexNotifications_exports);
 var import_ws = __toESM(require("ws"));
 const WS_PATH = "/:/websockets/notifications";
 const RECONNECT_DELAYS_MS = [1e3, 2e3, 5e3, 15e3, 3e4];
-const IDLE_TIMEOUT_MS = 5 * 6e4;
+const IDLE_TIMEOUT_MS = 30 * 6e4;
 class PlexNotifications {
   opts;
   ws;
@@ -100,7 +100,7 @@ class PlexNotifications {
     this.ws.on("open", () => {
       this.reconnectAttempt = 0;
       this.framesSeen = 0;
-      this.opts.log.info("PlexNotifications: WebSocket connection established.");
+      this.opts.log.debug("PlexNotifications: WebSocket connection established.");
       this.armIdleTimer();
     });
     this.ws.on("message", (raw) => this.handleMessage(raw));

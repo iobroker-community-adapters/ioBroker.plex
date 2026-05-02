@@ -4,11 +4,13 @@ const WS_PATH = '/:/websockets/notifications';
 const RECONNECT_DELAYS_MS = [1000, 2000, 5000, 15_000, 30_000] as const;
 /**
  * If no frame arrives for this long, the connection is presumed dead and we force
- * a reconnect. Plex pushes frames regularly even at idle (status, activity), so 5min
- * silence is a clear sign of a broken socket. Application-level idle check instead of
- * `ws.ping()`: PMS does not reliably respond to WebSocket protocol pings.
+ * a reconnect. PMS sends frames only during active playback; at idle it can be silent
+ * for extended periods. 30 min is conservative enough to catch a truly dead socket
+ * without causing spurious reconnects during idle phases.
+ * Application-level idle check instead of `ws.ping()`: PMS does not reliably respond
+ * to WebSocket protocol pings.
  */
-const IDLE_TIMEOUT_MS = 5 * 60_000;
+const IDLE_TIMEOUT_MS = 30 * 60_000;
 
 export interface PlexNotificationsOptions {
     hostname: string;
@@ -134,7 +136,7 @@ export class PlexNotifications {
         this.ws.on('open', () => {
             this.reconnectAttempt = 0;
             this.framesSeen = 0;
-            this.opts.log.info('PlexNotifications: WebSocket connection established.');
+            this.opts.log.debug('PlexNotifications: WebSocket connection established.');
             this.armIdleTimer();
         });
 

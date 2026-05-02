@@ -279,7 +279,7 @@ class Library {
       }
     );
   }
-  runGarbageCollector = async (state, del = false, offset = 6e4, whitelist = []) => {
+  runGarbageCollector = async (state, _del = false, offset = 6e4, whitelist = []) => {
     this._adapter.log.debug(`Running Garbage Collector for ${state}...`);
     return new Promise((resolve) => {
       this._adapter.getStates(`${state}.*`, async (err, states) => {
@@ -294,35 +294,26 @@ class Library {
             key = stateId.replace(`${this._adapter.name}.${this._adapter.instance}.`, "");
             const entry = this._STATES[key];
             if (entry && entry.ts !== void 0 && entry.ts < Date.now() - offset && !(whitelist.length > 0 && RegExp(whitelist.join("|")).test(stateId))) {
-              this._adapter.log.debug(`Garbage Collector: ${del ? "Deleted " : "Emptied "}${stateId}!`);
-              if (del) {
-                try {
-                  this._STATES[key] = void 0;
-                  await this._adapter.delObjectAsync(stateId);
-                } catch (error) {
-                  this._adapter.log.warn(JSON.stringify(error));
+              this._adapter.log.debug(`Garbage Collector: Emptied ${stateId}!`);
+              try {
+                const val = await this._adapter.getObjectAsync(key);
+                let emptyVal;
+                switch ((_a = val == null ? void 0 : val.common) == null ? void 0 : _a.type) {
+                  case "string":
+                    emptyVal = "";
+                    break;
+                  case "number":
+                    emptyVal = 0;
+                    break;
+                  case "boolean":
+                    emptyVal = false;
+                    break;
+                  default:
+                    emptyVal = null;
                 }
-              } else {
-                try {
-                  const val = await this._adapter.getObjectAsync(key);
-                  let emptyVal;
-                  switch ((_a = val == null ? void 0 : val.common) == null ? void 0 : _a.type) {
-                    case "string":
-                      emptyVal = "";
-                      break;
-                    case "number":
-                      emptyVal = 0;
-                      break;
-                    case "boolean":
-                      emptyVal = false;
-                      break;
-                    default:
-                      emptyVal = null;
-                  }
-                  void this._setValue(key, emptyVal, { force: true });
-                } catch (error) {
-                  this._adapter.log.warn(error instanceof Error ? error.message : String(error));
-                }
+                void this._setValue(key, emptyVal, { force: true });
+              } catch (error) {
+                this._adapter.log.warn(error instanceof Error ? error.message : String(error));
               }
             }
           }
@@ -405,25 +396,28 @@ class Library {
       }
     }
   }
+  clearStateCache(prefix) {
+    for (const key of Object.keys(this._STATES)) {
+      if (key === prefix || key.startsWith(`${prefix}.`)) {
+        this._STATES[key] = void 0;
+      }
+    }
+  }
   async del(state, nested, callback) {
-    await this._createNode({ node: state, description: "DELETED" });
-    this._adapter.getStates(nested ? `${state}.*` : state, (_err, objects) => {
-      let deleted = 0;
+    this._adapter.getStates(nested ? `${state}.*` : state, async (_err, objects) => {
       const objectIds = Object.keys(objects || {});
-      objectIds.push(state);
-      this._adapter.log.silly(`Found ${objectIds.length} objects in state ${state} to delete..`);
-      objectIds.forEach((object) => {
-        this._adapter.delObject(object, () => {
-          this._STATES[object.replace(`${this._adapter.namespace}.`, "")] = void 0;
-          deleted++;
-          if (deleted == objectIds.length) {
-            this._adapter.log.debug(`Deleted state ${state} with ${deleted} objects.`);
-            if (callback) {
-              callback();
-            }
-          }
-        });
-      });
+      for (const objectId of objectIds) {
+        const key = objectId.replace(`${this._adapter.namespace}.`, "");
+        try {
+          await this._setValue(key, null, { force: true });
+        } catch (error) {
+          this._adapter.log.warn(`del: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+      this._adapter.log.debug(`Reset ${objectIds.length} states under ${state}.`);
+      if (callback) {
+        callback();
+      }
     });
   }
   async setMultiple(values, nodes, options = {}) {

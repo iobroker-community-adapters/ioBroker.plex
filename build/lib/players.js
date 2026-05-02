@@ -132,6 +132,9 @@ class Player {
     this.address = options.address || this._controller._library.getDeviceState(`${this.prefix}.Player.localAddress`) || "";
     this.port = options.port || this._controller._library.getDeviceState(`${this.prefix}.Player.port`) || 0;
     this.config.controllable = !!this._controller._library.getDeviceState(`${this.prefix}.Player.controllable`);
+    if (!this.config.controllable) {
+      this._controller._library.clearStateCache(`${this.prefix}._Controls`);
+    }
     this.refreshDetails = !!this._controller._library.getDeviceState(`${this.prefix}._Controls.timeline.refreshDetails`) || true;
     this.details.state = "stopped";
     this.config.connected = true;
@@ -260,7 +263,7 @@ class Player {
   }
   delete() {
     this.unload = true;
-    this._controller._library.runGarbageCollector(this.prefix, true, 1, Controller.garbageExcluded);
+    this._controller._library.runGarbageCollector(this.prefix, false, 1, Controller.garbageExcluded);
     if (this.refreshTimeout) {
       this._controller._adapter.clearTimeout(this.refreshTimeout);
       this.refreshTimeout = null;
@@ -560,15 +563,10 @@ class Player {
         },
         false
       );
+      this._controller._library.clearStateCache(controls);
       this._controller._adapter.log.debug(
-        `setControls skipped for ${this.prefix}: not HTTP-controllable (provides="${this.provides}", sources=${this.sources.join("+") || "?"}); pruning _Controls subtree.`
+        `setControls skipped for ${this.prefix}: not HTTP-controllable (provides="${this.provides}", sources=${this.sources.join("+") || "?"}).`
       );
-      void this._controller._adapter.delObjectAsync(controls, { recursive: true }).catch((err) => {
-        const m = err instanceof Error ? err.message : String(err);
-        if (!/Not exists/i.test(m)) {
-          this._controller._adapter.log.debug(`prune _Controls failed for ${this.prefix}: ${m}`);
-        }
-      });
       return;
     }
     this.config.protocolCapabilities.split(",").forEach((mode) => {

@@ -353,7 +353,7 @@ export class Library {
 
     runGarbageCollector = async (
         state: string,
-        del = false,
+        _del = false,
         offset = 60_000,
         whitelist: string[] = [],
     ): Promise<boolean> => {
@@ -377,36 +377,27 @@ export class Library {
                             entry.ts < Date.now() - offset &&
                             !(whitelist.length > 0 && RegExp(whitelist.join('|')).test(stateId))
                         ) {
-                            this._adapter.log.debug(`Garbage Collector: ${del ? 'Deleted ' : 'Emptied '}${stateId}!`);
+                            this._adapter.log.debug(`Garbage Collector: Emptied ${stateId}!`);
 
-                            if (del) {
-                                try {
-                                    this._STATES[key] = undefined;
-                                    await this._adapter.delObjectAsync(stateId);
-                                } catch (error) {
-                                    this._adapter.log.warn(JSON.stringify(error));
+                            try {
+                                const val = await this._adapter.getObjectAsync(key);
+                                let emptyVal: any;
+                                switch ((val as any)?.common?.type) {
+                                    case 'string':
+                                        emptyVal = '';
+                                        break;
+                                    case 'number':
+                                        emptyVal = 0;
+                                        break;
+                                    case 'boolean':
+                                        emptyVal = false;
+                                        break;
+                                    default:
+                                        emptyVal = null;
                                 }
-                            } else {
-                                try {
-                                    const val = await this._adapter.getObjectAsync(key);
-                                    let emptyVal: any;
-                                    switch ((val as any)?.common?.type) {
-                                        case 'string':
-                                            emptyVal = '';
-                                            break;
-                                        case 'number':
-                                            emptyVal = 0;
-                                            break;
-                                        case 'boolean':
-                                            emptyVal = false;
-                                            break;
-                                        default:
-                                            emptyVal = null;
-                                    }
-                                    void this._setValue(key, emptyVal, { force: true });
-                                } catch (error) {
-                                    this._adapter.log.warn(error instanceof Error ? error.message : String(error));
-                                }
+                                void this._setValue(key, emptyVal, { force: true });
+                            } catch (error) {
+                                this._adapter.log.warn(error instanceof Error ? error.message : String(error));
                             }
                         }
                     }
@@ -514,27 +505,29 @@ export class Library {
         }
     }
 
+    clearStateCache(prefix: string): void {
+        for (const key of Object.keys(this._STATES)) {
+            if (key === prefix || key.startsWith(`${prefix}.`)) {
+                this._STATES[key] = undefined;
+            }
+        }
+    }
+
     async del(state: string, nested?: boolean, callback?: () => void): Promise<void> {
-        await this._createNode({ node: state, description: 'DELETED' });
-        this._adapter.getStates(nested ? `${state}.*` : state, (_err, objects) => {
-            let deleted = 0;
+        this._adapter.getStates(nested ? `${state}.*` : state, async (_err, objects) => {
             const objectIds = Object.keys(objects || {});
-            objectIds.push(state);
-
-            this._adapter.log.silly(`Found ${objectIds.length} objects in state ${state} to delete..`);
-            objectIds.forEach(object => {
-                this._adapter.delObject(object, () => {
-                    this._STATES[object.replace(`${this._adapter.namespace}.`, '')] = undefined;
-                    deleted++;
-
-                    if (deleted == objectIds.length) {
-                        this._adapter.log.debug(`Deleted state ${state} with ${deleted} objects.`);
-                        if (callback) {
-                            callback();
-                        }
-                    }
-                });
-            });
+            for (const objectId of objectIds) {
+                const key = objectId.replace(`${this._adapter.namespace}.`, '');
+                try {
+                    await this._setValue(key, null, { force: true });
+                } catch (error) {
+                    this._adapter.log.warn(`del: ${error instanceof Error ? error.message : String(error)}`);
+                }
+            }
+            this._adapter.log.debug(`Reset ${objectIds.length} states under ${state}.`);
+            if (callback) {
+                callback();
+            }
         });
     }
 

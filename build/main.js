@@ -378,7 +378,7 @@ class Plex extends utils.Adapter {
    * the channel id and human title — enough for the admin UI to render and decide
    * what to delete.
    *
-   * @param msg
+   * @param msg ioBroker message carrying the sendTo request
    */
   async handleListKnownPlayers(msg) {
     var _a;
@@ -424,7 +424,7 @@ class Plex extends utils.Adapter {
    * Delete the given player-channel subtrees (`_playing.<title>-<uuid>` and everything below).
    * Idempotent — channels that no longer exist are silently skipped.
    *
-   * @param msg
+   * @param msg ioBroker message carrying the list of player object IDs to delete
    */
   async handleCleanupPlayers(msg) {
     const ids = msg.message && msg.message.ids;
@@ -441,7 +441,9 @@ class Plex extends utils.Adapter {
         continue;
       }
       try {
-        await this.delObjectAsync(id.slice(`${this.name}.${this.instance}.`.length), { recursive: true });
+        const relId = id.slice(`${this.name}.${this.instance}.`.length);
+        await this.delObjectAsync(relId, { recursive: true });
+        this.library.clearStateCache(relId);
         deleted++;
         this.knownPlayerIds.forEach((uuid) => {
           if (id.endsWith(`-${uuid}`)) {
@@ -702,7 +704,7 @@ class Plex extends utils.Adapter {
    * @param prefixIn The prefix of the event
    */
   async setEvent(dataIn, source, prefixIn) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     let data = dataIn;
     let prefix = prefixIn;
     this.log.debug(
@@ -717,7 +719,7 @@ class Plex extends utils.Adapter {
     data.timestamp = Math.floor(Date.now() / 1e3);
     data.datetime = this.library.getDateTime(Date.now());
     data.playing = data.event.indexOf("play") > -1 || data.event.indexOf("resume") > -1;
-    this.log.debug(`Enriched payload: ${JSON.stringify(((_a = data.Metadata) == null ? void 0 : _a.Media) || {})}`);
+    this.log.debug(`Enriched payload [${(_a = data.event) != null ? _a : "no-event"}]: ${JSON.stringify(((_b = data.Metadata) == null ? void 0 : _b.Media) || {})}`);
     if (!this.config.getMetadataTrees && data.Metadata) {
       delete data.Metadata.Media;
     }
@@ -739,8 +741,8 @@ class Plex extends utils.Adapter {
         node: `${prefix}.${groupBy}`,
         role: "channel",
         description: this.library.appendToDescription(
-          (_b = this.library.getNode("plex.player", true).description) != null ? _b : "",
-          ` ${((_c = data.Player) == null ? void 0 : _c.title) || this.library.getNode("plex.player.unknown", true).description}`
+          (_c = this.library.getNode("plex.player", true).description) != null ? _c : "",
+          ` ${((_d = data.Player) == null ? void 0 : _d.title) || this.library.getNode("plex.player.unknown", true).description}`
         )
       });
       prefix = `${prefix}.${groupBy}`;
@@ -842,12 +844,12 @@ class Plex extends utils.Adapter {
           id: (0, import_uuid.v1)(),
           timestamp: data.timestamp,
           datetime: data.datetime,
-          account: (_d = data.Account) == null ? void 0 : _d.title,
-          player: (_e = data.Player) == null ? void 0 : _e.title,
+          account: (_e = data.Account) == null ? void 0 : _e.title,
+          player: (_f = data.Player) == null ? void 0 : _f.title,
           media: data.media,
           event,
-          ...data.media === "episode" && ((_f = data.Metadata) == null ? void 0 : _f.parentIndex) != null ? { season: data.Metadata.parentIndex } : {},
-          ...data.media === "episode" && ((_g = data.Metadata) == null ? void 0 : _g.index) != null ? { episode: data.Metadata.index } : {},
+          ...data.media === "episode" && ((_g = data.Metadata) == null ? void 0 : _g.parentIndex) != null ? { season: data.Metadata.parentIndex } : {},
+          ...data.media === "episode" && ((_h = data.Metadata) == null ? void 0 : _h.index) != null ? { episode: data.Metadata.index } : {},
           thumb: message.thumb ? `${this.library.AXIOS_OPTIONS._protocol}//${this.config.plexIp}:${this.config.plexPort}${this.replacePlaceholders(message.thumb, eventData)}?X-Plex-Token=${this.config.plexToken}` : "",
           message: this.replacePlaceholders(message.message, eventData),
           caption: this.replacePlaceholders(message.caption, eventData),
@@ -1331,8 +1333,8 @@ class Plex extends utils.Adapter {
    * updates can be heavy. We schedule a debounced sessions refresh rather than
    * reacting per frame.
    *
-   * @param type
-   * @param _payload
+   * @param type Notification type string from the PMS WebSocket (e.g. `playing`, `activity`)
+   * @param _payload Raw notification payload (currently unused)
    */
   handlePlexNotification(type, _payload) {
     if (this.unloaded) {

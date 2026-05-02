@@ -481,7 +481,7 @@ class Plex extends utils.Adapter {
      * the channel id and human title — enough for the admin UI to render and decide
      * what to delete.
      *
-     * @param msg
+     * @param msg ioBroker message carrying the sendTo request
      */
     private async handleListKnownPlayers(msg: ioBroker.Message): Promise<void> {
         try {
@@ -537,7 +537,7 @@ class Plex extends utils.Adapter {
      * Delete the given player-channel subtrees (`_playing.<title>-<uuid>` and everything below).
      * Idempotent — channels that no longer exist are silently skipped.
      *
-     * @param msg
+     * @param msg ioBroker message carrying the list of player object IDs to delete
      */
     private async handleCleanupPlayers(msg: ioBroker.Message): Promise<void> {
         const ids = (msg.message && msg.message.ids) as string[] | undefined;
@@ -554,8 +554,10 @@ class Plex extends utils.Adapter {
                 continue;
             }
             try {
+                const relId = id.slice(`${this.name}.${this.instance}.`.length);
                 // Recursive delete: channel + all its states/sub-channels.
-                await this.delObjectAsync(id.slice(`${this.name}.${this.instance}.`.length), { recursive: true });
+                await this.delObjectAsync(relId, { recursive: true });
+                this.library.clearStateCache(relId);
                 deleted++;
                 this.knownPlayerIds.forEach(uuid => {
                     if (id.endsWith(`-${uuid}`)) {
@@ -881,7 +883,7 @@ class Plex extends utils.Adapter {
         data.timestamp = Math.floor(Date.now() / 1000);
         data.datetime = this.library.getDateTime(Date.now());
         data.playing = data.event.indexOf('play') > -1 || data.event.indexOf('resume') > -1;
-        this.log.debug(`Enriched payload: ${JSON.stringify(data.Metadata?.Media || {})}`);
+        this.log.debug(`Enriched payload [${data.event ?? 'no-event'}]: ${JSON.stringify(data.Metadata?.Media || {})}`);
         if (!this.config.getMetadataTrees && data.Metadata) {
             delete data.Metadata.Media;
         }
@@ -1606,8 +1608,8 @@ class Plex extends utils.Adapter {
      * updates can be heavy. We schedule a debounced sessions refresh rather than
      * reacting per frame.
      *
-     * @param type
-     * @param _payload
+     * @param type Notification type string from the PMS WebSocket (e.g. `playing`, `activity`)
+     * @param _payload Raw notification payload (currently unused)
      */
     private handlePlexNotification(type: string, _payload: unknown): void {
         if (this.unloaded) {

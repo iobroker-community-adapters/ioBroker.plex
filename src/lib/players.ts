@@ -191,6 +191,11 @@ export class Player {
             options.address || this._controller._library.getDeviceState(`${this.prefix}.Player.localAddress`) || '';
         this.port = options.port || this._controller._library.getDeviceState(`${this.prefix}.Player.port`) || 0;
         this.config.controllable = !!this._controller._library.getDeviceState(`${this.prefix}.Player.controllable`);
+        if (!this.config.controllable) {
+            // Orphaned _Controls state values (left by a previous run that deleted the objects)
+            // would otherwise populate _STATES and cause setState-on-missing-object warnings.
+            this._controller._library.clearStateCache(`${this.prefix}._Controls`);
+        }
         this.refreshDetails =
             !!this._controller._library.getDeviceState(`${this.prefix}._Controls.timeline.refreshDetails`) || true;
         this.details.state = 'stopped';
@@ -350,7 +355,7 @@ export class Player {
 
     delete(): void {
         this.unload = true;
-        this._controller._library.runGarbageCollector(this.prefix, true, 1, Controller.garbageExcluded);
+        this._controller._library.runGarbageCollector(this.prefix, false, 1, Controller.garbageExcluded);
         if (this.refreshTimeout) {
             this._controller._adapter.clearTimeout(this.refreshTimeout);
             this.refreshTimeout = null;
@@ -667,10 +672,6 @@ export class Player {
             return;
         }
         // Companion-only mobile/web apps (Plex iOS/Android/Web): HTTP commands return 404.
-        // No control state can ever be populated, so remove the entire `_Controls` subtree
-        // — exception to the "states stay forever" rule, justified because they are not
-        // states that *can* appear, they're zombies from pre-F adapter versions that
-        // assumed every player was controllable.
         if (!this.isCompanionControllable()) {
             this.config.controllable = false;
             this._controller._library.set(
@@ -680,15 +681,12 @@ export class Player {
                 },
                 false,
             );
+            // Clear any _STATES entries for _Controls.* so confirmNode skips writes on
+            // orphaned state values (left by a previous run that deleted the objects).
+            this._controller._library.clearStateCache(controls);
             this._controller._adapter.log.debug(
-                `setControls skipped for ${this.prefix}: not HTTP-controllable (provides="${this.provides}", sources=${this.sources.join('+') || '?'}); pruning _Controls subtree.`,
+                `setControls skipped for ${this.prefix}: not HTTP-controllable (provides="${this.provides}", sources=${this.sources.join('+') || '?'}).`,
             );
-            void this._controller._adapter.delObjectAsync(controls, { recursive: true }).catch((err: unknown) => {
-                const m = err instanceof Error ? err.message : String(err);
-                if (!/Not exists/i.test(m)) {
-                    this._controller._adapter.log.debug(`prune _Controls failed for ${this.prefix}: ${m}`);
-                }
-            });
             return;
         }
         this.config.protocolCapabilities.split(',').forEach(mode => {

@@ -131,6 +131,10 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Fixed: Plex iOS, Plex Android, and Plex Web devices no longer generate "State has no existing object" log warnings after an upgrade.
+- (ticaki) Fixed: deleting a device via the adapter settings now correctly clears all its internal state entries.
+
 ### 2.0.0-alpha.0 (2026-05-01)
 - (ticaki) **Breaking:** Data points under `_playing.*` have been restructured — existing scripts and Vis widgets need to be updated.
 - (ticaki) Data retrieval from Plex Media Server reworked; which fields are populated now depends on the interface used (local / Plex.tv cloud).

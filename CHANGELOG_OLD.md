@@ -1,4 +1,7 @@
 # Older changes
+## 1.1.2 (2023-09-16)
+- (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
+
 ## 1.1.1 (2023-09-16)
 - (ticaki) Fixed: State common.name english/german
 - (ticaki) some minor improvements

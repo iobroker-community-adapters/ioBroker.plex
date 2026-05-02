@@ -131,7 +131,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 2.0.0-alpha.1 (2026-05-02)
 - (ticaki) Fixed: Plex iOS, Plex Android, and Plex Web devices no longer generate "State has no existing object" log warnings after an upgrade.
 - (ticaki) Fixed: deleting a device via the adapter settings now correctly clears all its internal state entries.
 
@@ -153,9 +153,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ### 1.1.3 (2023-10-05)
 - (ticaki) fixed: bug in readable offset
-
-### 1.1.2 (2023-09-16)
-- (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
 
 ## License
 The MIT License (MIT)

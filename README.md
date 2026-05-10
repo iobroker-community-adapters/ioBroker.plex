@@ -157,6 +157,8 @@ This adapter would not have been possible without the great work of @Zefau (http
 ### 1.1.2 (2023-09-16)
 - (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 The MIT License (MIT)
 

@@ -104,7 +104,7 @@ class Library {
       this._adapter.log.error(msg);
       setTimeout(
         () => this._adapter && this._adapter.terminate ? this._adapter.terminate(msg, reason || 11) : process.exit(reason || 11),
-        2e3
+        5e3
       );
     }
     return false;
@@ -701,7 +701,8 @@ class Library {
       }
       case "create-link":
       case "create-link-only": {
-        const link = data ? `${this.AXIOS_OPTIONS._protocol}//${this._adapter.config.plexIp}:${this._adapter.config.plexPort}${data}?X-Plex-Token=${this._adapter.config.plexToken}` : "";
+        const tokenValue = this._adapter.config.tokenInLinks !== false ? this._adapter.config.plexToken : "__PLEX_TOKEN__";
+        const link = data ? `${this.AXIOS_OPTIONS._protocol}//${this._adapter.config.plexIp}:${this._adapter.config.plexPort}${data}?X-Plex-Token=${tokenValue}` : "";
         if (node.convert.func == "create-link-only") {
           return link;
         }

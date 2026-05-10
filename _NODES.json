@@ -6724,6 +6724,22 @@
         "role": "text",
         "type": "string"
     },
+    "playing.metadata.ultrablurcolors": {
+        "description": {
+            "en": "Blur colors of the media artwork",
+            "de": "Unschärfefarben des Medien-Covers",
+            "ru": "Цвета размытия обложки медиа",
+            "pt": "Cores de desfoque da arte da mídia",
+            "nl": "Vervagingskleuren van de media-artwork",
+            "fr": "Couleurs de flou de la pochette média",
+            "it": "Colori sfumatura dell'immagine multimediale",
+            "es": "Colores de desenfoque de la carátula multimedia",
+            "pl": "Kolory rozmycia okładki mediów",
+            "uk": "Кольори розмиття обкладинки медіа",
+            "zh-cn": "媒体封面的模糊颜色"
+        },
+        "role": "channel"
+    },
     "playing.metadata.updatedat": {
         "convert": {
             "func": "date-timestamp",

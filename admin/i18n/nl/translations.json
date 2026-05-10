@@ -85,6 +85,9 @@
     "tautulliIp": "IP-adres",
     "tautulliPort": "Poort",
     "tautulliToken": "API Token",
+    "tokenInLinks": "Token insluiten in medialinks",
+    "tokenInLinksHelp": "Indien ingeschakeld bevatten medialink-states het echte Plex-token en zijn direct bruikbaar. Schakel uit als u niet wilt dat het token als leesbare tekst in de state-waarden wordt opgeslagen.",
+    "tokenPrivacyHeader": "Privacy",
     "webhookIp": "Webhook Ip",
     "webhookIpInfo": "Webhook Terugbel-Ip, ALLEEN, als Plex is uitgevoerd in de Docker",
     "webhookPort": "Webhook Poort"

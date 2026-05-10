@@ -60,7 +60,7 @@ function pickBestConnection(connections) {
   };
   return [...connections].sort((a, b) => score(b) - score(a))[0];
 }
-const RETRY_BACKOFF_MIN = [1, 5, 15];
+const RETRY_BACKOFF_MIN = [1, 5, 15, 20, 30, 40, 50, 60];
 function nextBackoff(retryIndex) {
   return RETRY_BACKOFF_MIN[Math.min(retryIndex, RETRY_BACKOFF_MIN.length - 1)];
 }
@@ -223,8 +223,11 @@ class Plex extends utils.Adapter {
       },
       this.library
     );
-    this.getStates(`${this.name}.${this.instance}.*`, async (_err, states) => {
-      void this.library.set(import_library.Library.CONNECTION, true);
+    this.getStates(`${this.name}.${this.instance}.*`, async (err, states) => {
+      var _a;
+      if (err) {
+        this.log.warn(`Failed to read adapter states from DB: ${(_a = err.message) != null ? _a : String(err)}`);
+      }
       for (const state in states) {
         void this.library.extendState(state);
         if (states[state] !== null && states[state] !== void 0) {
@@ -233,9 +236,9 @@ class Plex extends utils.Adapter {
             try {
               const parsed = JSON.parse(String(states[state].val));
               this.history = Array.isArray(parsed) ? parsed : [];
-            } catch (err) {
+            } catch (err2) {
               this.log.warn(
-                `Stored history state is corrupted, starting fresh: ${err instanceof Error ? err.message : String(err)}`
+                `Stored history state is corrupted, starting fresh: ${err2 instanceof Error ? err2.message : String(err2)}`
               );
               this.history = [];
             }
@@ -503,6 +506,24 @@ class Plex extends utils.Adapter {
     }
   }
   /**
+   * Sets info.connection and lastConnectionOk. Logs only when the state actually changes:
+   * warn on false, info on true.
+   *
+   * @param ok New connection state
+   * @param detail Optional detail appended to the warn message (e.g. the error string)
+   */
+  async setConnectionState(ok, detail) {
+    const changed = ok ? this.lastConnectionOk !== true : this.lastConnectionOk !== false;
+    this.lastConnectionOk = ok;
+    await this.library.set(import_library.Library.CONNECTION, ok);
+    if (!changed) return;
+    if (ok) {
+      this.log.info("Plex Media Server connected.");
+    } else {
+      this.log.warn(`Plex Media Server connection lost${detail ? `: ${detail}` : "."}`);
+    }
+  }
+  /**
    * Periodic health check against the local Plex Media Server. Sets the CONNECTION state
    * and only logs when the connection state actually changes, to avoid log spam.
    */
@@ -517,25 +538,19 @@ class Plex extends utils.Adapter {
       }
       try {
         await this.plex.query("/");
-        if (this.lastConnectionOk === false) {
-          this.log.info("Plex Media Server connection restored.");
-        } else {
+        const wasDown = this.lastConnectionOk !== true;
+        await this.setConnectionState(true);
+        if (!wasDown) {
           this.log.debug("Plex health check OK.");
-        }
-        if (this.lastConnectionOk !== true) {
-          await this.library.set(import_library.Library.CONNECTION, true);
-          this.lastConnectionOk = true;
         }
         this.lastErrorKind = null;
       } catch (err) {
         const m = err instanceof Error ? err.message : String(err);
-        if (this.lastConnectionOk !== false) {
-          this.log.warn(`Plex Media Server connection lost: ${m}`);
-        } else {
+        const stillFailing = this.lastConnectionOk === false;
+        await this.setConnectionState(false, m);
+        if (stillFailing) {
           this.log.debug(`Plex health check still failing: ${m}`);
         }
-        await this.library.set(import_library.Library.CONNECTION, false);
-        this.lastConnectionOk = false;
         if (m.indexOf("401") > -1 || m.indexOf("Unauthorized") > -1 || m.indexOf("unauthorized") > -1) {
           this.lastErrorKind = "unauthorized";
         } else {
@@ -553,7 +568,7 @@ class Plex extends utils.Adapter {
         return p ? `${p.title || "?"}/${p.product || "?"}/${p.state || "?"}` : "?";
       }).join(", ");
       this.log.debug(`Retrieved playing now from plex server: ${sessions.length} sessions [${summary}]`);
-      await this.library.set(import_library.Library.CONNECTION, true);
+      await this.setConnectionState(true);
       this.getStates(`${this.name}.${this.instance}.*`, async (err, states) => {
         if (err || !states) {
           return;
@@ -618,7 +633,6 @@ class Plex extends utils.Adapter {
       this.refreshCycle = this.setTimeout(this.retrieveDataLoop, 1e3);
       void this.startListener();
       this.startPlexNotifications();
-      this.lastConnectionOk = true;
       this.lastErrorKind = null;
       this.networkRetryCount = 0;
       this.authRetryCount = 0;
@@ -647,14 +661,13 @@ class Plex extends utils.Adapter {
       this.log.debug(`Request-Options: ${JSON.stringify(safeOpts)}`);
       this.log.debug(`Stack-Trace: ${JSON.stringify(err instanceof Error ? err.stack : String(err))}`);
       const m = err instanceof Error ? err.message : String(err);
-      if (m.indexOf("EHOSTUNREACH") > -1 || m.indexOf("ECONNREFUSED") > -1 || m.indexOf("ETIMEDOUT") > -1 || m.indexOf("ENOTFOUND") > -1) {
+      if (m.indexOf("EHOSTUNREACH") > -1 || m.indexOf("ECONNREFUSED") > -1 || m.indexOf("ETIMEDOUT") > -1 || m.indexOf("ENOTFOUND") > -1 || m.indexOf("ECONNABORTED") > -1) {
         const wait = nextBackoff(this.networkRetryCount++);
         this.config.retry = wait;
         this.log.info(
           `Plex Media Server(${this.config.plexIp}:${this.config.plexPort}) not reachable! Will try again in ${wait} minute(s)...`
         );
-        await this.library.set(import_library.Library.CONNECTION, false);
-        this.lastConnectionOk = false;
+        await this.setConnectionState(false);
         this.lastErrorKind = "network";
         this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
       } else if (m.indexOf("Permission denied") > -1 || m.indexOf("401") > -1 || m.indexOf("Unauthorized") > -1 || m.indexOf("unauthorized") > -1) {
@@ -663,12 +676,18 @@ class Plex extends utils.Adapter {
         this.log.warn(
           `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${wait} minute(s).`
         );
-        await this.library.set(import_library.Library.CONNECTION, false);
-        this.lastConnectionOk = false;
+        await this.setConnectionState(false);
         this.lastErrorKind = "unauthorized";
         this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
       } else {
-        this.library.terminate(m);
+        const wait = nextBackoff(this.networkRetryCount++);
+        this.config.retry = wait;
+        this.log.warn(
+          `Unexpected error connecting to Plex Media Server: ${m}. Will retry in ${wait} minute(s).`
+        );
+        await this.setConnectionState(false);
+        this.lastErrorKind = "network";
+        this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
       }
     });
   }

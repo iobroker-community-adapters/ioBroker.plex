@@ -19,16 +19,22 @@ When the user asks to "prepare a release" / "release vorbereiten":
 
 ## Plex domain knowledge
 
-- **Primary reference for Plex API behavior: `python-plexapi`** (https://github.com/pkkid/python-plexapi, docs at https://python-plexapi.readthedocs.io/). Actively maintained, used by Home Assistant. When Plex API questions come up (which endpoint to call, what a field means, how Plex actually behaves), consult its source before guessing or pulling random forum posts. Plex's own developer docs are sparse and outdated; python-plexapi is the de-facto spec.
-- **X-Plex-Tokens from the PIN flow do not normally expire.** Don't write log messages or code comments suggesting "the token has expired, please renew" without evidence. Other Plex clients (Home Assistant, Plexamp, …) run for years on the same token. If the adapter goes offline, look for the real cause first — token expiry is almost never it.
+- **Primary reference for Plex API behavior: `python-plexapi`** (https://github.com/pkkid/python-plexapi, docs at https://python-plexapi.readthedocs.io/). Actively maintained, used by Home Assistant. When Plex API questions come up (which endpoint to call, what a field means, how Plex actually behaves), consult its source before guessing or pulling random forum posts.
+- **Plex API auth reference (local copy):** `docs/plex-api-auth.md` — extracted from `developer.plex.tv/pms/` (May 2026). Covers: X-Plex-* headers, JWT auth flow (new), legacy PIN flow, token refresh. The docs page is a Redoc SPA — WebFetch returns only navigation skeleton; use `curl + python3 html.unescape + tag-strip` to re-extract (method is in the file header).
+- **Two token types exist; only the new JWT tokens expire.** Legacy opaque tokens (obtained via the old `plex.tv/api/v2/pins` flow, ~15 chars) do **not** expire. New JWT tokens (obtained via `clients.plex.tv/api/v2/pins` with a JWK, long `eyJ...` strings) expire after **7 days** and must be refreshed. Do not assume token expiry is the cause of offline without checking which token type is in use.
+- **JWT token refresh** requires: (1) Ed25519 key pair per device, (2) `GET clients.plex.tv/api/v2/auth/nonce`, (3) sign a Device JWT, (4) `POST clients.plex.tv/api/v2/auth/token`. See `docs/plex-api-auth.md` for full details.
 - **Plex Media Server HTTPS certs don't validate against IP addresses.** PMS presents either a self-signed cert or a `*.plex.direct` wildcard cert; both fail standard hostname validation when accessed by IP on the LAN. The adapter sets `rejectUnauthorized: false` on the `https.Agent` by design — this is the correct configuration for typical home setups, not a security oversight.
-- **PIN flow uses `https://plex.tv/api/v2/pins` without `strong=true`.** `strong=true` returns a long opaque code for headless clients; the default (omitted) returns the 4-character human-readable code that users enter at `plex.tv/link`.
+- **PIN flow (adapter's current implementation) uses `https://plex.tv/api/v2/pins` without `strong=true`.** This returns a 4-character human-readable code for entry at `plex.tv/link`. The new JWT PIN flow uses `clients.plex.tv/api/v2/pins` with a JWK body and `strong=true`.
 
 ## Code conventions
 
 - **axios does not accept top-level `cert` / `key` / `ca` / `rejectUnauthorized`.** They must be wrapped in `httpsAgent: new https.Agent({…})`. The legacy `request` package accepted them at the root, which is why this pattern looks fine in code review but silently fails at runtime.
 - **Do not reintroduce `plex-api` (npm) or `request-promise` as a direct dependency.** Plex API access goes through `lib/plexHttp.js`; PIN auth through `lib/plexPinAuth.js`. `request-promise` is still pulled in transitively via `tautulli-api` — that's out of our control until `tautulli-api` is replaced.
 - **ioBroker `Foreign*` APIs are for objects/states OUTSIDE the adapter's own namespace.** For our own `plex.<instance>.*` tree, use the non-Foreign variants: `getObject` / `getObjectAsync` / `setObject` / `extendObject` / `extendObjectAsync` (relative ID, no `<adapter>.<instance>.` prefix); `getStates` / `getState` / `setState` for state values; `getAdapterObjectsAsync()` to enumerate all of the adapter's own objects. Reach for `getForeignObject*` / `extendForeignObject*` / `getForeignStates*` only when touching another adapter's namespace.
+
+## Tooling
+
+- **ESLint mit `--fix` aufrufen**, damit einfache Formatierungsprobleme (Prettier-Style, Einrückung, Zeilenumbrüche) automatisch behoben werden: `npx eslint --fix <datei>`. Erst danach `tsc --noEmit` zum Prüfen auf echte Typfehler.
 
 ## Reviewing & fixing
 

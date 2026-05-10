@@ -1,360 +1,373 @@
 {
-  "common": {
-    "news": {
-      "2.0.0-alpha.1": {
-        "en": "Fixed: Plex iOS, Plex Android, and Plex Web devices no longer generate \"State has no existing object\" log warnings after an upgrade.\nFixed: deleting a device via the adapter settings now correctly clears all its internal state entries.",
-        "de": "Behoben: Plex iOS-, Android- und Web-Geräte erzeugen nach einem Update keine \"State has no existing object\"-Warnungen mehr.\nBehoben: Das Löschen eines Geräts in den Adaptereinstellungen entfernt jetzt alle internen State-Einträge korrekt.",
-        "ru": "Исправлено: устройства Plex iOS, Android и Web больше не генерируют предупреждения «State has no existing object» после обновления.\nИсправлено: удаление устройства в настройках адаптера теперь корректно очищает все внутренние записи состояний.",
-        "pt": "Corrigido: dispositivos Plex iOS, Android e Web já não geram avisos \"State has no existing object\" após uma atualização.\nCorrigido: a eliminação de um dispositivo nas definições do adaptador remove agora corretamente todas as entradas de estado internas.",
-        "nl": "Opgelost: Plex iOS-, Android- en Web-apparaten genereren na een update geen \"State has no existing object\"-waarschuwingen meer.\nOpgelost: het verwijderen van een apparaat via de adapterinstellingen verwijdert nu correct alle interne statusvermeldingen.",
-        "fr": "Corrigé : les appareils Plex iOS, Android et Web ne génèrent plus d'avertissements « State has no existing object » après une mise à jour.\nCorrigé : la suppression d'un appareil dans les paramètres de l'adaptateur efface maintenant correctement toutes les entrées d'état internes.",
-        "it": "Corretto: i dispositivi Plex iOS, Android e Web non generano più avvisi \"State has no existing object\" dopo un aggiornamento.\nCorretto: l'eliminazione di un dispositivo nelle impostazioni dell'adattatore ora rimuove correttamente tutte le voci di stato interne.",
-        "es": "Corregido: los dispositivos Plex iOS, Android y Web ya no generan advertencias \"State has no existing object\" tras una actualización.\nCorregido: eliminar un dispositivo desde los ajustes del adaptador ahora elimina correctamente todas las entradas de estado internas.",
-        "pl": "Naprawiono: urządzenia Plex iOS, Android i Web nie generują już ostrzeżeń \"State has no existing object\" po aktualizacji.\nNaprawiono: usunięcie urządzenia w ustawieniach adaptera teraz poprawnie usuwa wszystkie wewnętrzne wpisy stanu.",
-        "uk": "Виправлено: пристрої Plex iOS, Android і Web більше не генерують попередження «State has no existing object» після оновлення.\nВиправлено: видалення пристрою в налаштуваннях адаптера тепер коректно очищає всі внутрішні записи стану.",
-        "zh-cn": "修复：Plex iOS、Android 和 Web 设备升级后不再产生\"State has no existing object\"日志警告。\n修复：通过适配器设置删除设备现在可正确清除所有内部状态条目。"
-      },
-      "2.0.0-alpha.0": {
-        "en": "Breaking: Data points under _playing.* have been restructured — existing scripts and Vis widgets need to be updated.\nData retrieval from Plex Media Server reworked; which fields are populated now depends on the interface used (local / Plex.tv cloud).\nAdapter configuration fully migrated to the modern jsonConfig format.\nBuilt-in web interface redesigned: timeline of recent events, Now Playing display, and customizable layout.\nPlayer detection improved: Plexamp, Plex iOS/Android, PlexHTPC, and newer TV apps are now reliably detected.\nReconnect after connection errors accelerated: progressive backoff instead of fixed wait time.",
-        "de": "Breaking: Die Datenpunkte unter _playing.* wurden neu strukturiert — bestehende Skripte und Vis-Widgets müssen angepasst werden.\nDatenabfrage vom Plex Media Server grundlegend überarbeitet; welche Felder befüllt werden, hängt jetzt von der genutzten Schnittstelle ab (lokal / Plex.tv-Cloud).\nAdapterkonfiguration vollständig auf das moderne jsonConfig-Format migriert.\nIntegrierte Weboberfläche neu entwickelt: Timeline der letzten Ereignisse, Now-Playing-Anzeige und anpassbares Layout.\nPlayer-Erkennung verbessert: Plexamp, Plex iOS/Android, PlexHTPC und neuere TV-Apps werden jetzt zuverlässig erkannt.\nReconnect nach Verbindungsfehlern beschleunigt: progressives Backoff statt fester Wartezeit.",
-        "ru": "Breaking: структура точек данных _playing.* изменена — существующие скрипты и виджеты Vis требуют обновления.\nЗапрос данных с Plex Media Server переработан; набор заполняемых полей теперь зависит от используемого интерфейса (локальный / Plex.tv).\nКонфигурация адаптера полностью перенесена на современный формат jsonConfig.\nВстроенный веб-интерфейс переработан: лента последних событий, отображение Now Playing и настраиваемый макет.\nОпределение плеера улучшено: Plexamp, Plex iOS/Android, PlexHTPC и новые ТВ-приложения теперь надёжно распознаются.\nПереподключение после ошибок ускорено: прогрессивная пауза вместо фиксированного ожидания.",
-        "pt": "Breaking: os pontos de dados em _playing.* foram reestruturados — scripts e widgets Vis existentes precisam de ser atualizados.\nConsulta de dados ao Plex Media Server totalmente reformulada; os campos preenchidos dependem agora da interface utilizada (local / Plex.tv).\nConfiguração do adaptador completamente migrada para o moderno formato jsonConfig.\nInterface web integrada redesenhada: linha do tempo de eventos recentes, ecrã Now Playing e layout personalizável.\nDeteção de leitores melhorada: Plexamp, Plex iOS/Android, PlexHTPC e aplicações de TV mais recentes são agora detetados de forma fiável.\nReconexão após erros acelerada: recuo progressivo em vez de espera fixa.",
-        "nl": "Breaking: de datapunten onder _playing.* zijn geherstructureerd — bestaande scripts en Vis-widgets moeten worden bijgewerkt.\nGegevensopvraging van Plex Media Server grondig herzien; welke velden worden gevuld, hangt nu af van de gebruikte interface (lokaal / Plex.tv).\nAdapterconfiguratie volledig gemigreerd naar het moderne jsonConfig-formaat.\nIngebouwde webinterface opnieuw ontworpen: tijdlijn van recente gebeurtenissen, Now Playing-weergave en aanpasbare lay-out.\nSpelerdetectie verbeterd: Plexamp, Plex iOS/Android, PlexHTPC en nieuwere tv-apps worden nu betrouwbaar herkend.\nHerverbinding na fouten versneld: progressieve wachttijd in plaats van vaste wachttijd.",
-        "fr": "Breaking : la structure des points de données sous _playing.* a été réorganisée — les scripts et widgets Vis existants doivent être mis à jour.\nRécupération des données depuis Plex Media Server entièrement revue ; les champs remplis dépendent désormais de l’interface utilisée (locale / Plex.tv).\nConfiguration de l’adaptateur entièrement migrée vers le format moderne jsonConfig.\nInterface web intégrée repensée : chronologie des événements récents, affichage Now Playing et mise en page personnalisable.\nDétection des lecteurs améliorée : Plexamp, Plex iOS/Android, PlexHTPC et les nouvelles applications TV sont désormais détectés de manière fiable.\nReconnexion après erreurs accélérée : recul progressif au lieu d’une attente fixe.",
-        "it": "Breaking: i punti dati sotto _playing.* sono stati ristrutturati — gli script e i widget Vis esistenti devono essere aggiornati.\nIl recupero dei dati da Plex Media Server è stato completamente rivisto; i campi popolati dipendono ora dall’interfaccia utilizzata (locale / Plex.tv).\nConfigurazione dell’adattatore completamente migrata al moderno formato jsonConfig.\nInterfaccia web integrata riprogettata: cronologia degli eventi recenti, visualizzazione Now Playing e layout personalizzabile.\nRilevamento dei player migliorato: Plexamp, Plex iOS/Android, PlexHTPC e le nuove app TV vengono ora rilevati in modo affidabile.\nRiconnessione dopo errori accelerata: backoff progressivo invece di attesa fissa.",
-        "es": "Breaking: los puntos de datos bajo _playing.* han sido reestructurados — los scripts y widgets Vis existentes deben actualizarse.\nConsulta de datos al Plex Media Server completamente revisada; los campos que se rellenan dependen ahora de la interfaz utilizada (local / Plex.tv).\nConfiguración del adaptador completamente migrada al moderno formato jsonConfig.\nInterfaz web integrada rediseñada: línea de tiempo de eventos recientes, pantalla Now Playing y diseño personalizable.\nDetección de reproductores mejorada: Plexamp, Plex iOS/Android, PlexHTPC y las nuevas apps de TV ahora se detectan de forma fiable.\nReconexión tras errores acelerada: retroceso progresivo en lugar de espera fija.",
-        "pl": "Breaking: punkty danych pod _playing.* zostały przebudowane — istniejące skrypty i widżety Vis wymagają aktualizacji.\nPobieranie danych z Plex Media Server gruntownie przeprojektowane; wypełniane pola zależą teraz od używanego interfejsu (lokalny / Plex.tv).\nKonfiguracja adaptera w pełni zmigrowana do nowoczesnego formatu jsonConfig.\nWbudowany interfejs webowy przeprojektowany: oś czasu ostatnich zdarzeń, wyświetlanie Now Playing i konfigurowalny układ.\nWykrywanie odtwarzaczy ulepszone: Plexamp, Plex iOS/Android, PlexHTPC i nowsze aplikacje TV są teraz niezawodnie wykrywane.\nReconnect po błędach przyspieszony: progresywne opóźnienie zamiast stałego czasu oczekiwania.",
-        "uk": "Breaking: точки даних під _playing.* були перебудовані — наявні скрипти та віджети Vis потребують оновлення.\nОтримання даних від Plex Media Server кардинально переопрацьовано; які поля заповнюються, тепер залежить від використовуваного інтерфейсу (локальний / Plex.tv).\nКонфігурацію адаптера повністю перенесено на сучасний формат jsonConfig.\nВбудований веб-інтерфейс перероблено: стрічка останніх подій, відображення Now Playing та налаштовуваний макет.\nРозпізнавання плеєрів покращено: Plexamp, Plex iOS/Android, PlexHTPC та нові ТВ-застосунки тепер надійно розпізнаються.\nПеревідключення після помилок прискорено: прогресивна затримка замість фіксованого очікування.",
-        "zh-cn": "Breaking：_playing.* 下的数据点已重新调整结构——现有脚本和 Vis 组件需要更新。\n从 Plex Media Server 获取数据的方式已彻底重构；填充哪些字段现在取决于所使用的接口（本地 / Plex.tv 云端）。\n适配器配置已完全迁移到现代 jsonConfig 格式。\n内置 Web 界面已重新设计：最近事件的时间线、正在播放显示以及可自定义的布局。\n播放器检测改进：Plexamp、Plex iOS/Android、PlexHTPC 及较新的电视应用现在可被可靠识别。\n断线重连加速：渐进式退避，不再等待固定时间。"
-      },
-      "1.1.5": {
-        "en": "State _playing.*.Metadata.viewOffset is created.\nDependencies updated\nAdapter requires nodejs >= 18 now",
-        "de": "State _playing.* Metadata.view Offset wird erstellt.\nAusgaben aktualisiert\nAdapter benötigt jetzt Nodejs >= 18",
-        "ru": "State _playing.*. Metadata.view Создается офсет.\nОбновленные данные о зависимостях\nАдаптер требует nodejs >= 18 сейчас",
-        "pt": "Estado _playing.*. Metadata.view Offset é criado.\nDependências atualizadas\nAdapter requer nodejs >= 18 agora",
-        "nl": "Staat _spelen.*. Metadata.view Offset is aangemaakt.\nAfhankelijkheden bijgewerkt\nVoor de adapter zijn nodejs < 18 nu nodig",
-        "fr": "État _jouant.*. Métadonnées.view L'offset est créé.\nDépendances actualisées\nAdaptateur nécessite nodejs >= 18 maintenant",
-        "it": "State _playing.* Metadata.view Offset è creato.\nDipendenze aggiornate\nAdattatore richiede nodejs >= 18 ora",
-        "es": "Estado _playing.*. Metadatos.view Se crea Offset.\nActualización de las dependencias\nAdaptador requiere nodejs ю= 18 ahora",
-        "pl": "State _ playing. Metadata.view Offset jest tworzony.\nAktualizacja zależności\nAdapter wymaga węzłów > = 18",
-        "uk": "Стан _playing.*. Метадані.view Офсет створений.\nЗалежність оновлено\nАдаптер вимагає nodejs >= 18 тепер",
-        "zh-cn": "状态 _ playing.*. 元数据。 视图 偏移被创建 .\n更新的依赖关系\n适配器现在需要节点18"
-      },
-      "1.1.4": {
-        "en": "move logmessage into debug",
-        "de": "logmessing in debug verschieben",
-        "ru": "переместить logmessage в debug",
-        "pt": "mover logmessage para depuração",
-        "nl": "verplaats logica in debug",
-        "fr": "déplacer logmessage dans debug",
-        "it": "spostare logmessage in debug",
-        "es": "mover logmessage en depuración",
-        "pl": "logmesowanie ruchu w debugowanie",
-        "uk": "перемістити logmessage в debug",
-        "zh-cn": "将伐木移入黑体"
-      },
-      "1.1.3": {
-        "en": "Fixed: Error in the formatted playback position",
-        "de": "Behoben: Fehler in der formatierten Abspielposition",
-        "ru": "исправлено: ошибка в читаемом смещение",
-        "pt": "corrigido: bug no deslocamento legível",
-        "nl": "vertaling:",
-        "fr": "corrigé: bug in readable offset",
-        "it": "fisso: bug in offset leggibile",
-        "es": "fijo: error en offset legible",
-        "pl": "uruchomiony: bug in readable offset",
-        "uk": "виправлено: помилка в читабельному офсеті",
-        "zh-cn": "固定:可宣读的抵偿金"
-      },
-      "1.0.3": {
-        "de": "Behoben: Fügen keine leeren Benachrichtigungen zur History hinzu #[183](https://github.com/iobroker-community-adapter/ioBroker.plex/issues/183) \nBehoben: Verhindere die Erstellung doppelter Histroyeinträge in den meisten Fällen",
-        "en": "Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFixed: prevent the creation of duplicate history entries in most cases",
-        "es": "Fijo: No añadas las notificaciones vacías a la historia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFijo: prevenir la creación de entradas de historia duplicadas en la mayoría de los casos",
-        "fr": "Fixed: Don't add empty notifications to history #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrection : empêcher la création de doubles entrées d'histoire dans la plupart des cas",
-        "it": "Fisso: Non aggiungere notifiche vuote alla storia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nRisolto: impedire la creazione di voci di storia duplicate nella maggior parte dei casi",
-        "nl": "Voeg geen lege aanmeldingen toe aan geschiedenis 183:\nVertaling:",
-        "pl": "(Fixed: Don't add empty notifications to history #183(https:/github.com/iobroker-community-adapters/ioBroker.plex/issues/183) (ang.)\nFixed: Zapobieganie stworzenia replikacyjnej historii w większości przypadków",
-        "pt": "Corrigido: Não adicione notificações vazias ao histórico #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrigido: evitar a criação de entradas de histórico duplicado na maioria dos casos",
-        "ru": "Исправлено: Не добавляйте пустые уведомления в историю #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nИсправлено: предотвратить создание записей истории дублирования в большинстве случаев",
-        "uk": "Виправлено: Не додайте порожні повідомлення до історії #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nВиправлено: запобігти створенню записів історії дублікатів у більшості випадків",
-        "zh-cn": "九. 固定:向历史编号[183](http://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)增添空通知。\n固定:防止在多数情况下建立重复的历史内容"
-      },
-      "1.0.4": {
-        "de": "Behoben: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "en": "Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "es": "Corregido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "fr": "Correction : #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "it": "Fisso: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "nl": "Quality over Quantity (QoQ) Releases Vertaling:",
-        "pl": "Fixed: #184 (https:/github.com/iobroker-community-adapters/ioBrokerplex/issues/184) (ang.)",
-        "pt": "Corrigido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "ru": "Исправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
-        "uk": "Виправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/products/184)",
-        "zh-cn": "固定:第[184]号(http://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)"
-      }
+    "common": {
+        "news": {
+            "2.0.0-alpha.2": {
+                "en": "New option: media link states can store a placeholder instead of the real Plex token in plain text (configurable in adapter settings, enabled by default).",
+                "de": "Neue Option: Medien-Link-States können statt des echten Plex-Tokens einen Platzhalter speichern (konfigurierbar in den Adaptereinstellungen, standardmäßig aktiviert).",
+                "ru": "Новая опция: состояния медиа-ссылок могут хранить заполнитель вместо реального токена Plex в открытом виде (настраивается в параметрах адаптера, по умолчанию включено).",
+                "pt": "Nova opção: os estados de link de mídia podem armazenar um espaço reservado em vez do token real do Plex em texto simples (configurável nas definições do adaptador, ativado por padrão).",
+                "nl": "Nieuwe optie: medialink-states kunnen een plaatshouder opslaan in plaats van het echte Plex-token als leesbare tekst (instelbaar in adapterinstellingen, standaard ingeschakeld).",
+                "fr": "Nouvelle option: les états de lien média peuvent stocker un espace réservé à la place du vrai jeton Plex en texte clair (configurable dans les paramètres de l'adaptateur, activé par défaut).",
+                "it": "Nuova opzione: gli stati dei link media possono memorizzare un segnaposto al posto del vero token Plex in testo normale (configurabile nelle impostazioni dell'adattatore, abilitato per impostazione predefinita).",
+                "es": "Nueva opción: los estados de enlace de medios pueden almacenar un marcador de posición en lugar del token real de Plex en texto sin formato (configurable en los ajustes del adaptador, habilitado de forma predeterminada).",
+                "pl": "Nowa opcja: stany linków do mediów mogą przechowywać symbol zastępczy zamiast prawdziwego tokenu Plex w postaci zwykłego tekstu (konfigurowalny w ustawieniach adaptera, domyślnie włączony).",
+                "uk": "Нова опція: стани медіапосилань можуть зберігати заповнювач замість справжнього токена Plex у відкритому тексті (налаштовується в параметрах адаптера, увімкнено за замовчуванням).",
+                "zh-cn": "新选项：媒体链接状态可以存储占位符而不是明文的真实Plex令牌（可在适配器设置中配置，默认启用）。"
+            },
+            "2.0.0-alpha.1": {
+                "en": "Fixed: Plex iOS, Plex Android, and Plex Web devices no longer generate \"State has no existing object\" log warnings after an upgrade.\nFixed: deleting a device via the adapter settings now correctly clears all its internal state entries.",
+                "de": "Behoben: Plex iOS-, Android- und Web-Geräte erzeugen nach einem Update keine \"State has no existing object\"-Warnungen mehr.\nBehoben: Das Löschen eines Geräts in den Adaptereinstellungen entfernt jetzt alle internen State-Einträge korrekt.",
+                "ru": "Исправлено: устройства Plex iOS, Android и Web больше не генерируют предупреждения «State has no existing object» после обновления.\nИсправлено: удаление устройства в настройках адаптера теперь корректно очищает все внутренние записи состояний.",
+                "pt": "Corrigido: dispositivos Plex iOS, Android e Web já não geram avisos \"State has no existing object\" após uma atualização.\nCorrigido: a eliminação de um dispositivo nas definições do adaptador remove agora corretamente todas as entradas de estado internas.",
+                "nl": "Opgelost: Plex iOS-, Android- en Web-apparaten genereren na een update geen \"State has no existing object\"-waarschuwingen meer.\nOpgelost: het verwijderen van een apparaat via de adapterinstellingen verwijdert nu correct alle interne statusvermeldingen.",
+                "fr": "Corrigé : les appareils Plex iOS, Android et Web ne génèrent plus d'avertissements « State has no existing object » après une mise à jour.\nCorrigé : la suppression d'un appareil dans les paramètres de l'adaptateur efface maintenant correctement toutes les entrées d'état internes.",
+                "it": "Corretto: i dispositivi Plex iOS, Android e Web non generano più avvisi \"State has no existing object\" dopo un aggiornamento.\nCorretto: l'eliminazione di un dispositivo nelle impostazioni dell'adattatore ora rimuove correttamente tutte le voci di stato interne.",
+                "es": "Corregido: los dispositivos Plex iOS, Android y Web ya no generan advertencias \"State has no existing object\" tras una actualización.\nCorregido: eliminar un dispositivo desde los ajustes del adaptador ahora elimina correctamente todas las entradas de estado internas.",
+                "pl": "Naprawiono: urządzenia Plex iOS, Android i Web nie generują już ostrzeżeń \"State has no existing object\" po aktualizacji.\nNaprawiono: usunięcie urządzenia w ustawieniach adaptera teraz poprawnie usuwa wszystkie wewnętrzne wpisy stanu.",
+                "uk": "Виправлено: пристрої Plex iOS, Android і Web більше не генерують попередження «State has no existing object» після оновлення.\nВиправлено: видалення пристрою в налаштуваннях адаптера тепер коректно очищає всі внутрішні записи стану.",
+                "zh-cn": "修复：Plex iOS、Android 和 Web 设备升级后不再产生\"State has no existing object\"日志警告。\n修复：通过适配器设置删除设备现在可正确清除所有内部状态条目。"
+            },
+            "2.0.0-alpha.0": {
+                "en": "Breaking: Data points under _playing.* have been restructured — existing scripts and Vis widgets need to be updated.\nData retrieval from Plex Media Server reworked; which fields are populated now depends on the interface used (local / Plex.tv cloud).\nAdapter configuration fully migrated to the modern jsonConfig format.\nBuilt-in web interface redesigned: timeline of recent events, Now Playing display, and customizable layout.\nPlayer detection improved: Plexamp, Plex iOS/Android, PlexHTPC, and newer TV apps are now reliably detected.\nReconnect after connection errors accelerated: progressive backoff instead of fixed wait time.",
+                "de": "Breaking: Die Datenpunkte unter _playing.* wurden neu strukturiert — bestehende Skripte und Vis-Widgets müssen angepasst werden.\nDatenabfrage vom Plex Media Server grundlegend überarbeitet; welche Felder befüllt werden, hängt jetzt von der genutzten Schnittstelle ab (lokal / Plex.tv-Cloud).\nAdapterkonfiguration vollständig auf das moderne jsonConfig-Format migriert.\nIntegrierte Weboberfläche neu entwickelt: Timeline der letzten Ereignisse, Now-Playing-Anzeige und anpassbares Layout.\nPlayer-Erkennung verbessert: Plexamp, Plex iOS/Android, PlexHTPC und neuere TV-Apps werden jetzt zuverlässig erkannt.\nReconnect nach Verbindungsfehlern beschleunigt: progressives Backoff statt fester Wartezeit.",
+                "ru": "Breaking: структура точек данных _playing.* изменена — существующие скрипты и виджеты Vis требуют обновления.\nЗапрос данных с Plex Media Server переработан; набор заполняемых полей теперь зависит от используемого интерфейса (локальный / Plex.tv).\nКонфигурация адаптера полностью перенесена на современный формат jsonConfig.\nВстроенный веб-интерфейс переработан: лента последних событий, отображение Now Playing и настраиваемый макет.\nОпределение плеера улучшено: Plexamp, Plex iOS/Android, PlexHTPC и новые ТВ-приложения теперь надёжно распознаются.\nПереподключение после ошибок ускорено: прогрессивная пауза вместо фиксированного ожидания.",
+                "pt": "Breaking: os pontos de dados em _playing.* foram reestruturados — scripts e widgets Vis existentes precisam de ser atualizados.\nConsulta de dados ao Plex Media Server totalmente reformulada; os campos preenchidos dependem agora da interface utilizada (local / Plex.tv).\nConfiguração do adaptador completamente migrada para o moderno formato jsonConfig.\nInterface web integrada redesenhada: linha do tempo de eventos recentes, ecrã Now Playing e layout personalizável.\nDeteção de leitores melhorada: Plexamp, Plex iOS/Android, PlexHTPC e aplicações de TV mais recentes são agora detetados de forma fiável.\nReconexão após erros acelerada: recuo progressivo em vez de espera fixa.",
+                "nl": "Breaking: de datapunten onder _playing.* zijn geherstructureerd — bestaande scripts en Vis-widgets moeten worden bijgewerkt.\nGegevensopvraging van Plex Media Server grondig herzien; welke velden worden gevuld, hangt nu af van de gebruikte interface (lokaal / Plex.tv).\nAdapterconfiguratie volledig gemigreerd naar het moderne jsonConfig-formaat.\nIngebouwde webinterface opnieuw ontworpen: tijdlijn van recente gebeurtenissen, Now Playing-weergave en aanpasbare lay-out.\nSpelerdetectie verbeterd: Plexamp, Plex iOS/Android, PlexHTPC en nieuwere tv-apps worden nu betrouwbaar herkend.\nHerverbinding na fouten versneld: progressieve wachttijd in plaats van vaste wachttijd.",
+                "fr": "Breaking : la structure des points de données sous _playing.* a été réorganisée — les scripts et widgets Vis existants doivent être mis à jour.\nRécupération des données depuis Plex Media Server entièrement revue ; les champs remplis dépendent désormais de l’interface utilisée (locale / Plex.tv).\nConfiguration de l’adaptateur entièrement migrée vers le format moderne jsonConfig.\nInterface web intégrée repensée : chronologie des événements récents, affichage Now Playing et mise en page personnalisable.\nDétection des lecteurs améliorée : Plexamp, Plex iOS/Android, PlexHTPC et les nouvelles applications TV sont désormais détectés de manière fiable.\nReconnexion après erreurs accélérée : recul progressif au lieu d’une attente fixe.",
+                "it": "Breaking: i punti dati sotto _playing.* sono stati ristrutturati — gli script e i widget Vis esistenti devono essere aggiornati.\nIl recupero dei dati da Plex Media Server è stato completamente rivisto; i campi popolati dipendono ora dall’interfaccia utilizzata (locale / Plex.tv).\nConfigurazione dell’adattatore completamente migrata al moderno formato jsonConfig.\nInterfaccia web integrata riprogettata: cronologia degli eventi recenti, visualizzazione Now Playing e layout personalizzabile.\nRilevamento dei player migliorato: Plexamp, Plex iOS/Android, PlexHTPC e le nuove app TV vengono ora rilevati in modo affidabile.\nRiconnessione dopo errori accelerata: backoff progressivo invece di attesa fissa.",
+                "es": "Breaking: los puntos de datos bajo _playing.* han sido reestructurados — los scripts y widgets Vis existentes deben actualizarse.\nConsulta de datos al Plex Media Server completamente revisada; los campos que se rellenan dependen ahora de la interfaz utilizada (local / Plex.tv).\nConfiguración del adaptador completamente migrada al moderno formato jsonConfig.\nInterfaz web integrada rediseñada: línea de tiempo de eventos recientes, pantalla Now Playing y diseño personalizable.\nDetección de reproductores mejorada: Plexamp, Plex iOS/Android, PlexHTPC y las nuevas apps de TV ahora se detectan de forma fiable.\nReconexión tras errores acelerada: retroceso progresivo en lugar de espera fija.",
+                "pl": "Breaking: punkty danych pod _playing.* zostały przebudowane — istniejące skrypty i widżety Vis wymagają aktualizacji.\nPobieranie danych z Plex Media Server gruntownie przeprojektowane; wypełniane pola zależą teraz od używanego interfejsu (lokalny / Plex.tv).\nKonfiguracja adaptera w pełni zmigrowana do nowoczesnego formatu jsonConfig.\nWbudowany interfejs webowy przeprojektowany: oś czasu ostatnich zdarzeń, wyświetlanie Now Playing i konfigurowalny układ.\nWykrywanie odtwarzaczy ulepszone: Plexamp, Plex iOS/Android, PlexHTPC i nowsze aplikacje TV są teraz niezawodnie wykrywane.\nReconnect po błędach przyspieszony: progresywne opóźnienie zamiast stałego czasu oczekiwania.",
+                "uk": "Breaking: точки даних під _playing.* були перебудовані — наявні скрипти та віджети Vis потребують оновлення.\nОтримання даних від Plex Media Server кардинально переопрацьовано; які поля заповнюються, тепер залежить від використовуваного інтерфейсу (локальний / Plex.tv).\nКонфігурацію адаптера повністю перенесено на сучасний формат jsonConfig.\nВбудований веб-інтерфейс перероблено: стрічка останніх подій, відображення Now Playing та налаштовуваний макет.\nРозпізнавання плеєрів покращено: Plexamp, Plex iOS/Android, PlexHTPC та нові ТВ-застосунки тепер надійно розпізнаються.\nПеревідключення після помилок прискорено: прогресивна затримка замість фіксованого очікування.",
+                "zh-cn": "Breaking：_playing.* 下的数据点已重新调整结构——现有脚本和 Vis 组件需要更新。\n从 Plex Media Server 获取数据的方式已彻底重构；填充哪些字段现在取决于所使用的接口（本地 / Plex.tv 云端）。\n适配器配置已完全迁移到现代 jsonConfig 格式。\n内置 Web 界面已重新设计：最近事件的时间线、正在播放显示以及可自定义的布局。\n播放器检测改进：Plexamp、Plex iOS/Android、PlexHTPC 及较新的电视应用现在可被可靠识别。\n断线重连加速：渐进式退避，不再等待固定时间。"
+            },
+            "1.1.5": {
+                "en": "State _playing.*.Metadata.viewOffset is created.\nDependencies updated\nAdapter requires nodejs >= 18 now",
+                "de": "State _playing.* Metadata.view Offset wird erstellt.\nAusgaben aktualisiert\nAdapter benötigt jetzt Nodejs >= 18",
+                "ru": "State _playing.*. Metadata.view Создается офсет.\nОбновленные данные о зависимостях\nАдаптер требует nodejs >= 18 сейчас",
+                "pt": "Estado _playing.*. Metadata.view Offset é criado.\nDependências atualizadas\nAdapter requer nodejs >= 18 agora",
+                "nl": "Staat _spelen.*. Metadata.view Offset is aangemaakt.\nAfhankelijkheden bijgewerkt\nVoor de adapter zijn nodejs < 18 nu nodig",
+                "fr": "État _jouant.*. Métadonnées.view L'offset est créé.\nDépendances actualisées\nAdaptateur nécessite nodejs >= 18 maintenant",
+                "it": "State _playing.* Metadata.view Offset è creato.\nDipendenze aggiornate\nAdattatore richiede nodejs >= 18 ora",
+                "es": "Estado _playing.*. Metadatos.view Se crea Offset.\nActualización de las dependencias\nAdaptador requiere nodejs ю= 18 ahora",
+                "pl": "State _ playing. Metadata.view Offset jest tworzony.\nAktualizacja zależności\nAdapter wymaga węzłów > = 18",
+                "uk": "Стан _playing.*. Метадані.view Офсет створений.\nЗалежність оновлено\nАдаптер вимагає nodejs >= 18 тепер",
+                "zh-cn": "状态 _ playing.*. 元数据。 视图 偏移被创建 .\n更新的依赖关系\n适配器现在需要节点18"
+            },
+            "1.1.4": {
+                "en": "move logmessage into debug",
+                "de": "logmessing in debug verschieben",
+                "ru": "переместить logmessage в debug",
+                "pt": "mover logmessage para depuração",
+                "nl": "verplaats logica in debug",
+                "fr": "déplacer logmessage dans debug",
+                "it": "spostare logmessage in debug",
+                "es": "mover logmessage en depuración",
+                "pl": "logmesowanie ruchu w debugowanie",
+                "uk": "перемістити logmessage в debug",
+                "zh-cn": "将伐木移入黑体"
+            },
+            "1.1.3": {
+                "en": "Fixed: Error in the formatted playback position",
+                "de": "Behoben: Fehler in der formatierten Abspielposition",
+                "ru": "исправлено: ошибка в читаемом смещение",
+                "pt": "corrigido: bug no deslocamento legível",
+                "nl": "vertaling:",
+                "fr": "corrigé: bug in readable offset",
+                "it": "fisso: bug in offset leggibile",
+                "es": "fijo: error en offset legible",
+                "pl": "uruchomiony: bug in readable offset",
+                "uk": "виправлено: помилка в читабельному офсеті",
+                "zh-cn": "固定:可宣读的抵偿金"
+            },
+            "1.0.3": {
+                "de": "Behoben: Fügen keine leeren Benachrichtigungen zur History hinzu #[183](https://github.com/iobroker-community-adapter/ioBroker.plex/issues/183) \nBehoben: Verhindere die Erstellung doppelter Histroyeinträge in den meisten Fällen",
+                "en": "Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFixed: prevent the creation of duplicate history entries in most cases",
+                "es": "Fijo: No añadas las notificaciones vacías a la historia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFijo: prevenir la creación de entradas de historia duplicadas en la mayoría de los casos",
+                "fr": "Fixed: Don't add empty notifications to history #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrection : empêcher la création de doubles entrées d'histoire dans la plupart des cas",
+                "it": "Fisso: Non aggiungere notifiche vuote alla storia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nRisolto: impedire la creazione di voci di storia duplicate nella maggior parte dei casi",
+                "nl": "Voeg geen lege aanmeldingen toe aan geschiedenis 183:\nVertaling:",
+                "pl": "(Fixed: Don't add empty notifications to history #183(https:/github.com/iobroker-community-adapters/ioBroker.plex/issues/183) (ang.)\nFixed: Zapobieganie stworzenia replikacyjnej historii w większości przypadków",
+                "pt": "Corrigido: Não adicione notificações vazias ao histórico #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrigido: evitar a criação de entradas de histórico duplicado na maioria dos casos",
+                "ru": "Исправлено: Не добавляйте пустые уведомления в историю #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nИсправлено: предотвратить создание записей истории дублирования в большинстве случаев",
+                "uk": "Виправлено: Не додайте порожні повідомлення до історії #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nВиправлено: запобігти створенню записів історії дублікатів у більшості випадків",
+                "zh-cn": "九. 固定:向历史编号[183](http://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)增添空通知。\n固定:防止在多数情况下建立重复的历史内容"
+            },
+            "1.0.4": {
+                "de": "Behoben: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "en": "Fixed: [#184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "es": "Corregido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "fr": "Correction : #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "it": "Fisso: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "nl": "Quality over Quantity (QoQ) Releases Vertaling:",
+                "pl": "Fixed: #184 (https:/github.com/iobroker-community-adapters/ioBrokerplex/issues/184) (ang.)",
+                "pt": "Corrigido: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "ru": "Исправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)",
+                "uk": "Виправлено: #[184](https://github.com/iobroker-community-adapters/ioBroker.plex/products/184)",
+                "zh-cn": "固定:第[184]号(http://github.com/iobroker-community-adapters/ioBroker.plex/issues/184)"
+            }
+        },
+        "authors": [
+            "Zefau <zefau@mailbox.org>",
+            "ticaki <ticaki@renopoint.de>",
+            "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
+        ],
+        "compact": true,
+        "connectionType": "local",
+        "dataSource": "push",
+        "desc": {
+            "de": "Integration des Plex Media Servers und Tautulli",
+            "en": "Integration of your Plex Media Server and your Tautulli",
+            "es": "La integración de su Plex Media Server y / o su Tautulli",
+            "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
+            "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
+            "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
+            "pl": "Integracja Plex media serwer i / lub Tautulli",
+            "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
+            "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
+            "uk": "Інтеграція медіасервера Plex і Tautulli",
+            "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=7.8.0"
+            }
+        ],
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
+        "icon": "plex.jpg",
+        "keywords": [
+            "tautulli",
+            "plex",
+            "media"
+        ],
+        "licenseInformation": {
+            "license": "MIT",
+            "type": "free"
+        },
+        "localLinks": {
+            "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
+        },
+        "loglevel": "info",
+        "adminUI": {
+            "config": "json"
+        },
+        "messagebox": true,
+        "mode": "daemon",
+        "name": "plex",
+        "tier": 3,
+        "platform": "Javascript/Node.js",
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
+        "titleLang": {
+            "de": "Plex Media Server",
+            "en": "Plex Media Server",
+            "es": "Plex Media Server",
+            "fr": "Plex Media Server",
+            "it": "Plex Media Server",
+            "nl": "Plex Media Server",
+            "pl": "Plex Media Server",
+            "pt": "Plex Media Server",
+            "ru": "Plex Media Server",
+            "uk": "Медіасервер Plex",
+            "zh-cn": "Plex Media Server"
+        },
+        "type": "multimedia",
+        "version": "2.0.0-alpha.1"
     },
-    "authors": [
-      "Zefau <zefau@mailbox.org>",
-      "ticaki <ticaki@renopoint.de>",
-      "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
-    ],
-    "compact": true,
-    "connectionType": "local",
-    "dataSource": "push",
-    "desc": {
-      "de": "Integration des Plex Media Servers und Tautulli",
-      "en": "Integration of your Plex Media Server and your Tautulli",
-      "es": "La integración de su Plex Media Server y / o su Tautulli",
-      "fr": "L'intégration de votre Plex Media Server et / ou votre Tautulli",
-      "it": "L'integrazione di Plex Media Server e / o il vostro Tautulli",
-      "nl": "Integratie van uw Plex Media Server en / of uw Tautulli",
-      "pl": "Integracja Plex media serwer i / lub Tautulli",
-      "pt": "A integração de suas Plex Media Server e / ou o seu Tautulli",
-      "ru": "Интеграция Plex медиа-сервер и / или Tautulli",
-      "uk": "Інтеграція медіасервера Plex і Tautulli",
-      "zh-cn": "融入你的丛媒体服务器以及/或者你Tautulli"
+    "instanceObjects": [],
+    "native": {
+        "getAllItems": false,
+        "getLibraries": true,
+        "getMetadataTrees": false,
+        "getPlayerRefresh": 1,
+        "getPlaylists": true,
+        "getPlaylistsDetails": false,
+        "getServers": true,
+        "getSettings": true,
+        "getStatistics": false,
+        "getUsers": false,
+        "tautulliEnabled": false,
+        "notifications": [
+            {
+                "caption": "",
+                "event": "any",
+                "media": "any",
+                "message": "No Message defined for media %Metadata.type% and event %event%",
+                "thumb": ""
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.play",
+                "media": "any",
+                "message": "%Metadata.title% (%Metadata.year%) playing",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.pause",
+                "media": "any",
+                "message": "%Metadata.title% (%Metadata.year%) paused",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.stop",
+                "media": "any",
+                "message": "%Metadata.title% (%Metadata.year%) stopped",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.resume",
+                "media": "any",
+                "message": "%Metadata.title% (%Metadata.year%) resumed",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.rate",
+                "media": "any",
+                "message": "%Metadata.title% (%Metadata.year%) rated",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.watched",
+                "media": "any",
+                "message": "%Metadata.title% (%Metadata.year%) watched",
+                "thumb": "%Metadata.thumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.play",
+                "media": "episode",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.pause",
+                "media": "episode",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.stop",
+                "media": "episode",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.resume",
+                "media": "episode",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.rate",
+                "media": "episode",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.watched",
+                "media": "episode",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
+                "thumb": "%Metadata.grandparentThumb%"
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.play",
+                "media": "track",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
+                "thumb": ""
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.pause",
+                "media": "track",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
+                "thumb": ""
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.stop",
+                "media": "track",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
+                "thumb": ""
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.resume",
+                "media": "track",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
+                "thumb": ""
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.rate",
+                "media": "track",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
+                "thumb": ""
+            },
+            {
+                "caption": "Played by %Account.title% on %Player.title%",
+                "event": "media.watched",
+                "media": "track",
+                "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
+                "thumb": ""
+            },
+            {
+                "caption": "",
+                "event": "library.on.deck",
+                "media": "system",
+                "message": "A new item is added that appears in the user’s On Deck.",
+                "thumb": ""
+            },
+            {
+                "caption": "",
+                "event": "library.new",
+                "media": "system",
+                "message": "A new item is added to a library.",
+                "thumb": ""
+            },
+            {
+                "caption": "",
+                "event": "admin.database.backup",
+                "media": "system",
+                "message": "A database backup is completed successfully via scheduled tasks.",
+                "thumb": ""
+            },
+            {
+                "caption": "",
+                "event": "admin.database.corrupted",
+                "media": "system",
+                "message": "Corruption is detected in the server database.",
+                "thumb": ""
+            },
+            {
+                "caption": "",
+                "event": "device.new",
+                "media": "system",
+                "message": "A new device is using the Plex Media Server.",
+                "thumb": ""
+            },
+            {
+                "caption": "",
+                "event": "playback.started",
+                "media": "system",
+                "message": "Playback is started by a shared user.",
+                "thumb": ""
+            }
+        ]
     },
-    "dependencies": [
-      {
-        "js-controller": ">=6.0.11"
-      }
-    ],
-    "globalDependencies": [
-      {
-        "admin": ">=7.8.0"
-      }
-    ],
-    "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.plex/master/admin/plex.jpg",
-    "icon": "plex.jpg",
-    "keywords": [
-      "tautulli",
-      "plex",
-      "media"
-    ],
-    "licenseInformation": {
-      "license": "MIT",
-      "type": "free"
-    },
-    "localLinks": {
-      "_default": "%web_protocol%://%ip%:%web_port%/plex/index.html"
-    },
-    "loglevel": "info",
-    "adminUI": {
-      "config": "json"
-    },
-    "messagebox": true,
-    "mode": "daemon",
-    "name": "plex",
-    "tier": 3,
-    "platform": "Javascript/Node.js",
-    "readme": "https://github.com/iobroker-community-adapters/ioBroker.plex/blob/master/README.md",
-    "titleLang": {
-      "de": "Plex Media Server",
-      "en": "Plex Media Server",
-      "es": "Plex Media Server",
-      "fr": "Plex Media Server",
-      "it": "Plex Media Server",
-      "nl": "Plex Media Server",
-      "pl": "Plex Media Server",
-      "pt": "Plex Media Server",
-      "ru": "Plex Media Server",
-      "uk": "Медіасервер Plex",
-      "zh-cn": "Plex Media Server"
-    },
-    "type": "multimedia",
-    "version": "2.0.0-alpha.1"
-  },
-  "instanceObjects": [],
-  "native": {
-    "getAllItems": false,
-    "getLibraries": true,
-    "getMetadataTrees": false,
-    "getPlayerRefresh": 1,
-    "getPlaylists": true,
-    "getPlaylistsDetails": false,
-    "getServers": true,
-    "getSettings": true,
-    "getStatistics": false,
-    "getUsers": false,
-    "tautulliEnabled": false,
-    "notifications": [
-      {
-        "caption": "",
-        "event": "any",
-        "media": "any",
-        "message": "No Message defined for media %Metadata.type% and event %event%",
-        "thumb": ""
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.play",
-        "media": "any",
-        "message": "%Metadata.title% (%Metadata.year%) playing",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.pause",
-        "media": "any",
-        "message": "%Metadata.title% (%Metadata.year%) paused",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.stop",
-        "media": "any",
-        "message": "%Metadata.title% (%Metadata.year%) stopped",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.resume",
-        "media": "any",
-        "message": "%Metadata.title% (%Metadata.year%) resumed",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.rate",
-        "media": "any",
-        "message": "%Metadata.title% (%Metadata.year%) rated",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.watched",
-        "media": "any",
-        "message": "%Metadata.title% (%Metadata.year%) watched",
-        "thumb": "%Metadata.thumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.play",
-        "media": "episode",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) playing",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.pause",
-        "media": "episode",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) paused",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.stop",
-        "media": "episode",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) stopped",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.resume",
-        "media": "episode",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) resumed",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.rate",
-        "media": "episode",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) rated",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.watched",
-        "media": "episode",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (%Metadata.parentTitle%, %Metadata.year%) watched",
-        "thumb": "%Metadata.grandparentThumb%"
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.play",
-        "media": "track",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) playing",
-        "thumb": ""
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.pause",
-        "media": "track",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) paused",
-        "thumb": ""
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.stop",
-        "media": "track",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) stopped",
-        "thumb": ""
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.resume",
-        "media": "track",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) resumed",
-        "thumb": ""
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.rate",
-        "media": "track",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) rated",
-        "thumb": ""
-      },
-      {
-        "caption": "Played by %Account.title% on %Player.title%",
-        "event": "media.watched",
-        "media": "track",
-        "message": "%Metadata.grandparentTitle% - %Metadata.title% (Album %Metadata.parentTitle%) watched",
-        "thumb": ""
-      },
-      {
-        "caption": "",
-        "event": "library.on.deck",
-        "media": "system",
-        "message": "A new item is added that appears in the user’s On Deck.",
-        "thumb": ""
-      },
-      {
-        "caption": "",
-        "event": "library.new",
-        "media": "system",
-        "message": "A new item is added to a library.",
-        "thumb": ""
-      },
-      {
-        "caption": "",
-        "event": "admin.database.backup",
-        "media": "system",
-        "message": "A database backup is completed successfully via scheduled tasks.",
-        "thumb": ""
-      },
-      {
-        "caption": "",
-        "event": "admin.database.corrupted",
-        "media": "system",
-        "message": "Corruption is detected in the server database.",
-        "thumb": ""
-      },
-      {
-        "caption": "",
-        "event": "device.new",
-        "media": "system",
-        "message": "A new device is using the Plex Media Server.",
-        "thumb": ""
-      },
-      {
-        "caption": "",
-        "event": "playback.started",
-        "media": "system",
-        "message": "Playback is started by a shared user.",
-        "thumb": ""
-      }
-    ]
-  },
-  "objects": []
+    "objects": []
 }

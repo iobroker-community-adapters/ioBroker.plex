@@ -131,6 +131,9 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 2.0.0-alpha.2 (2026-05-10)
+- (ticaki) New option: media link states can store a placeholder instead of the real Plex token in plain text (configurable in adapter settings, enabled by default).
+
 ### 2.0.0-alpha.1 (2026-05-02)
 - (ticaki) Fixed: Plex iOS, Plex Android, and Plex Web devices no longer generate "State has no existing object" log warnings after an upgrade.
 - (ticaki) Fixed: deleting a device via the adapter settings now correctly clears all its internal state entries.

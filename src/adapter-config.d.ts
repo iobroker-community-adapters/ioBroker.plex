@@ -26,6 +26,7 @@ declare global {
             certChained: string;
             certChainedVal: string;
             passphrase: string;
+            tokenInLinks: boolean;
 
             // Tautulli
             tautulliEnabled: boolean;

@@ -85,6 +85,9 @@
     "tautulliIp": "Indirizzo IP",
     "tautulliPort": "Porta",
     "tautulliToken": "API Token",
+    "tokenInLinks": "Incorpora il token nei link media",
+    "tokenInLinksHelp": "Se abilitato, gli stati dei link media contengono il vero token Plex e possono essere utilizzati direttamente. Disabilita se non vuoi che il token sia memorizzato in testo normale nei valori degli stati.",
+    "tokenPrivacyHeader": "Privacy",
     "webhookIp": "Webhook Ip",
     "webhookIpInfo": "Webhook Richiamata Ip, SOLO, se Plex è in esecuzione in finestra Mobile",
     "webhookPort": "Webhook Porta"

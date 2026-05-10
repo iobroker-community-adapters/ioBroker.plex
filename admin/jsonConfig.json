@@ -120,6 +120,24 @@
                     "md": 6,
                     "lg": 6,
                     "xl": 6
+                },
+                "_privacyHeader": {
+                    "type": "header",
+                    "text": "tokenPrivacyHeader",
+                    "size": 4,
+                    "newLine": true
+                },
+                "tokenInLinks": {
+                    "type": "checkbox",
+                    "label": "tokenInLinks",
+                    "help": "tokenInLinksHelp",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 5,
+                    "xl": 4
                 }
             }
         },

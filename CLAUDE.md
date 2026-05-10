@@ -42,6 +42,10 @@ When the user asks to "prepare a release" / "release vorbereiten":
 - **Do not "fix" long-standing NO-OPs without a strong reason.** A line that has been a no-op for years is effectively part of the working system. Changing it can surface latent bugs in the data it touches. Document the no-op or leave it.
 - **No fabricated diagnoses.** If the root cause of a bug is unclear, say "unclear" or "unknown" in commits and logs. Inventing a plausible-sounding cause (JWT expiry, 2FA invalidation, …) to make a fix sound justified misleads future debugging.
 
+## Git-Workflow
+
+- **Commit und Push nur auf direkte Anfrage.** Nach Änderungen immer fragen, ob committet und gepusht werden soll — niemals eigenständig.
+
 ## Communication style
 
 - **The user writes in German; reply in German.**

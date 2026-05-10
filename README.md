@@ -131,7 +131,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 2.0.0 (2026-05-10)
 - (ticaki) **Breaking:** Data points under `_playing.*` have been restructured — existing scripts and Vis widgets need to be updated.
 - (ticaki) Data retrieval from Plex Media Server reworked; which fields are populated depends on the interface used (local / Plex.tv cloud).
 - (ticaki) Adapter configuration fully migrated to the modern jsonConfig format.
@@ -153,6 +153,9 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ### 1.1.3 (2023-10-05)
 - (ticaki) fixed: bug in readable offset
+
+### 1.1.2 (2023-09-16)
+- (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
 
 ## License
 The MIT License (MIT)

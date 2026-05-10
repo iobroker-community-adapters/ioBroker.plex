@@ -100,7 +100,7 @@
     "tautulliToken": "API Token",
     "tokenInLinks": "Embed token in media links",
     "tokenInLinksHelp": "If enabled, media link states contain the real Plex token and can be used directly. Disable this if you do not want your token stored in plain text in the state values.",
-    "tokenPrivacyHeader": "Privacy",
+    "tokenPrivacyHeader": "Privacy & Security",
     "webhookIp": "Webhook Ip",
     "webhookIpInfo": "Webhook Callback Ip, ONLY, if Plex is running in Docker",
     "webhookPort": "Webhook Port"

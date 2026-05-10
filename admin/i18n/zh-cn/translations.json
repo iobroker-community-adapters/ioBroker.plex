@@ -87,7 +87,7 @@
     "tautulliToken": "API令牌",
     "tokenInLinks": "在媒体链接中嵌入令牌",
     "tokenInLinksHelp": "如果启用，媒体链接状态包含真实的Plex令牌，可直接使用。如果您不希望令牌以明文形式存储在状态值中，请禁用此选项。",
-    "tokenPrivacyHeader": "隐私",
+    "tokenPrivacyHeader": "隐私与安全",
     "webhookIp": "两者的Ip",
     "webhookIpInfo": "两者回Ip，只，如果丛运行在Docker",
     "webhookPort": "两者口"

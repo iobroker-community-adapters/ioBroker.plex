@@ -516,7 +516,9 @@ class Plex extends utils.Adapter {
     const changed = ok ? this.lastConnectionOk !== true : this.lastConnectionOk !== false;
     this.lastConnectionOk = ok;
     await this.library.set(import_library.Library.CONNECTION, ok);
-    if (!changed) return;
+    if (!changed) {
+      return;
+    }
     if (ok) {
       this.log.info("Plex Media Server connected.");
     } else {

@@ -87,7 +87,7 @@
     "tautulliToken": "Token API ",
     "tokenInLinks": "Osadź token w linkach do mediów",
     "tokenInLinksHelp": "Jeśli włączone, stany linków do mediów zawierają prawdziwy token Plex i można ich używać bezpośrednio. Wyłącz, jeśli nie chcesz, aby token był przechowywany w postaci zwykłego tekstu w wartościach stanów.",
-    "tokenPrivacyHeader": "Prywatność",
+    "tokenPrivacyHeader": "Prywatność & Bezpieczeństwo",
     "webhookIp": "Strony Pościgowa IZ",
     "webhookIpInfo": "Web przechwytujący oddzwonienia IP, tylko, jeśli plex dnia pracuje w Docker",
     "webhookPort": "Port Web-Pościgowa "

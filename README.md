@@ -131,20 +131,17 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 2.0.0-alpha.2 (2026-05-10)
-- (ticaki) New option: media link states can store a placeholder instead of the real Plex token in plain text (configurable in adapter settings, enabled by default).
-
-### 2.0.0-alpha.1 (2026-05-02)
-- (ticaki) Fixed: Plex iOS, Plex Android, and Plex Web devices no longer generate "State has no existing object" log warnings after an upgrade.
-- (ticaki) Fixed: deleting a device via the adapter settings now correctly clears all its internal state entries.
-
-### 2.0.0-alpha.0 (2026-05-01)
+### **WORK IN PROGRESS**
 - (ticaki) **Breaking:** Data points under `_playing.*` have been restructured — existing scripts and Vis widgets need to be updated.
-- (ticaki) Data retrieval from Plex Media Server reworked; which fields are populated now depends on the interface used (local / Plex.tv cloud).
+- (ticaki) Data retrieval from Plex Media Server reworked; which fields are populated depends on the interface used (local / Plex.tv cloud).
 - (ticaki) Adapter configuration fully migrated to the modern jsonConfig format.
 - (ticaki) Built-in web interface redesigned: timeline of recent events, Now Playing display, and customizable layout.
-- (ticaki) Player detection improved: Plexamp, Plex iOS/Android, PlexHTPC, and newer TV apps are now reliably detected.
+- (ticaki) Player detection improved: Plexamp, Plex iOS/Android, PlexHTPC, and newer TV apps now reliably detected.
 - (ticaki) Reconnect after connection errors accelerated: progressive backoff instead of fixed wait time.
+- (ticaki) Fixed: Plex iOS, Android, and Web devices no longer generate "State has no existing object" log warnings after an upgrade.
+- (ticaki) Fixed: deleting a device via adapter settings now correctly clears all internal state entries.
+- (ticaki) New privacy option: media link states can store a placeholder instead of the real Plex token in plain text (configurable in adapter settings, enabled by default).
+- (ticaki) Adapter rewritten in TypeScript. Requires Node.js >= 22.
 
 ### 1.1.5 (2024-12-11)
 - (ticaki) State _playing.*.Metadata.viewOffset is created.

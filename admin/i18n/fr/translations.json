@@ -87,7 +87,7 @@
     "tautulliToken": "Clé API",
     "tokenInLinks": "Intégrer le jeton dans les liens média",
     "tokenInLinksHelp": "Si activé, les états de lien média contiennent le vrai jeton Plex et peuvent être utilisés directement. Désactivez si vous ne souhaitez pas que votre jeton soit stocké en clair dans les valeurs d'état.",
-    "tokenPrivacyHeader": "Confidentialité",
+    "tokenPrivacyHeader": "Confidentialité & Sécurité",
     "webhookIp": "Webhook Ip",
     "webhookIpInfo": "Webhook Rappel Ip, SEULEMENT, si Plex est en cours d'exécution dans le Panneau",
     "webhookPort": "Webhook Port"

@@ -87,7 +87,7 @@
     "tautulliToken": "API Token",
     "tokenInLinks": "Insertar token en los enlaces de medios",
     "tokenInLinksHelp": "Si está habilitado, los estados de enlace multimedia contienen el token real de Plex y se pueden usar directamente. Deshabilite si no desea que el token se almacene en texto sin formato en los valores de estado.",
-    "tokenPrivacyHeader": "Privacidad",
+    "tokenPrivacyHeader": "Privacidad & Seguridad",
     "webhookIp": "Webhook Ip",
     "webhookIpInfo": "Webhook de devolución de llamada dirección Ip, SOLAMENTE, si Plex está ejecutando en la ventana acoplable",
     "webhookPort": "Webhook Puerto"

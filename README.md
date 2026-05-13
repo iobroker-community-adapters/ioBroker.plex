@@ -131,7 +131,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 2.1.0 (2026-05-13)
 - (ticaki) New: server management commands — library scan, force-refresh, empty trash, analyze streams (`libraries.{id}._commands.*`).
 - (ticaki) New: global maintenance buttons — refresh all libraries, clean bundles, optimize database (`maintenance.*`).
 - (ticaki) New: Butler task buttons — trigger any of Plex's scheduled background tasks on demand (`butler.*`).
@@ -161,11 +161,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ### 1.1.3 (2023-10-05)
 - (ticaki) fixed: bug in readable offset
-
-### 1.1.2 (2023-09-16)
-- (ticaki) prevent Plex from crashing due to incorrect tautulli configuration
-
-[Older changelogs can be found there](CHANGELOG_OLD.md)
 
 ## License
 The MIT License (MIT)

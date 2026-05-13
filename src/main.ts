@@ -573,7 +573,9 @@ class Plex extends utils.Adapter {
             });
             this.log.info(`Setting '${settingId}' updated to: ${val}`);
             if (this.config.getSettings) {
-                if (this.settingsRefreshTimer) this.clearTimeout(this.settingsRefreshTimer);
+                if (this.settingsRefreshTimer) {
+                    this.clearTimeout(this.settingsRefreshTimer);
+                }
                 this.settingsRefreshTimer = this.setTimeout(() => {
                     this.settingsRefreshTimer = undefined;
                     this.getSettings();
@@ -1726,8 +1728,7 @@ class Plex extends utils.Adapter {
                         description: `Settings ${this.library.ucFirst(entry.group)}`,
                     });
                     const settingId = `settings.${entry.group}.${entry.id}`;
-                    const settingType =
-                        entry.type == 'bool' ? 'boolean' : entry.type == 'int' ? 'number' : 'string';
+                    const settingType = entry.type == 'bool' ? 'boolean' : entry.type == 'int' ? 'number' : 'string';
                     const settingRole = entry.type == 'bool' ? 'switch' : entry.type == 'int' ? 'value' : 'text';
                     // extendObjectAsync bypasses _STATES cache so write:true is persisted even for existing objects
                     void this.extendObjectAsync(settingId, {

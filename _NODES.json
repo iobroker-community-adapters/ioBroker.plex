@@ -238,6 +238,65 @@
         "role": "json",
         "type": "string"
     },
+    "butler": {
+        "description": { "en": "Butler Tasks", "de": "Butler-Aufgaben" },
+        "role": "channel"
+    },
+    "maintenance": {
+        "description": {
+            "en": "Server Maintenance",
+            "de": "Server-Wartung",
+            "ru": "Техническое обслуживание",
+            "pt": "Manutenção do servidor",
+            "nl": "Serveronderhoud",
+            "fr": "Maintenance du serveur",
+            "it": "Manutenzione del server",
+            "es": "Mantenimiento del servidor",
+            "pl": "Konserwacja serwera",
+            "uk": "Обслуговування сервера",
+            "zh-cn": "服务器维护"
+        },
+        "role": "channel"
+    },
+    "maintenance.refreshalllibraries": {
+        "description": { "en": "Refresh All Libraries", "de": "Alle Bibliotheken aktualisieren" },
+        "role": "button",
+        "type": "boolean"
+    },
+    "maintenance.cleanbundles": {
+        "description": { "en": "Clean Bundles", "de": "Bundle-Dateien bereinigen" },
+        "role": "button",
+        "type": "boolean"
+    },
+    "maintenance.optimize": {
+        "description": { "en": "Optimize Database", "de": "Datenbank optimieren" },
+        "role": "button",
+        "type": "boolean"
+    },
+    "libraries._commands": {
+        "description": { "en": "Library Commands", "de": "Bibliotheks-Befehle" },
+        "role": "channel"
+    },
+    "libraries._commands.scan": {
+        "description": { "en": "Scan Library (fast)", "de": "Bibliothek scannen (schnell)" },
+        "role": "button",
+        "type": "boolean"
+    },
+    "libraries._commands.scanforce": {
+        "description": { "en": "Force Refresh Metadata (slow)", "de": "Metadaten erzwungen neu laden (langsam)" },
+        "role": "button",
+        "type": "boolean"
+    },
+    "libraries._commands.emptytrash": {
+        "description": { "en": "Empty Library Trash", "de": "Bibliotheks-Papierkorb leeren" },
+        "role": "button",
+        "type": "boolean"
+    },
+    "libraries._commands.analyze": {
+        "description": { "en": "Analyze Streams", "de": "Audio-/Untertitelspuren analysieren" },
+        "role": "button",
+        "type": "boolean"
+    },
     "libraries": {
         "description": {
             "en": "Plex Libraries",

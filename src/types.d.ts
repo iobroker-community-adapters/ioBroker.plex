@@ -588,3 +588,20 @@ namespace Plex {
         }
     }
 }
+
+interface ServerCommandDef {
+    description: string;
+    role: string;
+    type: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    path?: string;
+    pathTemplate?: string;
+    common?: Record<string, unknown>;
+}
+
+interface ServerCommandsConfig {
+    libraryCommands: Record<string, ServerCommandDef>;
+    maintenanceCommands: Record<string, ServerCommandDef>;
+    butlerTasks: Record<string, ServerCommandDef>;
+    metadataCommands: Record<string, ServerCommandDef>;
+}

@@ -92,6 +92,7 @@
     "_ACTIONS.json",
     "_NODES.json",
     "_PLAYERDETAILS.json",
+    "_SERVER_COMMANDS.json",
     "README.md",
     "README-states.md",
     "README-tautulli.md"

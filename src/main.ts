@@ -10,6 +10,7 @@ import { v1 as uuidv1 } from 'uuid';
 import _NODES_RAW from '../_NODES.json';
 import _ACTIONS_RAW from '../_ACTIONS.json';
 import _PLAYERDETAILS_RAW from '../_PLAYERDETAILS.json';
+import _SERVER_COMMANDS_RAW from '../_SERVER_COMMANDS.json';
 
 import { PlexHttp } from './lib/plexHttp';
 import { PlexNotifications } from './lib/plexNotifications';
@@ -28,6 +29,7 @@ const Tautulli: any = require('tautulli-api');
 const _NODES: Record<string, any> = _NODES_RAW;
 const _ACTIONS: Record<string, Record<string, any>> = _ACTIONS_RAW as any;
 const _PLAYERDETAILS: any = _PLAYERDETAILS_RAW;
+const _SERVER_COMMANDS: ServerCommandsConfig = _SERVER_COMMANDS_RAW as any;
 
 interface NotificationDef {
     message: string;
@@ -143,6 +145,7 @@ class Plex extends utils.Adapter {
     private notifications: Record<string, Record<string, NotificationDef>> = {};
     private retryCycle: ioBroker.Timeout | undefined;
     private refreshCycle: ioBroker.Timeout | undefined;
+    private settingsRefreshTimer: ioBroker.Timeout | undefined;
     private refreshInterval: ioBroker.Interval | undefined;
     private healthCheckInterval: ioBroker.Interval | undefined;
     private httpServer: HttpServer | null = null;
@@ -365,7 +368,7 @@ class Plex extends utils.Adapter {
             }
         }
 
-        // Refresh Library
+        // Refresh Library (bestehend, mit POST force=1)
         if (action == '_refresh') {
             const libId = stateId.substring(stateId.indexOf('libraries.') + 10, stateId.indexOf('-'));
             const options: any = {
@@ -386,16 +389,204 @@ class Plex extends utils.Adapter {
                     this.log.warn(`Error triggering refresh on library with ID ${libId}! See debug log for details.`);
                     this.log.debug(err instanceof Error ? err.message : String(err));
                 });
-        } else {
-            const path = stateId.replace(`${this.name}.${this.instance}.`, '').split('.');
-            action = path.pop() || '';
-            const mode = path.pop() || '';
+            return;
+        }
 
-            path.splice(-1);
-            const p = this.controller.existPlayer(path.join('.'));
-            if (p) {
-                void p.action({ mode, action, val, id: `${path.join('.')}._Controls` });
+        // Library-spezifische Commands (scan, emptyTrash, analyze …)
+        if (stateId.includes('._commands.') && stateId.includes('libraries.')) {
+            void this.handleLibraryCommand(stateId);
+            return;
+        }
+
+        // Server Maintenance Commands (maintenance.cleanBundles usw.)
+        if (stateId.includes(`${this.name}.${this.instance}.maintenance.`)) {
+            void this.handleMaintenanceCommand(action);
+            return;
+        }
+
+        // Butler Tasks (butler.BackupDatabase usw.)
+        if (stateId.includes(`${this.name}.${this.instance}.butler.`)) {
+            void this.handleButlerTask(action);
+            return;
+        }
+
+        // Metadata Commands pro laufendem Medium (_playing.X._Commands.Y)
+        if (stateId.includes('._Commands.') && stateId.includes('_playing.')) {
+            void this.handleMetadataCommand(stateId, action, val);
+            return;
+        }
+
+        // Settings Write-Back (settings.group.settingId)
+        if (stateId.includes(`${this.name}.${this.instance}.settings.`)) {
+            void this.handleSettingChange(stateId, val);
+            return;
+        }
+
+        // Player-Kontrolle (bestehend)
+        const path = stateId.replace(`${this.name}.${this.instance}.`, '').split('.');
+        action = path.pop() || '';
+        const mode = path.pop() || '';
+
+        path.splice(-1);
+        const p = this.controller.existPlayer(path.join('.'));
+        if (p) {
+            void p.action({ mode, action, val, id: `${path.join('.')}._Controls` });
+        }
+    }
+
+    private createMaintenanceStates(): void {
+        void this.library.set({ node: 'maintenance', role: 'channel', description: 'Server Maintenance' });
+        for (const [cmdName, cmdDef] of Object.entries(_SERVER_COMMANDS.maintenanceCommands)) {
+            const nodeKey = `maintenance.${cmdName}`;
+            void this.library.set(
+                {
+                    node: nodeKey,
+                    role: cmdDef.role,
+                    type: cmdDef.type as ioBroker.CommonType,
+                    description: cmdDef.description,
+                },
+                false,
+            );
+            void this.subscribeStatesAsync(nodeKey);
+        }
+
+        void this.library.set({ node: 'butler', role: 'channel', description: 'Butler Tasks' });
+        for (const [taskName, taskDef] of Object.entries(_SERVER_COMMANDS.butlerTasks)) {
+            const nodeKey = `butler.${taskName}`;
+            void this.library.set(
+                {
+                    node: nodeKey,
+                    role: taskDef.role,
+                    type: taskDef.type as ioBroker.CommonType,
+                    description: taskDef.description,
+                },
+                false,
+            );
+            void this.subscribeStatesAsync(nodeKey);
+        }
+    }
+
+    private createMetadataCommandStates(playerPrefix: string, ratingKey: string | undefined): void {
+        if (!ratingKey) {
+            return;
+        }
+        void this.library.set({ node: `${playerPrefix}._Commands`, role: 'channel', description: 'Media Commands' });
+        for (const [cmdName, cmdDef] of Object.entries(_SERVER_COMMANDS.metadataCommands)) {
+            const nodeKey = `${playerPrefix}._Commands.${cmdName}`;
+            void this.library.set(
+                {
+                    node: nodeKey,
+                    role: cmdDef.role,
+                    type: cmdDef.type as ioBroker.CommonType,
+                    description: cmdDef.description,
+                    common: cmdDef.common as any,
+                },
+                cmdDef.type === 'boolean' ? false : 0,
+            );
+            void this.subscribeStatesAsync(nodeKey);
+        }
+    }
+
+    private async handleLibraryCommand(stateId: string): Promise<void> {
+        const relId = stateId.replace(`${this.name}.${this.instance}.`, '');
+        // relId: libraries.{key}-{title}._commands.{cmdName}
+        const parts = relId.split('.');
+        const libSegment = parts[1]; // z.B. "1-movies"
+        const cmdName = parts[3];
+        const numericId = libSegment.substring(0, libSegment.indexOf('-'));
+        const cmdDef = _SERVER_COMMANDS.libraryCommands[cmdName];
+        if (!cmdDef?.pathTemplate) {
+            return;
+        }
+        const apiPath = cmdDef.pathTemplate.replace('{id}', numericId);
+        try {
+            await this.plex.query(apiPath, { method: cmdDef.method });
+            this.log.info(`Library command '${cmdName}' executed on library ${numericId}.`);
+        } catch (err: unknown) {
+            this.log.warn(`Library command '${cmdName}' failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    }
+
+    private async handleMaintenanceCommand(cmdName: string): Promise<void> {
+        const cmdDef = _SERVER_COMMANDS.maintenanceCommands[cmdName];
+        if (!cmdDef?.path) {
+            return;
+        }
+        try {
+            await this.plex.query(cmdDef.path, { method: cmdDef.method });
+            this.log.info(`Maintenance command '${cmdName}' executed.`);
+        } catch (err: unknown) {
+            this.log.warn(
+                `Maintenance command '${cmdName}' failed: ${err instanceof Error ? err.message : String(err)}`,
+            );
+        }
+    }
+
+    private async handleButlerTask(taskName: string): Promise<void> {
+        const taskDef = _SERVER_COMMANDS.butlerTasks[taskName];
+        if (!taskDef?.path) {
+            return;
+        }
+        try {
+            await this.plex.query(taskDef.path, { method: taskDef.method });
+            this.log.info(`Butler task '${taskName}' started.`);
+        } catch (err: unknown) {
+            this.log.warn(`Butler task '${taskName}' failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    }
+
+    private async handleMetadataCommand(stateId: string, cmdName: string, val: any): Promise<void> {
+        const relId = stateId.replace(`${this.name}.${this.instance}.`, '');
+        const playerPrefix = relId.substring(0, relId.indexOf('._Commands.'));
+        // Keys werden von library.readData() lowercase gespeichert
+        const ratingKey = this.library.getDeviceState(`${playerPrefix}.Metadata.ratingkey`);
+        if (!ratingKey) {
+            this.log.warn(`handleMetadataCommand: no ratingKey at ${playerPrefix}.Metadata.ratingkey`);
+            return;
+        }
+        const cmdDef = _SERVER_COMMANDS.metadataCommands[cmdName];
+        if (!cmdDef?.pathTemplate) {
+            return;
+        }
+        let apiPath = cmdDef.pathTemplate.replace('{key}', String(ratingKey));
+        if (cmdName === 'rate') {
+            apiPath = apiPath.replace('{val}', String(val));
+        }
+        try {
+            await this.plex.query(apiPath, { method: cmdDef.method });
+            this.log.info(`Metadata command '${cmdName}' executed for key ${ratingKey}.`);
+        } catch (err: unknown) {
+            this.log.warn(`Metadata command '${cmdName}' failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    }
+
+    private async handleSettingChange(stateId: string, val: any): Promise<void> {
+        const relId = stateId.replace(`${this.name}.${this.instance}.`, '');
+        const parts = relId.split('.');
+        if (parts.length < 3) {
+            return;
+        }
+        const settingId = parts[2];
+        try {
+            await this.plex.query(`/:/prefs?${encodeURIComponent(settingId)}=${encodeURIComponent(String(val))}`, {
+                method: 'PUT',
+            });
+            this.log.info(`Setting '${settingId}' updated to: ${val}`);
+            if (this.config.getSettings) {
+                if (this.settingsRefreshTimer) this.clearTimeout(this.settingsRefreshTimer);
+                this.settingsRefreshTimer = this.setTimeout(() => {
+                    this.settingsRefreshTimer = undefined;
+                    this.getSettings();
+                    if (this.refreshCycle) {
+                        this.clearTimeout(this.refreshCycle);
+                        this.refreshCycle = this.setTimeout(this.retrieveDataLoop, this.config.refresh * 1000);
+                    }
+                }, 1500);
             }
+        } catch (err: unknown) {
+            this.log.warn(
+                `Failed to update setting '${settingId}': ${err instanceof Error ? err.message : String(err)}`,
+            );
         }
     }
 
@@ -772,6 +963,7 @@ class Plex extends utils.Adapter {
                 await this.loadKnownPlayers();
 
                 this.refreshCycle = this.setTimeout(this.retrieveDataLoop, 1000);
+                this.createMaintenanceStates();
 
                 // listen to events from Plex
                 void this.startListener();
@@ -1129,7 +1321,16 @@ class Plex extends utils.Adapter {
 
         // cleanup old states when playing something new
         if (prefix.indexOf('_playing') > -1 && data?.event == 'media.play') {
-            void this.library.runGarbageCollector(prefix, false, 30_000, [...Controller.garbageExcluded, '_Controls']);
+            void this.library.runGarbageCollector(prefix, false, 30_000, [
+                ...Controller.garbageExcluded,
+                '_Controls',
+                '_Commands',
+            ]);
+        }
+
+        // create per-media command states (markWatched, rate, etc.)
+        if (prefix.indexOf('_playing') > -1 && ['media.play', 'media.resume'].indexOf(data?.event ?? '') > -1) {
+            this.createMetadataCommandStates(prefix, data?.Metadata?.ratingKey);
         }
         return true;
     }
@@ -1281,13 +1482,33 @@ class Plex extends utils.Adapter {
                     void this.library.set(
                         {
                             node: `libraries.${libId}._refresh`,
-                            type: this.library.getNode('plex.events', true).type,
-                            role: this.library.getNode('plex.events', true).role,
-                            description: this.library.getNode('plex.events', true).description,
+                            type: 'boolean',
+                            role: 'button.refresh',
+                            description: 'Scan + force refresh metadata',
+                            common: { write: true, read: false },
                         },
                         false,
                     );
                     void this.subscribeStatesAsync(`libraries.${libId}._refresh`);
+
+                    void this.library.set({
+                        node: `libraries.${libId}._commands`,
+                        role: 'channel',
+                        description: 'Library Commands',
+                    });
+                    for (const [cmdName, cmdDef] of Object.entries(_SERVER_COMMANDS.libraryCommands)) {
+                        const nodeKey = `libraries.${libId}._commands.${cmdName}`;
+                        void this.library.set(
+                            {
+                                node: nodeKey,
+                                role: cmdDef.role,
+                                type: cmdDef.type as ioBroker.CommonType,
+                                description: cmdDef.description,
+                            },
+                            false,
+                        );
+                        void this.subscribeStatesAsync(nodeKey);
+                    }
 
                     for (const key in entry) {
                         void this.library.set(
@@ -1504,15 +1725,31 @@ class Plex extends utils.Adapter {
                         role: 'channel',
                         description: `Settings ${this.library.ucFirst(entry.group)}`,
                     });
-                    void this.library.set(
-                        {
-                            node: `settings.${entry.group}.${entry.id}`,
-                            type: entry.type == 'bool' ? 'boolean' : entry.type == 'int' ? 'number' : 'string',
-                            role: entry.type == 'bool' ? 'indicator' : entry.type == 'int' ? 'value' : 'text',
-                            description: entry.label,
-                        },
-                        entry.value,
-                    );
+                    const settingId = `settings.${entry.group}.${entry.id}`;
+                    const settingType =
+                        entry.type == 'bool' ? 'boolean' : entry.type == 'int' ? 'number' : 'string';
+                    const settingRole = entry.type == 'bool' ? 'switch' : entry.type == 'int' ? 'value' : 'text';
+                    // extendObjectAsync bypasses _STATES cache so write:true is persisted even for existing objects
+                    void this.extendObjectAsync(settingId, {
+                        type: 'state',
+                        common: {
+                            name: entry.label,
+                            role: settingRole,
+                            type: settingType,
+                            write: true,
+                            read: true,
+                        } as any,
+                        native: {},
+                    }).then(() => {
+                        const converted =
+                            settingType === 'boolean'
+                                ? Boolean(entry.value)
+                                : settingType === 'number'
+                                  ? Number(entry.value)
+                                  : String(entry.value);
+                        void this.setStateAsync(settingId, { val: converted, ack: true });
+                    });
+                    void this.subscribeStatesAsync(settingId);
                 });
             })
             .catch((err: unknown) => {

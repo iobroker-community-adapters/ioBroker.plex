@@ -31,6 +31,7 @@ var import_uuid = require("uuid");
 var import_NODES = __toESM(require("../_NODES.json"));
 var import_ACTIONS = __toESM(require("../_ACTIONS.json"));
 var import_PLAYERDETAILS = __toESM(require("../_PLAYERDETAILS.json"));
+var import_SERVER_COMMANDS = __toESM(require("../_SERVER_COMMANDS.json"));
 var import_plexHttp = require("./lib/plexHttp");
 var import_plexNotifications = require("./lib/plexNotifications");
 var import_plexPinAuth = require("./lib/plexPinAuth");
@@ -40,6 +41,7 @@ const Tautulli = require("tautulli-api");
 const _NODES = import_NODES.default;
 const _ACTIONS = import_ACTIONS.default;
 const _PLAYERDETAILS = import_PLAYERDETAILS.default;
+const _SERVER_COMMANDS = import_SERVER_COMMANDS.default;
 function pickBestConnection(connections) {
   if (!connections || !connections.length) {
     return void 0;
@@ -105,6 +107,7 @@ class Plex extends utils.Adapter {
   notifications = {};
   retryCycle;
   refreshCycle;
+  settingsRefreshTimer;
   refreshInterval;
   healthCheckInterval;
   httpServer = null;
@@ -302,15 +305,177 @@ class Plex extends utils.Adapter {
         this.log.warn(`Error triggering refresh on library with ID ${libId}! See debug log for details.`);
         this.log.debug(err instanceof Error ? err.message : String(err));
       });
-    } else {
-      const path = stateId.replace(`${this.name}.${this.instance}.`, "").split(".");
-      action = path.pop() || "";
-      const mode = path.pop() || "";
-      path.splice(-1);
-      const p = this.controller.existPlayer(path.join("."));
-      if (p) {
-        void p.action({ mode, action, val, id: `${path.join(".")}._Controls` });
+      return;
+    }
+    if (stateId.includes("._commands.") && stateId.includes("libraries.")) {
+      void this.handleLibraryCommand(stateId);
+      return;
+    }
+    if (stateId.includes(`${this.name}.${this.instance}.maintenance.`)) {
+      void this.handleMaintenanceCommand(action);
+      return;
+    }
+    if (stateId.includes(`${this.name}.${this.instance}.butler.`)) {
+      void this.handleButlerTask(action);
+      return;
+    }
+    if (stateId.includes("._Commands.") && stateId.includes("_playing.")) {
+      void this.handleMetadataCommand(stateId, action, val);
+      return;
+    }
+    if (stateId.includes(`${this.name}.${this.instance}.settings.`)) {
+      void this.handleSettingChange(stateId, val);
+      return;
+    }
+    const path = stateId.replace(`${this.name}.${this.instance}.`, "").split(".");
+    action = path.pop() || "";
+    const mode = path.pop() || "";
+    path.splice(-1);
+    const p = this.controller.existPlayer(path.join("."));
+    if (p) {
+      void p.action({ mode, action, val, id: `${path.join(".")}._Controls` });
+    }
+  }
+  createMaintenanceStates() {
+    void this.library.set({ node: "maintenance", role: "channel", description: "Server Maintenance" });
+    for (const [cmdName, cmdDef] of Object.entries(_SERVER_COMMANDS.maintenanceCommands)) {
+      const nodeKey = `maintenance.${cmdName}`;
+      void this.library.set(
+        {
+          node: nodeKey,
+          role: cmdDef.role,
+          type: cmdDef.type,
+          description: cmdDef.description
+        },
+        false
+      );
+      void this.subscribeStatesAsync(nodeKey);
+    }
+    void this.library.set({ node: "butler", role: "channel", description: "Butler Tasks" });
+    for (const [taskName, taskDef] of Object.entries(_SERVER_COMMANDS.butlerTasks)) {
+      const nodeKey = `butler.${taskName}`;
+      void this.library.set(
+        {
+          node: nodeKey,
+          role: taskDef.role,
+          type: taskDef.type,
+          description: taskDef.description
+        },
+        false
+      );
+      void this.subscribeStatesAsync(nodeKey);
+    }
+  }
+  createMetadataCommandStates(playerPrefix, ratingKey) {
+    if (!ratingKey) {
+      return;
+    }
+    void this.library.set({ node: `${playerPrefix}._Commands`, role: "channel", description: "Media Commands" });
+    for (const [cmdName, cmdDef] of Object.entries(_SERVER_COMMANDS.metadataCommands)) {
+      const nodeKey = `${playerPrefix}._Commands.${cmdName}`;
+      void this.library.set(
+        {
+          node: nodeKey,
+          role: cmdDef.role,
+          type: cmdDef.type,
+          description: cmdDef.description,
+          common: cmdDef.common
+        },
+        cmdDef.type === "boolean" ? false : 0
+      );
+      void this.subscribeStatesAsync(nodeKey);
+    }
+  }
+  async handleLibraryCommand(stateId) {
+    const relId = stateId.replace(`${this.name}.${this.instance}.`, "");
+    const parts = relId.split(".");
+    const libSegment = parts[1];
+    const cmdName = parts[3];
+    const numericId = libSegment.substring(0, libSegment.indexOf("-"));
+    const cmdDef = _SERVER_COMMANDS.libraryCommands[cmdName];
+    if (!(cmdDef == null ? void 0 : cmdDef.pathTemplate)) {
+      return;
+    }
+    const apiPath = cmdDef.pathTemplate.replace("{id}", numericId);
+    try {
+      await this.plex.query(apiPath, { method: cmdDef.method });
+      this.log.info(`Library command '${cmdName}' executed on library ${numericId}.`);
+    } catch (err) {
+      this.log.warn(`Library command '${cmdName}' failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  async handleMaintenanceCommand(cmdName) {
+    const cmdDef = _SERVER_COMMANDS.maintenanceCommands[cmdName];
+    if (!(cmdDef == null ? void 0 : cmdDef.path)) {
+      return;
+    }
+    try {
+      await this.plex.query(cmdDef.path, { method: cmdDef.method });
+      this.log.info(`Maintenance command '${cmdName}' executed.`);
+    } catch (err) {
+      this.log.warn(
+        `Maintenance command '${cmdName}' failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+  async handleButlerTask(taskName) {
+    const taskDef = _SERVER_COMMANDS.butlerTasks[taskName];
+    if (!(taskDef == null ? void 0 : taskDef.path)) {
+      return;
+    }
+    try {
+      await this.plex.query(taskDef.path, { method: taskDef.method });
+      this.log.info(`Butler task '${taskName}' started.`);
+    } catch (err) {
+      this.log.warn(`Butler task '${taskName}' failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  async handleMetadataCommand(stateId, cmdName, val) {
+    const relId = stateId.replace(`${this.name}.${this.instance}.`, "");
+    const playerPrefix = relId.substring(0, relId.indexOf("._Commands."));
+    const ratingKey = this.library.getDeviceState(`${playerPrefix}.Metadata.ratingkey`);
+    if (!ratingKey) {
+      this.log.warn(`handleMetadataCommand: no ratingKey at ${playerPrefix}.Metadata.ratingkey`);
+      return;
+    }
+    const cmdDef = _SERVER_COMMANDS.metadataCommands[cmdName];
+    if (!(cmdDef == null ? void 0 : cmdDef.pathTemplate)) {
+      return;
+    }
+    let apiPath = cmdDef.pathTemplate.replace("{key}", String(ratingKey));
+    if (cmdName === "rate") {
+      apiPath = apiPath.replace("{val}", String(val));
+    }
+    try {
+      await this.plex.query(apiPath, { method: cmdDef.method });
+      this.log.info(`Metadata command '${cmdName}' executed for key ${ratingKey}.`);
+    } catch (err) {
+      this.log.warn(`Metadata command '${cmdName}' failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+  async handleSettingChange(stateId, val) {
+    const relId = stateId.replace(`${this.name}.${this.instance}.`, "");
+    const parts = relId.split(".");
+    if (parts.length < 3) {
+      return;
+    }
+    const settingId = parts[2];
+    try {
+      await this.plex.query(`/:/prefs?${encodeURIComponent(settingId)}=${encodeURIComponent(String(val))}`, {
+        method: "PUT"
+      });
+      this.log.info(`Setting '${settingId}' updated to: ${val}`);
+      if (this.config.getSettings) {
+        if (this.settingsRefreshTimer) this.clearTimeout(this.settingsRefreshTimer);
+        this.settingsRefreshTimer = this.setTimeout(() => {
+          this.settingsRefreshTimer = void 0;
+          this.getSettings();
+        }, 1500);
       }
+    } catch (err) {
+      this.log.warn(
+        `Failed to update setting '${settingId}': ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
   onMessage(msg) {
@@ -633,6 +798,7 @@ class Plex extends utils.Adapter {
       }
       await this.loadKnownPlayers();
       this.refreshCycle = this.setTimeout(this.retrieveDataLoop, 1e3);
+      this.createMaintenanceStates();
       void this.startListener();
       this.startPlexNotifications();
       this.lastErrorKind = null;
@@ -725,7 +891,7 @@ class Plex extends utils.Adapter {
    * @param prefixIn The prefix of the event
    */
   async setEvent(dataIn, source, prefixIn) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     let data = dataIn;
     let prefix = prefixIn;
     this.log.debug(
@@ -907,7 +1073,14 @@ class Plex extends utils.Adapter {
       }
     }
     if (prefix.indexOf("_playing") > -1 && (data == null ? void 0 : data.event) == "media.play") {
-      void this.library.runGarbageCollector(prefix, false, 3e4, [...import_players.Controller.garbageExcluded, "_Controls"]);
+      void this.library.runGarbageCollector(prefix, false, 3e4, [
+        ...import_players.Controller.garbageExcluded,
+        "_Controls",
+        "_Commands"
+      ]);
+    }
+    if (prefix.indexOf("_playing") > -1 && ["media.play", "media.resume"].indexOf((_i = data == null ? void 0 : data.event) != null ? _i : "") > -1) {
+      this.createMetadataCommandStates(prefix, (_j = data == null ? void 0 : data.Metadata) == null ? void 0 : _j.ratingKey);
     }
     return true;
   }
@@ -1040,13 +1213,32 @@ class Plex extends utils.Adapter {
         void this.library.set(
           {
             node: `libraries.${libId}._refresh`,
-            type: this.library.getNode("plex.events", true).type,
-            role: this.library.getNode("plex.events", true).role,
-            description: this.library.getNode("plex.events", true).description
+            type: "boolean",
+            role: "button.refresh",
+            description: "Scan + force refresh metadata",
+            common: { write: true, read: false }
           },
           false
         );
         void this.subscribeStatesAsync(`libraries.${libId}._refresh`);
+        void this.library.set({
+          node: `libraries.${libId}._commands`,
+          role: "channel",
+          description: "Library Commands"
+        });
+        for (const [cmdName, cmdDef] of Object.entries(_SERVER_COMMANDS.libraryCommands)) {
+          const nodeKey = `libraries.${libId}._commands.${cmdName}`;
+          void this.library.set(
+            {
+              node: nodeKey,
+              role: cmdDef.role,
+              type: cmdDef.type,
+              description: cmdDef.description
+            },
+            false
+          );
+          void this.subscribeStatesAsync(nodeKey);
+        }
         for (const key in entry) {
           void this.library.set(
             {
@@ -1238,15 +1430,24 @@ class Plex extends utils.Adapter {
           role: "channel",
           description: `Settings ${this.library.ucFirst(entry.group)}`
         });
-        void this.library.set(
-          {
-            node: `settings.${entry.group}.${entry.id}`,
-            type: entry.type == "bool" ? "boolean" : entry.type == "int" ? "number" : "string",
-            role: entry.type == "bool" ? "indicator" : entry.type == "int" ? "value" : "text",
-            description: entry.label
+        const settingId = `settings.${entry.group}.${entry.id}`;
+        const settingType = entry.type == "bool" ? "boolean" : entry.type == "int" ? "number" : "string";
+        const settingRole = entry.type == "bool" ? "switch" : entry.type == "int" ? "value" : "text";
+        void this.extendObjectAsync(settingId, {
+          type: "state",
+          common: {
+            name: entry.label,
+            role: settingRole,
+            type: settingType,
+            write: true,
+            read: true
           },
-          entry.value
-        );
+          native: {}
+        }).then(() => {
+          const converted = settingType === "boolean" ? Boolean(entry.value) : settingType === "number" ? Number(entry.value) : String(entry.value);
+          void this.setStateAsync(settingId, { val: converted, ack: true });
+        });
+        void this.subscribeStatesAsync(settingId);
       });
     }).catch((err) => {
       this.log.debug("Could not retrieve Settings from Plex!");

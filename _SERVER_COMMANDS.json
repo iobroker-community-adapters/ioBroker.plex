@@ -1,0 +1,105 @@
+{
+	"libraryCommands": {
+		"scan": {
+			"description": "Scan library for new/changed/deleted files (fast)",
+			"role": "button",
+			"type": "boolean",
+			"method": "GET",
+			"pathTemplate": "/library/sections/{id}/refresh"
+		},
+		"scanForce": {
+			"description": "Scan library + force re-download metadata for all items (slow)",
+			"role": "button",
+			"type": "boolean",
+			"method": "GET",
+			"pathTemplate": "/library/sections/{id}/refresh?force=1"
+		},
+		"emptyTrash": {
+			"description": "Empty library trash",
+			"role": "button",
+			"type": "boolean",
+			"method": "PUT",
+			"pathTemplate": "/library/sections/{id}/emptyTrash"
+		},
+		"analyze": {
+			"description": "Analyze audio/subtitle streams",
+			"role": "button",
+			"type": "boolean",
+			"method": "PUT",
+			"pathTemplate": "/library/sections/{id}/analyze"
+		}
+	},
+	"maintenanceCommands": {
+		"refreshAllLibraries": {
+			"description": "Refresh all libraries",
+			"role": "button",
+			"type": "boolean",
+			"method": "GET",
+			"path": "/library/sections/all/refresh"
+		},
+		"cleanBundles": {
+			"description": "Clean orphaned bundle files",
+			"role": "button",
+			"type": "boolean",
+			"method": "PUT",
+			"path": "/library/clean/bundles"
+		},
+		"optimize": {
+			"description": "Optimize Plex database",
+			"role": "button",
+			"type": "boolean",
+			"method": "PUT",
+			"path": "/library/optimize"
+		}
+	},
+	"butlerTasks": {
+		"BackupDatabase":                    { "description": "Backup database",                      "role": "button", "type": "boolean", "method": "POST", "path": "/butler/BackupDatabase" },
+		"CleanOldBundles":                   { "description": "Clean old bundle files",               "role": "button", "type": "boolean", "method": "POST", "path": "/butler/CleanOldBundles" },
+		"CleanOldCacheFiles":                { "description": "Clean old cache files",                "role": "button", "type": "boolean", "method": "POST", "path": "/butler/CleanOldCacheFiles" },
+		"DeepMediaAnalysis":                 { "description": "Deep media analysis",                  "role": "button", "type": "boolean", "method": "POST", "path": "/butler/DeepMediaAnalysis" },
+		"GenerateChapterThumbs":             { "description": "Generate chapter thumbnails",          "role": "button", "type": "boolean", "method": "POST", "path": "/butler/GenerateChapterThumbs" },
+		"GenerateMediaIndexFiles":           { "description": "Generate media index files",           "role": "button", "type": "boolean", "method": "POST", "path": "/butler/GenerateMediaIndexFiles" },
+		"LoudnessAnalysis":                  { "description": "Loudness analysis",                    "role": "button", "type": "boolean", "method": "POST", "path": "/butler/LoudnessAnalysis" },
+		"MusicAnalysis":                     { "description": "Music analysis",                       "role": "button", "type": "boolean", "method": "POST", "path": "/butler/MusicAnalysis" },
+		"OptimizeDatabase":                  { "description": "Optimize database (butler)",           "role": "button", "type": "boolean", "method": "POST", "path": "/butler/OptimizeDatabase" },
+		"RefreshLibraries":                  { "description": "Refresh all libraries (butler)",       "role": "button", "type": "boolean", "method": "POST", "path": "/butler/RefreshLibraries" },
+		"RefreshLocalMedia":                 { "description": "Refresh local media (artwork etc.)",   "role": "button", "type": "boolean", "method": "POST", "path": "/butler/RefreshLocalMedia" },
+		"RefreshPeriodicMetadata":           { "description": "Refresh periodic metadata",            "role": "button", "type": "boolean", "method": "POST", "path": "/butler/RefreshPeriodicMetadata" },
+		"UpgradeMediaAnalysis":              { "description": "Upgrade media analysis",               "role": "button", "type": "boolean", "method": "POST", "path": "/butler/UpgradeMediaAnalysis" },
+		"ButlerTaskGenerateIntroMarkers":    { "description": "Generate intro markers",               "role": "button", "type": "boolean", "method": "POST", "path": "/butler/ButlerTaskGenerateIntroMarkers" },
+		"ButlerTaskGenerateCreditsMarkers":  { "description": "Generate credits markers",             "role": "button", "type": "boolean", "method": "POST", "path": "/butler/ButlerTaskGenerateCreditsMarkers" },
+		"ButlerTaskGenerateAdMarkers":       { "description": "Generate ad markers",                  "role": "button", "type": "boolean", "method": "POST", "path": "/butler/ButlerTaskGenerateAdMarkers" },
+		"ButlerTaskGenerateVoiceActivity":   { "description": "Generate voice activity data",         "role": "button", "type": "boolean", "method": "POST", "path": "/butler/ButlerTaskGenerateVoiceActivity" }
+	},
+	"metadataCommands": {
+		"refreshMetadata": {
+			"description": "Refresh metadata for current media",
+			"role": "button",
+			"type": "boolean",
+			"method": "PUT",
+			"pathTemplate": "/library/metadata/{key}/refresh"
+		},
+		"markWatched": {
+			"description": "Mark current media as watched",
+			"role": "button",
+			"type": "boolean",
+			"method": "GET",
+			"pathTemplate": "/:/scrobble?key={key}&identifier=com.plexapp.plugins.library"
+		},
+		"markUnwatched": {
+			"description": "Mark current media as unwatched",
+			"role": "button",
+			"type": "boolean",
+			"method": "GET",
+			"pathTemplate": "/:/unscrobble?key={key}&identifier=com.plexapp.plugins.library"
+		},
+		"rate": {
+			"description": "Rate current media (0-10, 0=reset)",
+			"role": "level",
+			"type": "number",
+			"method": "PUT",
+			"pathTemplate": "/:/rate?key={key}&identifier=com.plexapp.plugins.library&rating={val}",
+			"common": { "write": true, "min": 0, "max": 10 }
+		}
+	}
+}

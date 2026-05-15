@@ -162,6 +162,8 @@ This adapter would not have been possible without the great work of @Zefau (http
 ### 1.1.3 (2023-10-05)
 - (ticaki) fixed: bug in readable offset
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 The MIT License (MIT)
 

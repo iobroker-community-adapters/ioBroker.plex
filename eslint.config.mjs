@@ -31,6 +31,7 @@ export default [
             'jsdoc/no-types': 'off',
             'require-await': 'off',
             '@typescript-eslint/require-await': 'off',
+            '@typescript-eslint/no-unnecessary-type-assertion': 'off',
             'no-unused-vars': 'off',
             'unicorn/numeric-separators-style': [
                 'warn',

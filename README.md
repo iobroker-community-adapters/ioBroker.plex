@@ -131,7 +131,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 2.1.1 (2026-06-21)
 - (mcm1957) some issues reported by repository checker have been fixed
 - (mcm1957) dependencies have been updated
 
@@ -162,9 +162,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ### 1.1.4 (2023-11-06)
 - (ticaki) move logmessage into debug
-
-### 1.1.3 (2023-10-05)
-- (ticaki) fixed: bug in readable offset
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

@@ -33,7 +33,7 @@
     "multer": "^2.1.1",
     "tautulli-api": "^1.0.2",
     "uuid": "^14.0.0",
-    "ws": "^8.20.0"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^5.2.1",

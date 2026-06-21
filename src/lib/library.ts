@@ -139,10 +139,7 @@ export class Library {
             this._adapter.log.warn(msg);
         } else if (kill === true) {
             this._adapter.log.error(msg);
-            setTimeout(
-                () => this._adapter.terminate(msg, reason || 11),
-                5000,
-            );
+            setTimeout(() => this._adapter.terminate(msg, reason || 11), 5000);
         }
 
         return false;

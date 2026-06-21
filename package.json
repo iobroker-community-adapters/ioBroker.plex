@@ -50,7 +50,6 @@
     "@types/node": "^22.19.20",
     "@types/uuid": "^11.0.0",
     "@types/ws": "^8.18.1",
-    "eslint-plugin-unicorn": "^60.0.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.4",
     "typescript": "~5.9.3"
@@ -64,7 +63,7 @@
     "build:ts": "build-adapter ts",
     "watch:ts": "build-adapter ts --watch",
     "check": "tsc --noEmit",
-    "lint": "eslint -c eslint.config.mjs . --cache --cache-location .eslintcache --cache-strategy content",
+    "lint": "eslint -c eslint.config.mjs .",
     "test:ts": "mocha --config test/mocharc.custom.json src/**/*.test.ts",
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
@@ -93,8 +92,6 @@
     "_NODES.json",
     "_PLAYERDETAILS.json",
     "_SERVER_COMMANDS.json",
-    "README.md",
-    "README-states.md",
-    "README-tautulli.md"
+    "README.md"
   ]
 }

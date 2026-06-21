@@ -140,10 +140,7 @@ export class Library {
         } else if (kill === true) {
             this._adapter.log.error(msg);
             setTimeout(
-                () =>
-                    this._adapter && this._adapter.terminate
-                        ? this._adapter.terminate(msg, reason || 11)
-                        : process.exit(reason || 11),
+                () => this._adapter.terminate(msg, reason || 11),
                 5000,
             );
         }

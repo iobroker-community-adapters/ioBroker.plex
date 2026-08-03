@@ -1,16 +1,18 @@
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
-import StopIcon from '@mui/icons-material/Stop';
-import SkipNextIcon from '@mui/icons-material/SkipNext';
-import LibraryAddIcon from '@mui/icons-material/LibraryAdd';
-import StarRateIcon from '@mui/icons-material/StarRate';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import DevicesOtherIcon from '@mui/icons-material/DevicesOther';
-import StorageIcon from '@mui/icons-material/Storage';
-import WarningIcon from '@mui/icons-material/Warning';
-import SystemUpdateIcon from '@mui/icons-material/SystemUpdate';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import type { SvgIconComponent } from '@mui/icons-material';
+import {
+    PlayArrow as PlayArrowIcon,
+    Pause as PauseIcon,
+    Stop as StopIcon,
+    SkipNext as SkipNextIcon,
+    LibraryAdd as LibraryAddIcon,
+    StarRate as StarRateIcon,
+    Bookmark as BookmarkIcon,
+    DevicesOther as DevicesOtherIcon,
+    Storage as StorageIcon,
+    Warning as WarningIcon,
+    SystemUpdate as SystemUpdateIcon,
+    HelpOutlineOutlined as HelpOutlineIcon,
+} from '@mui/icons-material';
 
 export function getEventIcon(event: string): SvgIconComponent {
     switch (event) {

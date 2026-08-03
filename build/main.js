@@ -466,10 +466,16 @@ class Plex extends utils.Adapter {
       });
       this.log.info(`Setting '${settingId}' updated to: ${val}`);
       if (this.config.getSettings) {
-        if (this.settingsRefreshTimer) this.clearTimeout(this.settingsRefreshTimer);
+        if (this.settingsRefreshTimer) {
+          this.clearTimeout(this.settingsRefreshTimer);
+        }
         this.settingsRefreshTimer = this.setTimeout(() => {
           this.settingsRefreshTimer = void 0;
           this.getSettings();
+          if (this.refreshCycle) {
+            this.clearTimeout(this.refreshCycle);
+            this.refreshCycle = this.setTimeout(this.retrieveDataLoop, this.config.refresh * 1e3);
+          }
         }, 1500);
       }
     } catch (err) {

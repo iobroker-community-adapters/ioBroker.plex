@@ -102,10 +102,7 @@ class Library {
       this._adapter.log.warn(msg);
     } else if (kill === true) {
       this._adapter.log.error(msg);
-      setTimeout(
-        () => this._adapter && this._adapter.terminate ? this._adapter.terminate(msg, reason || 11) : process.exit(reason || 11),
-        5e3
-      );
+      setTimeout(() => this._adapter.terminate(msg, reason || 11), 5e3);
     }
     return false;
   }

@@ -2,6 +2,7 @@ import { Box, Card, CardContent, Stack, Typography } from '@mui/material';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useSettings } from '../settings';
+import type { JSX } from 'react';
 
 export interface ActiveStream {
     player: string;
@@ -46,7 +47,7 @@ export function NowPlayingCard({ stream }: Props): JSX.Element {
                 ))}
                 <CardContent sx={{ p: 0, '&:last-child': { pb: 0 }, flex: 1, minWidth: 0 }}>
                     <Stack spacing={0.5}>
-                        <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
                             {stream.paused ? (
                                 <PauseIcon fontSize="small" sx={{ opacity: 0.6 }} />
                             ) : (

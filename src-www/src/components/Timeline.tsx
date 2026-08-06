@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useIobState } from '../socket';
 import { useSettings } from '../settings';
 import { TimelineEntry, type TimelineEvent } from './TimelineEntry';

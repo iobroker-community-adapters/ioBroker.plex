@@ -1,5 +1,5 @@
 import { Box, Card, CardContent, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { ADAPTER_NAMESPACE, getAdapterConfig, useIobStates } from '../socket';
 
 type Period = '24h' | '7d' | '30d' | 'all';
@@ -81,7 +81,7 @@ function StatList({ title, rows }: ListProps): JSX.Element {
                 ) : (
                     <Stack spacing={1} sx={{ mt: 1 }}>
                         {rows.map((r, i) => (
-                            <Stack key={r.name} direction="row" spacing={1} alignItems="center">
+                            <Stack key={r.name} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                                 <Typography variant="caption" sx={{ width: 18, opacity: 0.5 }}>
                                     {i + 1}
                                 </Typography>
@@ -135,7 +135,7 @@ export function TautulliStats(): JSX.Element | null {
 
     return (
         <Box sx={{ p: 2 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+            <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                 <Typography variant="overline" sx={{ opacity: 0.6, letterSpacing: 1 }}>
                     Tautulli Statistics
                 </Typography>

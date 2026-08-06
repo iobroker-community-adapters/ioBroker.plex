@@ -14,14 +14,17 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import CloseIcon from '@mui/icons-material/Close';
+import {
+    OpenInNew as OpenInNewIcon,
+    ContentCopy as ContentCopyIcon,
+    CheckCircle as CheckCircleIcon,
+    ErrorOutlineOutlined as ErrorOutlineIcon,
+    VpnKey as VpnKeyIcon,
+    Close as CloseIcon,
+} from '@mui/icons-material';
+
 import { ConfigGeneric, type ConfigGenericProps, type ConfigGenericState } from '@iobroker/json-config';
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/gui-components';
 
 type LastError = 'unauthorized' | 'network' | null;
 
@@ -68,8 +71,8 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
         } satisfies Partial<TokenWizardState>);
     }
 
-    componentDidMount(): void {
-        super.componentDidMount();
+    async componentDidMount(): Promise<void> {
+        await super.componentDidMount();
         this._visibilityHandler = (): void => {
             if (document.hidden) {
                 this.stopPolling();
@@ -359,7 +362,7 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
                                 <Stack
                                     direction="row"
                                     spacing={1}
-                                    alignItems="center"
+                                    sx={{ alignItems: 'center' }}
                                 >
                                     <CircularProgress size={18} />
                                     <Typography variant="body2">{I18n.t('tokenDialog_status_connecting')}</Typography>
@@ -408,7 +411,7 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
                             <Stack
                                 direction={{ xs: 'column', sm: 'row' }}
                                 spacing={1}
-                                alignItems={{ sm: 'center' }}
+                                sx={{ alignItems: { sm: 'center' } }}
                             >
                                 <Button
                                     variant="outlined"

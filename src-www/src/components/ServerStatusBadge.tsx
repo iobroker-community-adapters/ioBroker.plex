@@ -1,5 +1,5 @@
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { getConnection, useConnectionStatus, ADAPTER_NAMESPACE } from '../socket';
 
 interface ServerInfo {
@@ -48,7 +48,7 @@ export function ServerStatusBadge(): JSX.Element {
                 </Box>
             }
         >
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                 <Box
                     sx={{
                         width: 10,

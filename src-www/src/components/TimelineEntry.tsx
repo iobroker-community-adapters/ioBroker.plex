@@ -1,6 +1,6 @@
 import { Box, Collapse, Divider, IconButton, Paper, Stack, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { getEventIcon } from '../icons';
 import { useSettings } from '../settings';
 
@@ -50,7 +50,7 @@ export function TimelineEntry({ entry }: Props): JSX.Element {
             }}
             onClick={() => detailEntries.length > 0 && setOpen(o => !o)}
         >
-            <Stack direction="row" spacing={1.5} alignItems="flex-start">
+            <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
                 <Box
                     sx={{
                         width: 32,

@@ -2,7 +2,7 @@ import { Box, Checkbox, Divider, Drawer, FormControlLabel, IconButton, Slider, T
 import SettingsIcon from '@mui/icons-material/Settings';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useSettings } from '../settings';
 
 export function SettingsPanel(): JSX.Element {

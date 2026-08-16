@@ -1,6 +1,19 @@
 {
   "common": {
     "news": {
+      "3.0.0": {
+        "en": "Breaking: Admin 8 or newer is now required — the configuration UI no longer runs under Admin 7.\nDependencies have been updated.",
+        "de": "Breaking: Admin 8 oder neuer wird jetzt vorausgesetzt — die Konfigurationsoberfläche läuft nicht mehr unter Admin 7.\nDie Abhängigkeiten wurden aktualisiert.",
+        "ru": "Breaking: теперь требуется Admin 8 или новее — интерфейс настройки больше не работает с Admin 7.\nЗависимости обновлены.",
+        "pt": "Breaking: agora é necessário o Admin 8 ou superior — a interface de configuração já não funciona no Admin 7.\nAs dependências foram atualizadas.",
+        "nl": "Breaking: Admin 8 of nieuwer is nu vereist — de configuratie-interface werkt niet meer onder Admin 7.\nDe afhankelijkheden zijn bijgewerkt.",
+        "fr": "Breaking : Admin 8 ou plus récent est désormais requis — l'interface de configuration ne fonctionne plus sous Admin 7.\nLes dépendances ont été mises à jour.",
+        "it": "Breaking: ora è richiesto Admin 8 o successivo — l'interfaccia di configurazione non funziona più con Admin 7.\nLe dipendenze sono state aggiornate.",
+        "es": "Breaking: ahora se requiere Admin 8 o superior — la interfaz de configuración ya no funciona en Admin 7.\nLas dependencias se han actualizado.",
+        "pl": "Breaking: wymagany jest teraz Admin 8 lub nowszy — interfejs konfiguracji nie działa już w Admin 7.\nZaktualizowano zależności.",
+        "uk": "Breaking: тепер потрібен Admin 8 або новіший — інтерфейс налаштувань більше не працює з Admin 7.\nЗалежності оновлено.",
+        "zh-cn": "Breaking: 现在需要 Admin 8 或更高版本 — 配置界面不再支持 Admin 7。\n依赖项已更新。"
+      },
       "2.1.1": {
         "en": "some issues reported by repository checker have been fixed\ndependencies have been updated",
         "de": "Einige vom Repository-Prüfer gemeldete Probleme wurden behoben.\nDie Abhängigkeiten wurden aktualisiert",
@@ -78,19 +91,6 @@
         "pl": "uruchomiony: bug in readable offset",
         "uk": "виправлено: помилка в читабельному офсеті",
         "zh-cn": "固定:可宣读的抵偿金"
-      },
-      "1.0.3": {
-        "de": "Behoben: Fügen keine leeren Benachrichtigungen zur History hinzu #[183](https://github.com/iobroker-community-adapter/ioBroker.plex/issues/183) \nBehoben: Verhindere die Erstellung doppelter Histroyeinträge in den meisten Fällen",
-        "en": "Fixed: Don't add empty notifications to history [#183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFixed: prevent the creation of duplicate history entries in most cases",
-        "es": "Fijo: No añadas las notificaciones vacías a la historia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nFijo: prevenir la creación de entradas de historia duplicadas en la mayoría de los casos",
-        "fr": "Fixed: Don't add empty notifications to history #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrection : empêcher la création de doubles entrées d'histoire dans la plupart des cas",
-        "it": "Fisso: Non aggiungere notifiche vuote alla storia #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nRisolto: impedire la creazione di voci di storia duplicate nella maggior parte dei casi",
-        "nl": "Voeg geen lege aanmeldingen toe aan geschiedenis 183:\nVertaling:",
-        "pl": "(Fixed: Don't add empty notifications to history #183(https:/github.com/iobroker-community-adapters/ioBroker.plex/issues/183) (ang.)\nFixed: Zapobieganie stworzenia replikacyjnej historii w większości przypadków",
-        "pt": "Corrigido: Não adicione notificações vazias ao histórico #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nCorrigido: evitar a criação de entradas de histórico duplicado na maioria dos casos",
-        "ru": "Исправлено: Не добавляйте пустые уведомления в историю #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nИсправлено: предотвратить создание записей истории дублирования в большинстве случаев",
-        "uk": "Виправлено: Не додайте порожні повідомлення до історії #[183](https://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)\nВиправлено: запобігти створенню записів історії дублікатів у більшості випадків",
-        "zh-cn": "九. 固定:向历史编号[183](http://github.com/iobroker-community-adapters/ioBroker.plex/issues/183)增添空通知。\n固定:防止在多数情况下建立重复的历史内容"
       }
     },
     "authors": [
@@ -163,7 +163,7 @@
       "zh-cn": "Plex Media Server"
     },
     "type": "multimedia",
-    "version": "2.1.1",
+    "version": "3.0.0",
     "messages": [
       {
         "condition": {

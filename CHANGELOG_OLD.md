@@ -1,7 +1,9 @@
 # Older changes
+## 1.1.4 (2023-11-06)
+- (ticaki) move logmessage into debug
+
 ## 1.1.3 (2023-10-05)
 - (ticaki) fixed: bug in readable offset
-
 
 ## 1.1.2 (2023-09-16)
 - (ticaki) prevent Plex from crashing due to incorrect tautulli configuration

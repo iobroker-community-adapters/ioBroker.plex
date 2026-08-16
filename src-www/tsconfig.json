@@ -9,7 +9,6 @@
         "allowImportingTsExtensions": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "rootDir": "./src",
         "strict": true,
         "strictNullChecks": true,
         "noEmit": true,

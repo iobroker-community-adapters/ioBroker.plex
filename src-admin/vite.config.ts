@@ -20,7 +20,7 @@ const config = {
         react(),
         commonjs(),
     ],
-    resolve:  {
+    resolve: {
         tsconfigPaths: true,
     },
     server: {

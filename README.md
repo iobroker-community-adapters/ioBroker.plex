@@ -131,6 +131,11 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+- (bluefox) Breaking: Admin 8 or newer is now required — the configuration UI no longer runs under Admin 7.
+- (bluefox) Dependencies have been updated.
+
 ### 2.1.1 (2026-06-21)
 - (mcm1957) some issues reported by repository checker have been fixed
 - (mcm1957) dependencies have been updated

@@ -26,11 +26,15 @@ const __mfImport = (src) =>
 
 
 (async () => {
-  const __mfHostInit = await __mfImport("./hostInit-DdRrjXPV.js");
+  const __mfHostInit = await __mfImport("./hostInit-D0HmQ0RO.js");
   await __mfHostInit.__tla;
   const { initHost } = __mfHostInit;
   await initHost();
   if (__mfModuleCache.pendingShareLoads) {
     await Promise.all(__mfModuleCache.pendingShareLoads);
   }
-})().then(() => __mfImport("./index-3TA2ryRo.js"));
+  const __mfReactServerModuleCache = globalThis["__mf_module_cache_react_server__"];
+  if (__mfReactServerModuleCache?.pendingShareLoads) {
+    await Promise.all(__mfReactServerModuleCache.pendingShareLoads);
+  }
+})().then(() => __mfImport("./index-BukrZ1AX.js"));

@@ -8,6 +8,7 @@ import { Timeline } from './components/Timeline';
 import { TautulliStats } from './components/TautulliStats';
 import { SettingsPanel } from './components/SettingsPanel';
 import { SettingsContext, useSettings, useSettingsProvider } from './settings';
+import type { JSX } from 'react';
 
 function AppInner(): JSX.Element {
     const { mode, toggle, theme } = useThemeMode();

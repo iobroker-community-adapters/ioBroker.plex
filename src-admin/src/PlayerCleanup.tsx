@@ -12,10 +12,9 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { DeleteSweep as DeleteSweepIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import { ConfigGeneric, type ConfigGenericProps, type ConfigGenericState } from '@iobroker/json-config';
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/gui-components';
 
 interface KnownPlayer {
     id: string;
@@ -60,8 +59,8 @@ class PlayerCleanup extends ConfigGeneric<ConfigGenericProps, PlayerCleanupState
         } satisfies Partial<PlayerCleanupState>);
     }
 
-    componentDidMount(): void {
-        super.componentDidMount();
+    async componentDidMount(): Promise<void> {
+        await super.componentDidMount();
         void this.reload();
     }
 
@@ -254,21 +253,35 @@ class PlayerCleanup extends ConfigGeneric<ConfigGenericProps, PlayerCleanupState
                     <Stack
                         direction={{ xs: 'column', sm: 'row' }}
                         spacing={2}
-                        alignItems={{ sm: 'center' }}
+                        sx={{ alignItems: { sm: 'center' } }}
                     >
                         <TextField
                             type="number"
                             label={I18n.t('cleanup_days_label')}
                             value={days}
                             onChange={e => this.setDays(e.target.value)}
-                            inputProps={{ min: 0, step: 1 }}
+                            slotProps={{
+                                htmlInput: {
+                                    min: 0,
+                                    step: 1,
+                                },
+                            }}
                             size="small"
                             sx={{ maxWidth: 160 }}
                         />
                         <Button
                             variant="contained"
                             color="error"
-                            startIcon={busy ? <CircularProgress size={16} color="inherit" /> : <DeleteSweepIcon />}
+                            startIcon={
+                                busy ? (
+                                    <CircularProgress
+                                        size={16}
+                                        color="inherit"
+                                    />
+                                ) : (
+                                    <DeleteSweepIcon />
+                                )
+                            }
                             onClick={() => void this.runCleanup()}
                             disabled={busy || markedCount === 0}
                         >
@@ -303,7 +316,7 @@ class PlayerCleanup extends ConfigGeneric<ConfigGenericProps, PlayerCleanupState
                         <Stack
                             direction="row"
                             spacing={1}
-                            alignItems="center"
+                            sx={{ alignItems: 'center' }}
                         >
                             <CircularProgress size={18} />
                             <Typography variant="body2">{I18n.t('cleanup_loading')}</Typography>

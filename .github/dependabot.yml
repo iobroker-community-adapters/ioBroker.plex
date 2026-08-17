@@ -6,7 +6,7 @@ version: 2
 updates:
 
   - package-ecosystem: 'npm'
-    directory: '/'
+    directories: '**/*'
     schedule:
       interval: 'cron'
       cronjob: '5 4 16 * *'
@@ -27,3 +27,6 @@ updates:
       cronjob: '5 5 16 * *'
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 15
+    cooldown:
+      default-days: 7
+

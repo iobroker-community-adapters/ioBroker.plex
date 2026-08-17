@@ -6,7 +6,8 @@ version: 2
 updates:
 
   - package-ecosystem: 'npm'
-    directories: '**/*'
+    directories: 
+      - '**/*'
     schedule:
       interval: 'cron'
       cronjob: '5 4 16 * *'

@@ -6,11 +6,11 @@ version: 2
 updates:
 
   - package-ecosystem: 'npm'
-    directories: 
+    directories:
       - '**/*'
     schedule:
       interval: 'cron'
-      cronjob: '5 4 16 * *'
+      cronjob: '50 3 24 * *'
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 15
     versioning-strategy: 'increase'
@@ -25,9 +25,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'cron'
-      cronjob: '5 5 16 * *'
+      cronjob: '50 3 24 * *'
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 15
     cooldown:
       default-days: 7
-

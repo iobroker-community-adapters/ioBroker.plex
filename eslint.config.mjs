@@ -20,6 +20,7 @@ export default [
             'admin',
             'src-admin',
             'src-www',
+            'src-webcomponents',
             'www',
             'agent',
         ],

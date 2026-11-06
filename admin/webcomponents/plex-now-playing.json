@@ -1,0 +1,205 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ioBroker/web-components/main/schemas/manifest.json",
+    "manifestVersion": 1,
+    "tag": "iob-plex-now-playing",
+    "name": {
+        "en": "Plex now playing",
+        "de": "Plex - Läuft gerade",
+        "ru": "Plex — сейчас воспроизводится",
+        "pt": "Plex - a reproduzir agora",
+        "nl": "Plex - nu aan het afspelen",
+        "fr": "Plex - lecture en cours",
+        "it": "Plex - in riproduzione",
+        "es": "Plex - reproduciendo ahora",
+        "pl": "Plex - teraz odtwarzane",
+        "uk": "Plex — зараз відтворюється",
+        "zh-cn": "Plex 正在播放"
+    },
+    "description": {
+        "en": "What is playing on the Plex players right now: cover, title, user, progress, and controls for players that can be controlled",
+        "de": "Was gerade auf den Plex-Playern läuft: Cover, Titel, Benutzer, Fortschritt und Bedienung für steuerbare Player",
+        "ru": "Что сейчас воспроизводится на плеерах Plex: обложка, название, пользователь, прогресс и управление для управляемых плееров",
+        "pt": "O que está a ser reproduzido agora nos leitores Plex: capa, título, utilizador, progresso e controlos para leitores controláveis",
+        "nl": "Wat er nu op de Plex-spelers speelt: hoes, titel, gebruiker, voortgang en bediening voor bestuurbare spelers",
+        "fr": "Ce qui est lu en ce moment sur les lecteurs Plex : pochette, titre, utilisateur, progression et commandes pour les lecteurs contrôlables",
+        "it": "Cosa è in riproduzione ora sui lettori Plex: copertina, titolo, utente, avanzamento e comandi per i lettori controllabili",
+        "es": "Lo que se reproduce ahora en los reproductores Plex: portada, título, usuario, progreso y controles para los reproductores controlables",
+        "pl": "Co jest teraz odtwarzane na odtwarzaczach Plex: okładka, tytuł, użytkownik, postęp i sterowanie dla sterowalnych odtwarzaczy",
+        "uk": "Що зараз відтворюється на плеєрах Plex: обкладинка, назва, користувач, прогрес і керування для керованих плеєрів",
+        "zh-cn": "Plex 播放器当前正在播放的内容：封面、标题、用户、进度，以及可控播放器的控制"
+    },
+    "icon": "../plex.jpg",
+    "module": "plex-now-playing.js",
+    "size": {
+        "width": 400,
+        "height": 200
+    },
+    "settings": {
+        "type": "panel",
+        "items": {
+            "instance": {
+                "type": "instance",
+                "adapter": "plex",
+                "label": {
+                    "en": "Instance",
+                    "de": "Instanz",
+                    "ru": "Экземпляр",
+                    "pt": "Instância",
+                    "nl": "Instantie",
+                    "fr": "Instance",
+                    "it": "Istanza",
+                    "es": "Instancia",
+                    "pl": "Instancja",
+                    "uk": "Екземпляр",
+                    "zh-cn": "实例"
+                }
+            },
+            "player": {
+                "type": "objectId",
+                "types": "channel",
+                "root": "plex",
+                "label": {
+                    "en": "Only this player",
+                    "de": "Nur dieser Player",
+                    "ru": "Только этот плеер",
+                    "pt": "Apenas este leitor",
+                    "nl": "Alleen deze speler",
+                    "fr": "Uniquement ce lecteur",
+                    "it": "Solo questo lettore",
+                    "es": "Solo este reproductor",
+                    "pl": "Tylko ten odtwarzacz",
+                    "uk": "Лише цей плеєр",
+                    "zh-cn": "仅此播放器"
+                },
+                "help": {
+                    "en": "The channel of a player: plex.0._playing.<name>-<id>. Empty: all players",
+                    "de": "Der Kanal eines Players: plex.0._playing.<Name>-<ID>. Leer: alle Player",
+                    "ru": "Канал плеера: plex.0._playing.<имя>-<id>. Пусто: все плееры",
+                    "pt": "O canal de um leitor: plex.0._playing.<nome>-<id>. Vazio: todos os leitores",
+                    "nl": "Het kanaal van een speler: plex.0._playing.<naam>-<id>. Leeg: alle spelers",
+                    "fr": "Le canal d'un lecteur : plex.0._playing.<nom>-<id>. Vide : tous les lecteurs",
+                    "it": "Il canale di un lettore: plex.0._playing.<nome>-<id>. Vuoto: tutti i lettori",
+                    "es": "El canal de un reproductor: plex.0._playing.<nombre>-<id>. Vacío: todos los reproductores",
+                    "pl": "Kanał odtwarzacza: plex.0._playing.<nazwa>-<id>. Puste: wszystkie odtwarzacze",
+                    "uk": "Канал плеєра: plex.0._playing.<назва>-<id>. Порожньо: усі плеєри",
+                    "zh-cn": "播放器的通道：plex.0._playing.<名称>-<id>。为空：所有播放器"
+                }
+            },
+            "layout": {
+                "type": "select",
+                "default": "cards",
+                "label": {
+                    "en": "Layout",
+                    "de": "Darstellung",
+                    "ru": "Вид",
+                    "pt": "Disposição",
+                    "nl": "Weergave",
+                    "fr": "Disposition",
+                    "it": "Disposizione",
+                    "es": "Diseño",
+                    "pl": "Układ",
+                    "uk": "Вигляд",
+                    "zh-cn": "布局"
+                },
+                "options": [
+                    {
+                        "value": "cards",
+                        "label": {
+                            "en": "Cards",
+                            "de": "Karten",
+                            "ru": "Карточки",
+                            "pt": "Cartões",
+                            "nl": "Kaarten",
+                            "fr": "Cartes",
+                            "it": "Schede",
+                            "es": "Tarjetas",
+                            "pl": "Karty",
+                            "uk": "Картки",
+                            "zh-cn": "卡片"
+                        }
+                    },
+                    {
+                        "value": "compact",
+                        "label": {
+                            "en": "Compact list",
+                            "de": "Kompakte Liste",
+                            "ru": "Компактный список",
+                            "pt": "Lista compacta",
+                            "nl": "Compacte lijst",
+                            "fr": "Liste compacte",
+                            "it": "Elenco compatto",
+                            "es": "Lista compacta",
+                            "pl": "Lista kompaktowa",
+                            "uk": "Компактний список",
+                            "zh-cn": "紧凑列表"
+                        }
+                    }
+                ]
+            },
+            "showPaused": {
+                "type": "checkbox",
+                "default": true,
+                "label": {
+                    "en": "Show paused streams",
+                    "de": "Pausierte Wiedergaben anzeigen",
+                    "ru": "Показывать приостановленные",
+                    "pt": "Mostrar reproduções em pausa",
+                    "nl": "Gepauzeerde streams tonen",
+                    "fr": "Afficher les lectures en pause",
+                    "it": "Mostra le riproduzioni in pausa",
+                    "es": "Mostrar reproducciones en pausa",
+                    "pl": "Pokaż wstrzymane odtwarzanie",
+                    "uk": "Показувати призупинені",
+                    "zh-cn": "显示已暂停的播放"
+                }
+            },
+            "showCover": {
+                "type": "checkbox",
+                "default": true,
+                "label": {
+                    "en": "Show cover",
+                    "de": "Cover anzeigen",
+                    "ru": "Показывать обложку",
+                    "pt": "Mostrar capa",
+                    "nl": "Hoes tonen",
+                    "fr": "Afficher la pochette",
+                    "it": "Mostra copertina",
+                    "es": "Mostrar portada",
+                    "pl": "Pokaż okładkę",
+                    "uk": "Показувати обкладинку",
+                    "zh-cn": "显示封面"
+                }
+            },
+            "showControls": {
+                "type": "checkbox",
+                "default": true,
+                "label": {
+                    "en": "Show controls",
+                    "de": "Bedienung anzeigen",
+                    "ru": "Показывать управление",
+                    "pt": "Mostrar controlos",
+                    "nl": "Bediening tonen",
+                    "fr": "Afficher les commandes",
+                    "it": "Mostra i comandi",
+                    "es": "Mostrar controles",
+                    "pl": "Pokaż sterowanie",
+                    "uk": "Показувати керування",
+                    "zh-cn": "显示控制"
+                },
+                "help": {
+                    "en": "Only for players that can be controlled through the Plex server",
+                    "de": "Nur für Player, die über den Plex-Server steuerbar sind",
+                    "ru": "Только для плееров, которыми можно управлять через сервер Plex",
+                    "pt": "Apenas para leitores que podem ser controlados através do servidor Plex",
+                    "nl": "Alleen voor spelers die via de Plex-server bestuurbaar zijn",
+                    "fr": "Uniquement pour les lecteurs contrôlables via le serveur Plex",
+                    "it": "Solo per i lettori controllabili tramite il server Plex",
+                    "es": "Solo para reproductores que se pueden controlar a través del servidor Plex",
+                    "pl": "Tylko dla odtwarzaczy, którymi można sterować przez serwer Plex",
+                    "uk": "Лише для плеєрів, якими можна керувати через сервер Plex",
+                    "zh-cn": "仅适用于可通过 Plex 服务器控制的播放器"
+                }
+            }
+        }
+    }
+}

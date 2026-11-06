@@ -1,0 +1,241 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ioBroker/web-components/main/schemas/manifest.json",
+    "manifestVersion": 1,
+    "tag": "iob-plex-stats",
+    "name": {
+        "en": "Plex watch statistics (Tautulli)",
+        "de": "Plex - Wiedergabestatistik (Tautulli)",
+        "ru": "Plex — статистика просмотров (Tautulli)",
+        "pt": "Plex - estatísticas de visualização (Tautulli)",
+        "nl": "Plex - kijkstatistieken (Tautulli)",
+        "fr": "Plex - statistiques de visionnage (Tautulli)",
+        "it": "Plex - statistiche di visione (Tautulli)",
+        "es": "Plex - estadísticas de visualización (Tautulli)",
+        "pl": "Plex - statystyki oglądania (Tautulli)",
+        "uk": "Plex — статистика переглядів (Tautulli)",
+        "zh-cn": "Plex 观看统计（Tautulli）"
+    },
+    "description": {
+        "en": "The users and libraries with the most watch time in the last 24 hours, 7 days, 30 days or of all time. Needs Tautulli and its statistics in the settings of the instance",
+        "de": "Die Benutzer und Bibliotheken mit der meisten Wiedergabezeit in den letzten 24 Stunden, 7 Tagen, 30 Tagen oder insgesamt. Benötigt Tautulli und dessen Statistik in den Einstellungen der Instanz",
+        "ru": "Пользователи и библиотеки с наибольшим временем просмотра за 24 часа, 7 дней, 30 дней или за всё время. Нужны Tautulli и его статистика в настройках экземпляра",
+        "pt": "Os utilizadores e bibliotecas com mais tempo de visualização nas últimas 24 horas, 7 dias, 30 dias ou de sempre. Requer o Tautulli e as suas estatísticas nas configurações da instância",
+        "nl": "De gebruikers en bibliotheken met de meeste kijktijd in de laatste 24 uur, 7 dagen, 30 dagen of ooit. Vereist Tautulli en zijn statistieken in de instellingen van de instantie",
+        "fr": "Les utilisateurs et bibliothèques avec le plus de temps de visionnage sur les dernières 24 heures, 7 jours, 30 jours ou depuis toujours. Nécessite Tautulli et ses statistiques dans les paramètres de l'instance",
+        "it": "Gli utenti e le librerie con il maggior tempo di visione nelle ultime 24 ore, 7 giorni, 30 giorni o di sempre. Richiede Tautulli e le sue statistiche nelle impostazioni dell'istanza",
+        "es": "Los usuarios y bibliotecas con más tiempo de visualización en las últimas 24 horas, 7 días, 30 días o de siempre. Requiere Tautulli y sus estadísticas en la configuración de la instancia",
+        "pl": "Użytkownicy i biblioteki z najdłuższym czasem oglądania w ostatnich 24 godzinach, 7 dniach, 30 dniach lub od początku. Wymaga Tautulli i jego statystyk w ustawieniach instancji",
+        "uk": "Користувачі та бібліотеки з найбільшим часом перегляду за 24 години, 7 днів, 30 днів або за весь час. Потрібні Tautulli та його статистика в налаштуваннях екземпляра",
+        "zh-cn": "过去 24 小时、7 天、30 天或全部时间内观看时长最多的用户和媒体库。需要在实例设置中启用 Tautulli 及其统计"
+    },
+    "icon": "../tautulli.jpg",
+    "module": "plex-stats.js",
+    "size": {
+        "width": 480,
+        "height": 260
+    },
+    "settings": {
+        "type": "panel",
+        "items": {
+            "instance": {
+                "type": "instance",
+                "adapter": "plex",
+                "label": {
+                    "en": "Instance",
+                    "de": "Instanz",
+                    "ru": "Экземпляр",
+                    "pt": "Instância",
+                    "nl": "Instantie",
+                    "fr": "Instance",
+                    "it": "Istanza",
+                    "es": "Instancia",
+                    "pl": "Instancja",
+                    "uk": "Екземпляр",
+                    "zh-cn": "实例"
+                }
+            },
+            "period": {
+                "type": "select",
+                "default": "7d",
+                "label": {
+                    "en": "Period",
+                    "de": "Zeitraum",
+                    "ru": "Период",
+                    "pt": "Período",
+                    "nl": "Periode",
+                    "fr": "Période",
+                    "it": "Periodo",
+                    "es": "Período",
+                    "pl": "Okres",
+                    "uk": "Період",
+                    "zh-cn": "时间段"
+                },
+                "help": {
+                    "en": "The period shown first; it can be switched in the element",
+                    "de": "Der zuerst gezeigte Zeitraum; er lässt sich im Element umschalten",
+                    "ru": "Период, показываемый сначала; его можно переключить в элементе",
+                    "pt": "O período mostrado primeiro; pode ser alterado no elemento",
+                    "nl": "De periode die eerst wordt getoond; deze kan in het element worden gewisseld",
+                    "fr": "La période affichée d'abord ; elle peut être changée dans l'élément",
+                    "it": "Il periodo mostrato per primo; si può cambiare nell'elemento",
+                    "es": "El período que se muestra primero; se puede cambiar en el elemento",
+                    "pl": "Okres pokazywany najpierw; można go przełączyć w elemencie",
+                    "uk": "Період, що показується спочатку; його можна перемкнути в елементі",
+                    "zh-cn": "首先显示的时间段；可在元素中切换"
+                },
+                "options": [
+                    {
+                        "value": "24h",
+                        "label": {
+                            "en": "Last 24 hours",
+                            "de": "Letzte 24 Stunden",
+                            "ru": "Последние 24 часа",
+                            "pt": "Últimas 24 horas",
+                            "nl": "Laatste 24 uur",
+                            "fr": "Dernières 24 heures",
+                            "it": "Ultime 24 ore",
+                            "es": "Últimas 24 horas",
+                            "pl": "Ostatnie 24 godziny",
+                            "uk": "Останні 24 години",
+                            "zh-cn": "过去 24 小时"
+                        }
+                    },
+                    {
+                        "value": "7d",
+                        "label": {
+                            "en": "Last 7 days",
+                            "de": "Letzte 7 Tage",
+                            "ru": "Последние 7 дней",
+                            "pt": "Últimos 7 dias",
+                            "nl": "Laatste 7 dagen",
+                            "fr": "Derniers 7 jours",
+                            "it": "Ultimi 7 giorni",
+                            "es": "Últimos 7 días",
+                            "pl": "Ostatnie 7 dni",
+                            "uk": "Останні 7 днів",
+                            "zh-cn": "过去 7 天"
+                        }
+                    },
+                    {
+                        "value": "30d",
+                        "label": {
+                            "en": "Last 30 days",
+                            "de": "Letzte 30 Tage",
+                            "ru": "Последние 30 дней",
+                            "pt": "Últimos 30 dias",
+                            "nl": "Laatste 30 dagen",
+                            "fr": "Derniers 30 jours",
+                            "it": "Ultimi 30 giorni",
+                            "es": "Últimos 30 días",
+                            "pl": "Ostatnie 30 dni",
+                            "uk": "Останні 30 днів",
+                            "zh-cn": "过去 30 天"
+                        }
+                    },
+                    {
+                        "value": "all",
+                        "label": {
+                            "en": "All time",
+                            "de": "Gesamt",
+                            "ru": "За всё время",
+                            "pt": "Desde sempre",
+                            "nl": "Altijd",
+                            "fr": "Depuis toujours",
+                            "it": "Da sempre",
+                            "es": "Desde siempre",
+                            "pl": "Od początku",
+                            "uk": "За весь час",
+                            "zh-cn": "全部时间"
+                        }
+                    }
+                ]
+            },
+            "show": {
+                "type": "select",
+                "default": "both",
+                "label": {
+                    "en": "Show",
+                    "de": "Anzeigen",
+                    "ru": "Показывать",
+                    "pt": "Mostrar",
+                    "nl": "Tonen",
+                    "fr": "Afficher",
+                    "it": "Mostra",
+                    "es": "Mostrar",
+                    "pl": "Pokaż",
+                    "uk": "Показувати",
+                    "zh-cn": "显示"
+                },
+                "options": [
+                    {
+                        "value": "both",
+                        "label": {
+                            "en": "Users and libraries",
+                            "de": "Benutzer und Bibliotheken",
+                            "ru": "Пользователи и библиотеки",
+                            "pt": "Utilizadores e bibliotecas",
+                            "nl": "Gebruikers en bibliotheken",
+                            "fr": "Utilisateurs et bibliothèques",
+                            "it": "Utenti e librerie",
+                            "es": "Usuarios y bibliotecas",
+                            "pl": "Użytkownicy i biblioteki",
+                            "uk": "Користувачі та бібліотеки",
+                            "zh-cn": "用户和媒体库"
+                        }
+                    },
+                    {
+                        "value": "users",
+                        "label": {
+                            "en": "Users",
+                            "de": "Benutzer",
+                            "ru": "Пользователи",
+                            "pt": "Utilizadores",
+                            "nl": "Gebruikers",
+                            "fr": "Utilisateurs",
+                            "it": "Utenti",
+                            "es": "Usuarios",
+                            "pl": "Użytkownicy",
+                            "uk": "Користувачі",
+                            "zh-cn": "用户"
+                        }
+                    },
+                    {
+                        "value": "libraries",
+                        "label": {
+                            "en": "Libraries",
+                            "de": "Bibliotheken",
+                            "ru": "Библиотеки",
+                            "pt": "Bibliotecas",
+                            "nl": "Bibliotheken",
+                            "fr": "Bibliothèques",
+                            "it": "Librerie",
+                            "es": "Bibliotecas",
+                            "pl": "Biblioteki",
+                            "uk": "Бібліотеки",
+                            "zh-cn": "媒体库"
+                        }
+                    }
+                ]
+            },
+            "count": {
+                "type": "number",
+                "min": 1,
+                "max": 25,
+                "default": 5,
+                "label": {
+                    "en": "Entries per list",
+                    "de": "Einträge pro Liste",
+                    "ru": "Записей в списке",
+                    "pt": "Entradas por lista",
+                    "nl": "Items per lijst",
+                    "fr": "Entrées par liste",
+                    "it": "Voci per elenco",
+                    "es": "Entradas por lista",
+                    "pl": "Pozycji na liście",
+                    "uk": "Записів у списку",
+                    "zh-cn": "每个列表的条目数"
+                }
+            }
+        }
+    }
+}

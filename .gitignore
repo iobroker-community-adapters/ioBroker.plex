@@ -11,6 +11,9 @@ src-admin/build
 src-admin/.__mf__temp
 src-www/node_modules
 src-www/build
+# web components: built with vite, the result in admin/webcomponents/ is committed
+src-webcomponents/node_modules
+src-webcomponents/build
 # local scratch files
 /te.txt
 # local data

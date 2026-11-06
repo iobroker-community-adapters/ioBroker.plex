@@ -36,6 +36,10 @@ Integration of the Plex Media Server in ioBroker (with or without Plex Pass). Fu
 - Retrieve all data from controllable clients
 - Web Interface that shows the recent events from Plex:
   ![Plex Web Interface](img/screenshot_adapter-interface.png)
+- Dashboard tiles (web components) for Aura, vis-2, ioBroker.devices and other hosts, each with the instance as setting:
+  - `iob-plex-now-playing` - what is playing on which player: cover, title, user, progress, and play/pause, skip and stop for players that can be controlled. Settings: only one player, cards or compact list, show paused streams, cover, controls
+  - `iob-plex-activity` - the latest events grouped by day; a click shows the details. Settings: number of events, only playback events, covers
+  - `iob-plex-stats` - top users and libraries by watch time for 24 hours, 7 days, 30 days or all time (only with Tautulli). Settings: period, users and/or libraries, entries per list
 
 
 ## 2. Setup instructions
@@ -131,6 +135,9 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (GermanBluefox) Added dashboard tiles for Aura and other dashboards: now playing with controls, recent activity and Tautulli watch statistics
+
 ### 2.1.1 (2026-06-21)
 - (mcm1957) some issues reported by repository checker have been fixed
 - (mcm1957) dependencies have been updated

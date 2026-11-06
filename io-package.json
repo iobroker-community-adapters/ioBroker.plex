@@ -143,6 +143,11 @@
     "adminUI": {
       "config": "json"
     },
+    "webComponents": [
+      "webcomponents/plex-now-playing.json",
+      "webcomponents/plex-activity.json",
+      "webcomponents/plex-stats.json"
+    ],
     "messagebox": true,
     "mode": "daemon",
     "name": "plex",

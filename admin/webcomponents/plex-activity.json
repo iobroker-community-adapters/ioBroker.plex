@@ -1,0 +1,125 @@
+{
+    "$schema": "https://raw.githubusercontent.com/ioBroker/web-components/main/schemas/manifest.json",
+    "manifestVersion": 1,
+    "tag": "iob-plex-activity",
+    "name": {
+        "en": "Plex activity",
+        "de": "Plex - Aktivitäten",
+        "ru": "Plex — активность",
+        "pt": "Plex - atividade",
+        "nl": "Plex - activiteit",
+        "fr": "Plex - activité",
+        "it": "Plex - attività",
+        "es": "Plex - actividad",
+        "pl": "Plex - aktywność",
+        "uk": "Plex — активність",
+        "zh-cn": "Plex 动态"
+    },
+    "description": {
+        "en": "The latest events of the Plex server - played, paused, stopped, new in the library - grouped by day; a click shows the details",
+        "de": "Die letzten Ereignisse des Plex-Servers - abgespielt, pausiert, gestoppt, neu in der Bibliothek - nach Tagen gruppiert; ein Klick zeigt die Details",
+        "ru": "Последние события сервера Plex — воспроизведение, пауза, остановка, новое в библиотеке — по дням; щелчок показывает подробности",
+        "pt": "Os últimos eventos do servidor Plex - reproduzido, em pausa, parado, novo na biblioteca - agrupados por dia; um clique mostra os detalhes",
+        "nl": "De laatste gebeurtenissen van de Plex-server - afgespeeld, gepauzeerd, gestopt, nieuw in de bibliotheek - per dag gegroepeerd; een klik toont de details",
+        "fr": "Les derniers événements du serveur Plex - lu, en pause, arrêté, nouveau dans la bibliothèque - regroupés par jour ; un clic affiche les détails",
+        "it": "Gli ultimi eventi del server Plex - riprodotto, in pausa, fermato, nuovo nella libreria - raggruppati per giorno; un clic mostra i dettagli",
+        "es": "Los últimos eventos del servidor Plex - reproducido, en pausa, detenido, nuevo en la biblioteca - agrupados por día; un clic muestra los detalles",
+        "pl": "Ostatnie zdarzenia serwera Plex - odtworzone, wstrzymane, zatrzymane, nowe w bibliotece - pogrupowane według dni; kliknięcie pokazuje szczegóły",
+        "uk": "Останні події сервера Plex — відтворення, пауза, зупинка, нове в бібліотеці — за днями; клік показує подробиці",
+        "zh-cn": "Plex 服务器的最新事件（播放、暂停、停止、媒体库新增），按天分组；点击显示详情"
+    },
+    "icon": "../plex.jpg",
+    "module": "plex-activity.js",
+    "size": {
+        "width": 360,
+        "height": 400
+    },
+    "settings": {
+        "type": "panel",
+        "items": {
+            "instance": {
+                "type": "instance",
+                "adapter": "plex",
+                "label": {
+                    "en": "Instance",
+                    "de": "Instanz",
+                    "ru": "Экземпляр",
+                    "pt": "Instância",
+                    "nl": "Instantie",
+                    "fr": "Instance",
+                    "it": "Istanza",
+                    "es": "Instancia",
+                    "pl": "Instancja",
+                    "uk": "Екземпляр",
+                    "zh-cn": "实例"
+                }
+            },
+            "count": {
+                "type": "number",
+                "min": 1,
+                "max": 200,
+                "default": 30,
+                "label": {
+                    "en": "Number of events",
+                    "de": "Anzahl der Ereignisse",
+                    "ru": "Количество событий",
+                    "pt": "Número de eventos",
+                    "nl": "Aantal gebeurtenissen",
+                    "fr": "Nombre d'événements",
+                    "it": "Numero di eventi",
+                    "es": "Número de eventos",
+                    "pl": "Liczba zdarzeń",
+                    "uk": "Кількість подій",
+                    "zh-cn": "事件数量"
+                }
+            },
+            "playbackOnly": {
+                "type": "checkbox",
+                "default": false,
+                "label": {
+                    "en": "Only playback events",
+                    "de": "Nur Wiedergabe-Ereignisse",
+                    "ru": "Только события воспроизведения",
+                    "pt": "Apenas eventos de reprodução",
+                    "nl": "Alleen afspeelgebeurtenissen",
+                    "fr": "Uniquement les événements de lecture",
+                    "it": "Solo eventi di riproduzione",
+                    "es": "Solo eventos de reproducción",
+                    "pl": "Tylko zdarzenia odtwarzania",
+                    "uk": "Лише події відтворення",
+                    "zh-cn": "仅播放事件"
+                },
+                "help": {
+                    "en": "Play, pause, stop, watched and rated - without library, device and server events",
+                    "de": "Abspielen, Pause, Stopp, gesehen und bewertet - ohne Ereignisse von Bibliothek, Geräten und Server",
+                    "ru": "Воспроизведение, пауза, стоп, просмотрено и оценено — без событий библиотеки, устройств и сервера",
+                    "pt": "Reproduzir, pausa, parar, visto e avaliado - sem eventos da biblioteca, dos dispositivos e do servidor",
+                    "nl": "Afspelen, pauze, stop, bekeken en beoordeeld - zonder gebeurtenissen van bibliotheek, apparaten en server",
+                    "fr": "Lecture, pause, arrêt, vu et noté - sans les événements de la bibliothèque, des appareils et du serveur",
+                    "it": "Riproduzione, pausa, stop, visto e valutato - senza eventi di libreria, dispositivi e server",
+                    "es": "Reproducir, pausa, detener, visto y valorado - sin eventos de la biblioteca, los dispositivos y el servidor",
+                    "pl": "Odtwarzanie, pauza, stop, obejrzane i ocenione - bez zdarzeń biblioteki, urządzeń i serwera",
+                    "uk": "Відтворення, пауза, стоп, переглянуто й оцінено — без подій бібліотеки, пристроїв і сервера",
+                    "zh-cn": "播放、暂停、停止、已观看和已评分，不含媒体库、设备和服务器事件"
+                }
+            },
+            "showCovers": {
+                "type": "checkbox",
+                "default": true,
+                "label": {
+                    "en": "Show cover",
+                    "de": "Cover anzeigen",
+                    "ru": "Показывать обложку",
+                    "pt": "Mostrar capa",
+                    "nl": "Hoes tonen",
+                    "fr": "Afficher la pochette",
+                    "it": "Mostra copertina",
+                    "es": "Mostrar portada",
+                    "pl": "Pokaż okładkę",
+                    "uk": "Показувати обкладинку",
+                    "zh-cn": "显示封面"
+                }
+            }
+        }
+    }
+}

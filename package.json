@@ -71,6 +71,7 @@
     "verify": "npm run lint && npm run lint:admin && npm run lint:wc && npm run build",
     "lint:admin": "cd src-admin && npm run lint",
     "translate": "translate-adapter",
+    "translate:all": "translate-adapter -b admin/i18n/en/translations.json && translate-adapter -b src-admin/src/i18n/en.json ",
     "npm": "npm i && cd src-admin && npm i -f && cd ../src-www && npm i -f && cd ../src-webcomponents && npm i -f",
     "update-packages": "npx npm-check-updates -u && cd src-admin && npm i -f && cd ../src-www && npm i -f && cd ../src-webcomponents && npm i -f",
     "npm:admin": "cd src-admin && npm i",

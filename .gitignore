@@ -1,6 +1,6 @@
 .*/
+!.vscode/
 !.github/
-!.github/**
 
 /node_modules
 /.idea

@@ -144,9 +144,72 @@
       "config": "json"
     },
     "webComponents": [
-      "webcomponents/plex-now-playing.json",
-      "webcomponents/plex-activity.json",
-      "webcomponents/plex-stats.json"
+      {
+        "manifest": "webcomponents/plex-now-playing.json",
+        "tag": "iob-plex-now-playing",
+        "name": {
+          "en": "Plex now playing",
+          "de": "Plex - Läuft gerade",
+          "ru": "Plex — сейчас воспроизводится",
+          "pt": "Plex - a reproduzir agora",
+          "nl": "Plex - nu aan het afspelen",
+          "fr": "Plex - lecture en cours",
+          "it": "Plex - in riproduzione",
+          "es": "Plex - reproduciendo ahora",
+          "pl": "Plex - teraz odtwarzane",
+          "uk": "Plex — зараз відтворюється",
+          "zh-cn": "Plex 正在播放"
+        },
+        "icon": "../plex.jpg",
+        "size": {
+          "width": 400,
+          "height": 200
+        }
+      },
+      {
+        "manifest": "webcomponents/plex-activity.json",
+        "tag": "iob-plex-activity",
+        "name": {
+          "en": "Plex activity",
+          "de": "Plex - Aktivitäten",
+          "ru": "Plex — активность",
+          "pt": "Plex - atividade",
+          "nl": "Plex - activiteit",
+          "fr": "Plex - activité",
+          "it": "Plex - attività",
+          "es": "Plex - actividad",
+          "pl": "Plex - aktywność",
+          "uk": "Plex — активність",
+          "zh-cn": "Plex 动态"
+        },
+        "icon": "../plex.jpg",
+        "size": {
+          "width": 360,
+          "height": 400
+        }
+      },
+      {
+        "manifest": "webcomponents/plex-stats.json",
+        "tag": "iob-plex-stats",
+        "name": {
+          "en": "Plex watch statistics (Tautulli)",
+          "de": "Plex - Wiedergabestatistik (Tautulli)",
+          "ru": "Plex — статистика просмотров (Tautulli)",
+          "pt": "Plex - estatísticas de visualização (Tautulli)",
+          "nl": "Plex - kijkstatistieken (Tautulli)",
+          "fr": "Plex - statistiques de visionnage (Tautulli)",
+          "it": "Plex - statistiche di visione (Tautulli)",
+          "es": "Plex - estadísticas de visualización (Tautulli)",
+          "pl": "Plex - statystyki oglądania (Tautulli)",
+          "uk": "Plex — статистика переглядів (Tautulli)",
+          "zh-cn": "Plex 观看统计（Tautulli）"
+        },
+        "icon": "../tautulli.jpg",
+        "size": {
+          "width": 480,
+          "height": 260
+        }
+      }
     ],
     "messagebox": true,
     "mode": "daemon",

@@ -43,6 +43,7 @@
     "@iobroker/adapter-dev": "^1.5.0",
     "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/testing": "^6.3.1",
+    "@iobroker/web-components": "^0.8.0",
     "@tsconfig/node22": "^22.0.6",
     "@types/body-parser": "^1.19.6",
     "@types/express": "^5.0.6",
@@ -57,7 +58,7 @@
   "main": "build/main.js",
   "scripts": {
     "prebuild": "clean-dir ./build",
-    "build": "build-adapter ts",
+    "build": "build-adapter ts && iob-web-components sync-io-package",
     "watch": "build-adapter ts --watch",
     "prebuild:ts": "clean-dir ./build",
     "build:ts": "build-adapter ts",

@@ -44,7 +44,7 @@
     "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/testing": "^6.3.1",
     "@iobroker/web-components": "^0.8.0",
-    "@tsconfig/node22": "^22.0.6",
+    "@tsconfig/node22": "^22.0.7",
     "@types/body-parser": "^1.19.6",
     "@types/express": "^5.0.6",
     "@types/multer": "^2.2.0",

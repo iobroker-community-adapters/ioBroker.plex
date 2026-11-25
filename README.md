@@ -136,7 +136,7 @@ This adapter would not have been possible without the great work of @Zefau (http
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 3.1.0 (2026-11-25)
 - (GermanBluefox) Added dashboard tiles for Aura and other dashboards: now playing with controls, recent activity and Tautulli watch statistics
 - (copilot) Adapter requires node.js >= 22.19.0 now
 - (ticaki) Player objects below `_playing` were created without an object type ("obj.type has to exist" warning); existing objects are repaired on start - fixed #618
@@ -180,11 +180,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 - (ticaki) Fixed: deleting a device via adapter settings now correctly clears all internal state entries.
 - (ticaki) New privacy option: media link states can store a placeholder instead of the real Plex token in plain text (configurable in adapter settings, enabled by default).
 - (ticaki) Adapter rewritten in TypeScript. Requires Node.js >= 22.
-
-### 1.1.5 (2024-12-11)
-- (ticaki) State _playing.*.Metadata.viewOffset is created.
-- (ticaki) Dependencies updated
-- (mcm1957) Adapter requires nodejs >= 18 now
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

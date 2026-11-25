@@ -1,4 +1,9 @@
 # Older changes
+## 1.1.5 (2024-12-11)
+- (ticaki) State _playing.*.Metadata.viewOffset is created.
+- (ticaki) Dependencies updated
+- (mcm1957) Adapter requires nodejs >= 18 now
+
 ## 1.1.4 (2023-11-06)
 - (ticaki) move logmessage into debug
 

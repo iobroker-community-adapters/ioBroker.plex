@@ -144,6 +144,10 @@ This adapter would not have been possible without the great work of @Zefau (http
 - (ticaki) Fixed: the `...Date` states (e.g. `addedAtDate`, `lastViewedAtDate`) were one month off
 - (ticaki) Fixed: the playback position follows jumps during playback now, and `viewOffsethuman` keeps running instead of staying at the value of the last Plex event
 - (ticaki) Fixed: possible crash when the adapter was stopped while the connection to the Plex server was still being established
+- (ticaki) Fixed: after a new playback started, states whose value had not changed were emptied until the next event
+- (ticaki) Fixed: players with a dot in their name could not be listed or removed in the cleanup tab
+- (ticaki) Fixed: names from plex.tv with characters like `&` were not decoded, and lists with more than 1000 entries overwrote their first entries
+- (ticaki) Web page: of two events of the same second the later one counts, and a stream whose end was never reported expires after 12 hours (paused: 24 hours)
 - (ticaki) Entries of `events.history` now contain the UUID of the player (`playerUuid`)
 - (ticaki) Counting library and playlist items no longer loads the complete listing: far fewer disk writes on the Plex server and no more "Missing X-Plex-Container-Size" warnings in its log
 - (ticaki) Token dialog: the PIN can now be copied when admin is opened via plain http (e.g. Safari), and admin offers to save the configuration right after a new token was retrieved

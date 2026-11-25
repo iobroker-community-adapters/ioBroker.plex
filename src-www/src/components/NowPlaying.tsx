@@ -7,6 +7,8 @@ interface HistoryEvent {
     id?: string;
     timestamp: number;
     player?: string;
+    /** UUID of the player; missing in entries written before the adapter stored it */
+    playerUuid?: string;
     account?: string;
     media?: string;
     event?: string;
@@ -42,19 +44,38 @@ export function NowPlaying(): JSX.Element {
             return [];
         }
 
-        const latestPerPlayer = new Map<string, HistoryEvent>();
-        for (const e of parsed) {
-            if (!e.player) {
+        // Newest first. The adapter appends and counts whole seconds, so of two events of the
+        // same second the later one in the array is the newer one (the sort is stable).
+        const events = [...parsed].reverse().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+        // The latest event per device. Two events are of two devices only if both name a UUID
+        // (`playerUuid`) and these differ - so two devices of the same title are told apart. An
+        // entry without a UUID (written before the adapter stored it) is one of its title: a newer
+        // event of that title replaces it, with or without a UUID, and it replaces the older ones
+        // of that title. So an old "play" and a new "stop" leave no stream that plays forever.
+        const seenUuids = new Set<string>();
+        const seenTitles = new Set<string>();
+        const seenUuidTitles = new Set<string>();
+        const result: ActiveStream[] = [];
+        for (const e of events) {
+            const player = e.player;
+            if (!player) {
                 continue;
             }
-            const prev = latestPerPlayer.get(e.player);
-            if (!prev || (e.timestamp || 0) > (prev.timestamp || 0)) {
-                latestPerPlayer.set(e.player, e);
+            const playerUuid = typeof e.playerUuid === 'string' && e.playerUuid ? e.playerUuid : undefined;
+            const uuid = playerUuid?.toLowerCase();
+            const seen = uuid
+                ? seenUuids.has(uuid) || seenTitles.has(player)
+                : seenTitles.has(player) || seenUuidTitles.has(player);
+            if (uuid) {
+                seenUuids.add(uuid);
+                seenUuidTitles.add(player);
+            } else {
+                seenTitles.add(player);
             }
-        }
-
-        const result: ActiveStream[] = [];
-        for (const [player, e] of latestPerPlayer) {
+            if (seen) {
+                continue;
+            }
             const ev = e.event || '';
             const isPlaying = PLAYING_EVENTS.has(ev);
             const isPaused = STOP_EVENTS.has(ev) && (ev === 'media.pause' || ev === 'pause');
@@ -64,6 +85,7 @@ export function NowPlaying(): JSX.Element {
             }
             result.push({
                 player,
+                playerUuid,
                 account: e.account,
                 media: e.media,
                 message: e.message,
@@ -89,7 +111,7 @@ export function NowPlaying(): JSX.Element {
             ) : (
                 <Stack direction="row" spacing={2} sx={{ mt: 1, flexWrap: 'wrap', gap: 2, justifyContent: 'center' }}>
                     {streams.map(s => (
-                        <NowPlayingCard key={s.player} stream={s} />
+                        <NowPlayingCard key={s.playerUuid || s.player} stream={s} />
                     ))}
                 </Stack>
             )}

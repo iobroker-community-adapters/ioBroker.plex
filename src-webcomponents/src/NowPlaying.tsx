@@ -334,13 +334,13 @@ function NowPlayingView(props: ViewProps): JSX.Element {
             {entries.map(entry =>
                 compact ? (
                     <Row
-                        key={entry.stream.player}
+                        key={entry.stream.playerUuid || entry.stream.player}
                         {...props}
                         entry={entry}
                     />
                 ) : (
                     <Card
-                        key={entry.stream.player}
+                        key={entry.stream.playerUuid || entry.stream.player}
                         {...props}
                         entry={entry}
                     />
@@ -406,13 +406,18 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
             streams = streams.filter(stream => !stream.paused);
         }
         if (filter) {
+            // with the UUID of the player the title in its channel ID is known: "tv" is not "tv-kitchen" - and a
+            // stream that names its UUID is the one of this player only if it is the same
+            const state = this.states[`${filter}.Player.uuid`]?.val;
+            const uuid = typeof state === 'string' ? state : undefined;
             return streams
-                .filter(stream => isChannelOf(filter, stream.player))
+                .filter(stream => isChannelOf(filter, stream.player, uuid, stream.playerUuid))
                 .map(stream => ({ stream, channel: filter }));
         }
+        const channels = this.#getChannels(namespace) || [];
         return streams.map(stream => ({
             stream,
-            channel: findPlayerChannel(this.#getChannels(namespace) || [], stream.player)?.id || null,
+            channel: findPlayerChannel(channels, stream.player, stream.playerUuid)?.id || null,
         }));
     }
 
@@ -426,6 +431,10 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
             return [];
         }
         const ids = [`${namespace}.events.history`];
+        const filter = settings.player ? getPlayerChannelId(settings.player) : null;
+        if (filter) {
+            ids.push(`${filter}.Player.uuid`);
+        }
         for (const { channel } of this.#getStreams(settings, namespace)) {
             if (channel) {
                 ids.push(`${channel}.Metadata.viewOffset`, `${channel}.Metadata.durationSeconds`);

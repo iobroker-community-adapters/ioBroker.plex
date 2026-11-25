@@ -7,7 +7,11 @@
  * - `Player.controllable` - false for players that cannot be controlled through the Plex server
  * - `_Controls.playback.<button>` - the buttons, only for players that can be controlled
  *
- * The history names a player by its title only, so a player is found by the beginning of its channel ID.
+ * The history names a player by its title and - in entries written since the adapter stores it - by its UUID
+ * (`playerUuid`). With the UUID the channel of that device is found: the one of this UUID. Without it a player is
+ * found by the title in its channel ID. Where the UUID of a channel is known (`native.uuid` of the channel, written
+ * when the adapter discovers the player, or the state `Player.uuid`), the rest of the ID is the title and must be
+ * the same; else the ID must begin with the title.
  */
 
 /** The characters ioBroker forbids in IDs, as `FORBIDDEN_CHARS` of js-controller */
@@ -25,6 +29,8 @@ export interface PlayerChannel {
     id: string;
     /** The last part of the ID */
     name: string;
+    /** The UUID of the player (`native.uuid`) if the ID ends with it; empty if unknown */
+    uuid: string;
     /** When the adapter saw the player last (`native.lastSeenAt`), in ms; 0 if unknown */
     lastSeen: number;
     /** Whether `_Controls.playback` exists below it */
@@ -55,14 +61,32 @@ export function getPlayerChannelId(id: string | undefined): string | null {
 }
 
 /**
- * Whether a player channel belongs to the player of this title
+ * The title in the name of a player channel, `<title>-<uuid>`
+ *
+ * @param name the last part of the channel ID
+ * @param uuid the UUID of the player, in any case
+ * @returns the title as the adapter cleaned it, or null if the UUID is unknown or not the end of the name
+ */
+function getChannelTitle(name: string, uuid: string | undefined): string | null {
+    return uuid && name.toLowerCase().endsWith(`-${uuid.toLowerCase()}`) ? name.slice(0, -(uuid.length + 1)) : null;
+}
+
+/**
+ * Whether a player channel belongs to the player of this title - or of this UUID, if the history names one
  *
  * @param channelId the channel, `plex.0._playing.<title>-<uuid>`
  * @param title the title of the player as the history names it
+ * @param uuid the UUID of the player of the channel if it is known: then "tv" is not the player "tv-kitchen"
+ * @param playerUuid the UUID of the player as the history names it, if it does: then it decides, not the title
  */
-export function isChannelOf(channelId: string, title: string): boolean {
+export function isChannelOf(channelId: string, title: string, uuid?: string, playerUuid?: string): boolean {
     const name = channelId.slice(channelId.lastIndexOf('.') + 1);
-    return name.startsWith(`${cleanTitle(title)}-`);
+    if (playerUuid) {
+        // two devices of the same title differ in their UUID only; a channel of unknown UUID has it in its ID
+        return uuid ? uuid.toLowerCase() === playerUuid.toLowerCase() : getChannelTitle(name, playerUuid) !== null;
+    }
+    const channelTitle = getChannelTitle(name, uuid);
+    return channelTitle !== null ? channelTitle === cleanTitle(title) : name.startsWith(`${cleanTitle(title)}-`);
 }
 
 /**
@@ -82,9 +106,11 @@ export function toPlayerChannels(namespace: string, channels: Record<string, ioB
         }
         const native = (channels[id]?.native || {}) as Record<string, unknown>;
         const lastSeen = typeof native.lastSeenAt === 'string' ? Date.parse(native.lastSeenAt) || 0 : 0;
+        const uuid = typeof native.uuid === 'string' ? native.uuid : '';
         result.push({
             id,
             name,
+            uuid: getChannelTitle(name, uuid) === null ? '' : uuid,
             lastSeen,
             hasControls: ids.includes(`${id}._Controls.playback`) || ids.includes(`${id}._Controls`),
         });
@@ -93,13 +119,30 @@ export function toPlayerChannels(namespace: string, channels: Record<string, ioB
 }
 
 /**
- * The channel of the player of this title: the one with controls and seen last if there are several
+ * The channel of a player. If the history names its UUID: the channel of that UUID - and only if there is none, one
+ * of the title whose UUID is unknown, never the one of another device. Else the channel of the title: one whose UUID
+ * is known, so that its title is the same, before one that only begins with the title. If there are several, the
+ * one with controls and seen last.
  *
  * @param channels the player channels of the instance
  * @param title the title of the player as the history names it
+ * @param playerUuid the UUID of the player as the history names it, if it does
  */
-export function findPlayerChannel(channels: PlayerChannel[], title: string): PlayerChannel | null {
-    const found = channels.filter(channel => isChannelOf(channel.id, title));
-    found.sort((a, b) => Number(b.hasControls) - Number(a.hasControls) || b.lastSeen - a.lastSeen);
+export function findPlayerChannel(channels: PlayerChannel[], title: string, playerUuid?: string): PlayerChannel | null {
+    let found = playerUuid ? channels.filter(channel => isChannelOf(channel.id, title, channel.uuid, playerUuid)) : [];
+    if (!found.length) {
+        found = channels.filter(
+            channel => !(playerUuid && channel.uuid) && isChannelOf(channel.id, title, channel.uuid),
+        );
+    }
+    // several channels of one UUID (a device that was renamed): the one of the title
+    const isOfTitle = (channel: PlayerChannel): boolean => isChannelOf(channel.id, title, channel.uuid || playerUuid);
+    found.sort(
+        (a, b) =>
+            Number(isOfTitle(b)) - Number(isOfTitle(a)) ||
+            Number(!!b.uuid) - Number(!!a.uuid) ||
+            Number(b.hasControls) - Number(a.hasControls) ||
+            b.lastSeen - a.lastSeen,
+    );
     return found[0] || null;
 }

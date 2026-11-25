@@ -1600,7 +1600,9 @@ class Plex extends utils.Adapter {
   /**
    * Take over the playback position Plex reports with every `playing` notification (about every
    * 10 seconds, and right after a seek). Between Plex events the adapter counts the position up
-   * by itself (see `refreshViewOffset`) and would otherwise never notice a jump.
+   * by itself (see `refreshViewOffset`) and would otherwise never notice a jump. The notification
+   * also says whether the player plays: that starts and stops the counting for players no
+   * play/pause event was received for.
    *
    * @param payload `PlaySessionStateNotification` list of the notification
    */
@@ -1609,8 +1611,26 @@ class Plex extends utils.Adapter {
       return;
     }
     for (const session of payload) {
+      const uuid = session == null ? void 0 : session.clientIdentifier;
       const viewOffset = Number(session == null ? void 0 : session.viewOffset);
-      const player = typeof (session == null ? void 0 : session.clientIdentifier) === "string" && Number.isFinite(viewOffset) ? this.playingDevice.find((entry) => entry.playerIdentifier === session.clientIdentifier) : void 0;
+      if (typeof uuid !== "string" || !uuid || !Number.isFinite(viewOffset)) {
+        continue;
+      }
+      let player = this.playingDevice.find((entry) => entry.playerIdentifier === uuid);
+      if (session.state === "paused" || session.state === "stopped") {
+        this.playingDevice = this.playingDevice.filter((entry) => entry !== player);
+        continue;
+      }
+      if (!player && session.state === "playing") {
+        const known = this.controller.players.find((entry) => {
+          var _a;
+          return ((_a = entry.config) == null ? void 0 : _a.uuid) === uuid;
+        });
+        if (known) {
+          player = { prefix: known.prefix, title: known.config.title, playerIdentifier: uuid };
+          this.playingDevice.push(player);
+        }
+      }
       if (player) {
         this.library.setDeviceState(`${player.prefix}.Metadata.viewOffset`, viewOffset);
       }

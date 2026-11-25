@@ -1923,7 +1923,9 @@ class Plex extends utils.Adapter {
     /**
      * Take over the playback position Plex reports with every `playing` notification (about every
      * 10 seconds, and right after a seek). Between Plex events the adapter counts the position up
-     * by itself (see `refreshViewOffset`) and would otherwise never notice a jump.
+     * by itself (see `refreshViewOffset`) and would otherwise never notice a jump. The notification
+     * also says whether the player plays: that starts and stops the counting for players no
+     * play/pause event was received for.
      *
      * @param payload `PlaySessionStateNotification` list of the notification
      */
@@ -1932,11 +1934,26 @@ class Plex extends utils.Adapter {
             return;
         }
         for (const session of payload) {
+            const uuid = session?.clientIdentifier;
             const viewOffset = Number(session?.viewOffset);
-            const player =
-                typeof session?.clientIdentifier === 'string' && Number.isFinite(viewOffset)
-                    ? this.playingDevice.find(entry => entry.playerIdentifier === session.clientIdentifier)
-                    : undefined;
+            if (typeof uuid !== 'string' || !uuid || !Number.isFinite(viewOffset)) {
+                continue;
+            }
+            let player = this.playingDevice.find(entry => entry.playerIdentifier === uuid);
+            if (session.state === 'paused' || session.state === 'stopped') {
+                // no counting up while nothing moves
+                this.playingDevice = this.playingDevice.filter(entry => entry !== player);
+                continue;
+            }
+            if (!player && session.state === 'playing') {
+                // No play/resume event registered this player - e.g. the adapter was started
+                // while it plays, or no webhook is set up: count up from here on.
+                const known = this.controller.players.find(entry => entry.config?.uuid === uuid);
+                if (known) {
+                    player = { prefix: known.prefix, title: known.config.title, playerIdentifier: uuid };
+                    this.playingDevice.push(player);
+                }
+            }
             if (player) {
                 // only the cached value: the next tick of refreshViewOffset writes the states
                 this.library.setDeviceState(`${player.prefix}.Metadata.viewOffset`, viewOffset);

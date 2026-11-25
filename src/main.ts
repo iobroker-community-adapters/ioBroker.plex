@@ -52,6 +52,8 @@ interface HistoryEntry {
     datetime: string;
     account?: string;
     player?: string;
+    /** UUID of the player; the title alone does not tell two devices of the same name apart */
+    playerUuid?: string;
     media?: string;
     event?: string;
     thumb?: string;
@@ -140,7 +142,7 @@ class Plex extends utils.Adapter {
     private knownPlayerIds: Set<string> = new Set();
     private alertsClient?: PlexNotifications;
     /** Dedupe rapid bursts of `playing` events (Plex sends ~1/s during playback). */
-    private alertsRefreshTimer: NodeJS.Timeout | null = null;
+    private alertsRefreshTimer: ioBroker.Timeout | undefined;
     private history: HistoryEntry[] = [];
     private notifications: Record<string, Record<string, NotificationDef>> = {};
     private retryCycle: ioBroker.Timeout | undefined;
@@ -260,8 +262,11 @@ class Plex extends utils.Adapter {
 
         // verify Plex settings
         if (!this.config.plexIp || !this.config.plexToken) {
+            const missing = [!this.config.plexIp && 'Plex IP', !this.config.plexToken && 'Plex Token']
+                .filter(Boolean)
+                .join(' and ');
             this.library.terminate(
-                'Plex IP and Plex Token not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token.',
+                `${missing} not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token.`,
             );
             return;
         }
@@ -785,8 +790,8 @@ class Plex extends utils.Adapter {
                 this.alertsClient = undefined;
             }
             if (this.alertsRefreshTimer) {
-                clearTimeout(this.alertsRefreshTimer);
-                this.alertsRefreshTimer = null;
+                this.clearTimeout(this.alertsRefreshTimer);
+                this.alertsRefreshTimer = undefined;
             }
             if (this.retryCycle) {
                 this.clearTimeout(this.retryCycle);
@@ -1011,14 +1016,14 @@ class Plex extends utils.Adapter {
                     m.indexOf('ENOTFOUND') > -1 ||
                     m.indexOf('ECONNABORTED') > -1
                 ) {
-                    const wait = nextBackoff(this.networkRetryCount++);
-                    this.config.retry = wait;
+                    const waitMin = nextBackoff(this.networkRetryCount++);
+                    this.config.retry = waitMin;
                     this.log.info(
-                        `Plex Media Server(${this.config.plexIp}:${this.config.plexPort}) not reachable! Will try again in ${wait} minute(s)...`,
+                        `Plex Media Server(${this.config.plexIp}:${this.config.plexPort}) not reachable! Will try again in ${waitMin} minute(s)...`,
                     );
                     await this.setConnectionState(false);
                     this.lastErrorKind = 'network';
-                    this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1000);
+                    this.retryCycle = this.setTimeout(() => this.init(), waitMin * 60 * 1000);
                 } else if (
                     m.indexOf('Permission denied') > -1 ||
                     m.indexOf('401') > -1 ||
@@ -1027,23 +1032,23 @@ class Plex extends utils.Adapter {
                 ) {
                     // Auth error from PMS. Don't terminate – stay offline and retry so the adapter recovers
                     // automatically once the token works again (e.g. after the user updates it in settings).
-                    const wait = nextBackoff(this.authRetryCount++);
-                    this.config.retry = wait;
+                    const waitMin = nextBackoff(this.authRetryCount++);
+                    this.config.retry = waitMin;
                     this.log.warn(
-                        `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${wait} minute(s).`,
+                        `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${waitMin} minute(s).`,
                     );
                     await this.setConnectionState(false);
                     this.lastErrorKind = 'unauthorized';
-                    this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1000);
+                    this.retryCycle = this.setTimeout(() => this.init(), waitMin * 60 * 1000);
                 } else {
-                    const wait = nextBackoff(this.networkRetryCount++);
-                    this.config.retry = wait;
+                    const waitMin = nextBackoff(this.networkRetryCount++);
+                    this.config.retry = waitMin;
                     this.log.warn(
-                        `Unexpected error connecting to Plex Media Server: ${m}. Will retry in ${wait} minute(s).`,
+                        `Unexpected error connecting to Plex Media Server: ${m}. Will retry in ${waitMin} minute(s).`,
                     );
                     await this.setConnectionState(false);
                     this.lastErrorKind = 'network';
-                    this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1000);
+                    this.retryCycle = this.setTimeout(() => this.init(), waitMin * 60 * 1000);
                 }
             });
     }
@@ -1266,6 +1271,9 @@ class Plex extends utils.Adapter {
                     datetime: data.datetime,
                     account: data.Account?.title,
                     player: data.Player?.title,
+                    ...(typeof data.Player?.uuid === 'string' && data.Player.uuid
+                        ? { playerUuid: data.Player.uuid }
+                        : {}),
                     media: data.media,
                     event,
                     ...(data.media === 'episode' && data.Metadata?.parentIndex != null
@@ -1387,8 +1395,13 @@ class Plex extends utils.Adapter {
         if (!this.config.getAllItems) {
             return;
         }
+        // Only the count is needed, so ask for an empty page: Plex then answers with `totalSize`
+        // and no items. Fetching the whole listing made the server write several MB to disk per
+        // library on every refresh cycle, and without a container size it logs a warning that
+        // announces a future HTTP 400 for such requests.
+        const countPath = `${path}${path.includes('?') ? '&' : '?'}X-Plex-Container-Start=0&X-Plex-Container-Size=0`;
         this.plex
-            .query(path)
+            .query(countPath)
             .then(async (res: any) => {
                 await this.library.set(
                     {
@@ -1397,7 +1410,7 @@ class Plex extends utils.Adapter {
                         role: this.library.getNode(`${key.toLowerCase()}.itemscount`).role,
                         description: this.library.getNode(`${key.toLowerCase()}.itemscount`).description,
                     },
-                    res.MediaContainer.size,
+                    res.MediaContainer.totalSize ?? res.MediaContainer.size,
                 );
             })
             .catch((err: unknown) => {
@@ -1781,17 +1794,26 @@ class Plex extends utils.Adapter {
                     for (const key in entry) {
                         const node = this.library.getNode(`playlists.${key.toLowerCase()}`);
                         node.key = `playlists.${playlistId}.${key}`;
-                        entry[key] = this.library.convertNode(node, entry[key]);
-
-                        void this.library.set(
-                            {
-                                node: `playlists.${playlistId}.${key}`,
-                                type: node.type,
-                                role: node.role,
-                                description: node.description,
-                            },
-                            entry[key],
-                        );
+                        // convertNode is async: without waiting for it the state received the
+                        // pending Promise ("[object Promise]") instead of the converted value.
+                        this.library
+                            .convertNode(node, entry[key])
+                            .then(value =>
+                                this.library.set(
+                                    {
+                                        node: `playlists.${playlistId}.${key}`,
+                                        type: node.type,
+                                        role: node.role,
+                                        description: node.description,
+                                    },
+                                    value,
+                                ),
+                            )
+                            .catch((err: unknown) => {
+                                this.log.debug(
+                                    `Could not set playlist value ${playlistId}.${key}: ${err instanceof Error ? err.message : String(err)}`,
+                                );
+                            });
                     }
 
                     this.getItems(entry.key, 'playlists', `playlists.${playlistId}`);
@@ -1846,6 +1868,8 @@ class Plex extends utils.Adapter {
                 error: m => this.log.error(m),
             },
             rejectUnauthorized: this.library.AXIOS_OPTIONS.rejectUnauthorized === true,
+            setTimeout: (cb, ms) => this.setTimeout(cb, ms),
+            clearTimeout: timer => this.clearTimeout(timer),
             // Identity headers — same set we send on REST. Some Plex setups (especially behind
             // reverse proxies) don't deliver notifications without a recognizable client identity.
             headers: {
@@ -1869,21 +1893,22 @@ class Plex extends utils.Adapter {
      * reacting per frame.
      *
      * @param type Notification type string from the PMS WebSocket (e.g. `playing`, `activity`)
-     * @param _payload Raw notification payload (currently unused)
+     * @param payload Type-specific payload of the notification
      */
-    private handlePlexNotification(type: string, _payload: unknown): void {
+    private handlePlexNotification(type: string, payload: unknown): void {
         if (this.unloaded) {
             return;
         }
         switch (type) {
             case 'playing': {
+                this.syncViewOffsets(payload);
                 // Debounce: a single getPlayers() call within 500ms of the latest event
                 // covers any number of intervening playing/state changes.
                 if (this.alertsRefreshTimer) {
                     return;
                 }
-                this.alertsRefreshTimer = setTimeout(() => {
-                    this.alertsRefreshTimer = null;
+                this.alertsRefreshTimer = this.setTimeout(() => {
+                    this.alertsRefreshTimer = undefined;
                     void this.getPlayers();
                 }, 500);
                 break;
@@ -1895,7 +1920,65 @@ class Plex extends utils.Adapter {
         }
     }
 
+    /**
+     * Take over the playback position Plex reports with every `playing` notification (about every
+     * 10 seconds, and right after a seek). Between Plex events the adapter counts the position up
+     * by itself (see `refreshViewOffset`) and would otherwise never notice a jump.
+     *
+     * @param payload `PlaySessionStateNotification` list of the notification
+     */
+    private syncViewOffsets(payload: unknown): void {
+        if (!Array.isArray(payload)) {
+            return;
+        }
+        for (const session of payload) {
+            const viewOffset = Number(session?.viewOffset);
+            const player =
+                typeof session?.clientIdentifier === 'string' && Number.isFinite(viewOffset)
+                    ? this.playingDevice.find(entry => entry.playerIdentifier === session.clientIdentifier)
+                    : undefined;
+            if (player) {
+                // only the cached value: the next tick of refreshViewOffset writes the states
+                this.library.setDeviceState(`${player.prefix}.Metadata.viewOffset`, viewOffset);
+            }
+        }
+    }
+
+    /**
+     * Repair player objects that earlier versions left without `type` (#618): `_playing.<title>-<uuid>`
+     * carrying the `native.isPlayer` marker but no object type. `getAdapterObjectsAsync()` only
+     * returns typed objects, so these are invisible to `loadKnownPlayers()` and the admin Cleanup
+     * tab — look them up by id range instead. Existing `common`/`native` are kept (extendObject).
+     */
+    private async repairTypelessPlayerObjects(): Promise<void> {
+        try {
+            const prefix = `${this.namespace}._playing.`;
+            const list = await this.getObjectListAsync({ startkey: prefix, endkey: `${prefix}\u9999` });
+            for (const row of list.rows) {
+                const obj = row.value as Partial<ioBroker.Object> | null;
+                if (!obj || obj.type || !row.id.startsWith(prefix)) {
+                    continue;
+                }
+                const native = (obj.native || {}) as Record<string, unknown>;
+                const uuid = native.uuid;
+                if (native.isPlayer !== true || typeof uuid !== 'string' || !uuid || !row.id.endsWith(`-${uuid}`)) {
+                    continue;
+                }
+                const relId = row.id.slice(`${this.namespace}.`.length);
+                const title = row.id.slice(prefix.length, -(uuid.length + 1));
+                await this.extendObjectAsync(relId, {
+                    type: 'channel',
+                    common: obj.common?.name ? {} : { name: `Player ${title}` },
+                });
+                this.log.info(`Repaired player object without type: ${row.id}`);
+            }
+        } catch (err: unknown) {
+            this.log.debug(`repairTypelessPlayerObjects failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
+    }
+
     private async loadKnownPlayers(): Promise<void> {
+        await this.repairTypelessPlayerObjects();
         try {
             const objs = await this.getAdapterObjectsAsync();
             this.knownPlayerIds.clear();
@@ -2270,17 +2353,28 @@ class Plex extends utils.Adapter {
             // Persist player metadata in the channel object's `native` block — read on
             // next startup by loadKnownPlayers() so candidates with empty `provides` can
             // be re-promoted without needing an active session every time.
-            void this.extendObject(playerTemp.prefix, {
-                native: {
-                    uuid: player.uuid,
-                    isPlayer: true,
-                    lastSeenAt: new Date().toISOString(),
-                    lastSeenSource: player.sources.join('+'),
-                    product: player.product,
-                    platform: player.platform,
-                    device: player.device,
-                },
-            } as Partial<ioBroker.Object>);
+            // `type` and `common.name` must be part of this call: for a new player it runs
+            // concurrently with the channel creation in the Player constructor. Both see
+            // "object does not exist", both write the whole object and this one lands last —
+            // without `type` that left a typeless object behind (#618). Same name as in Player;
+            // `preserve` keeps a name that already exists, as this runs on every discovery.
+            void this.extendObject(
+                playerTemp.prefix,
+                {
+                    type: 'channel',
+                    common: { name: `Player ${player.title}` },
+                    native: {
+                        uuid: player.uuid,
+                        isPlayer: true,
+                        lastSeenAt: new Date().toISOString(),
+                        lastSeenSource: player.sources.join('+'),
+                        product: player.product,
+                        platform: player.platform,
+                        device: player.device,
+                    },
+                } as Partial<ioBroker.Object>,
+                { preserve: { common: ['name'] } },
+            );
             this.knownPlayerIds.add(player.uuid);
         }
     }
@@ -2415,6 +2509,18 @@ class Plex extends utils.Adapter {
                         description: node.description,
                     },
                     value / 1000,
+                );
+                // Keep the readable position in step as well; it used to stay at the value of
+                // the last Plex event while viewOffset moved on.
+                node = this.library.getNode('playing.metadata.viewOffsethuman', true);
+                void this.library.set(
+                    {
+                        node: `${player.prefix}.Metadata.viewOffsethuman`,
+                        type: node.type,
+                        role: node.role,
+                        description: node.description,
+                    },
+                    this.library.readableTime(value),
                 );
             });
         }

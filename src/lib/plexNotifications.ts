@@ -26,6 +26,12 @@ export interface PlexNotificationsOptions {
     rejectUnauthorized?: boolean;
     /** Extra headers for the upgrade request — typically the same X-Plex-* identity headers we send on REST calls. */
     headers?: Record<string, string>;
+    /**
+     * Timer functions of the adapter instance (`adapter.setTimeout` / `adapter.clearTimeout`), so that
+     * pending timers are tracked by the adapter and discarded on unload.
+     */
+    setTimeout: (cb: () => void, ms: number) => ioBroker.Timeout | undefined;
+    clearTimeout: (timer: ioBroker.Timeout | undefined) => void;
 }
 
 /**
@@ -68,8 +74,8 @@ export class PlexNotifications {
     private readonly opts: PlexNotificationsOptions;
     private ws?: WebSocket;
     private reconnectAttempt = 0;
-    private reconnectTimer?: NodeJS.Timeout;
-    private idleTimer?: NodeJS.Timeout;
+    private reconnectTimer?: ioBroker.Timeout;
+    private idleTimer?: ioBroker.Timeout;
     private framesSeen = 0;
     private stopped = false;
     private onEvent: NotificationHandler = () => {};
@@ -90,13 +96,16 @@ export class PlexNotifications {
     stop(): void {
         this.stopped = true;
         if (this.reconnectTimer) {
-            clearTimeout(this.reconnectTimer);
+            this.opts.clearTimeout(this.reconnectTimer);
             this.reconnectTimer = undefined;
         }
         this.clearIdleTimer();
         if (this.ws) {
             try {
                 this.ws.removeAllListeners();
+                // Closing a socket that is still connecting makes `ws` emit an `error` on the
+                // next tick; without a listener that is an uncaught exception.
+                this.ws.on('error', () => {});
                 this.ws.close();
             } catch {
                 /* ignore */
@@ -236,7 +245,7 @@ export class PlexNotifications {
      */
     private armIdleTimer(): void {
         this.clearIdleTimer();
-        this.idleTimer = setTimeout(() => {
+        this.idleTimer = this.opts.setTimeout(() => {
             this.opts.log.debug(
                 `PlexNotifications: idle timeout (${IDLE_TIMEOUT_MS / 1000}s without frame), forcing reconnect`,
             );
@@ -252,7 +261,7 @@ export class PlexNotifications {
 
     private clearIdleTimer(): void {
         if (this.idleTimer) {
-            clearTimeout(this.idleTimer);
+            this.opts.clearTimeout(this.idleTimer);
             this.idleTimer = undefined;
         }
     }
@@ -264,7 +273,7 @@ export class PlexNotifications {
         const delay = RECONNECT_DELAYS_MS[Math.min(this.reconnectAttempt, RECONNECT_DELAYS_MS.length - 1)];
         this.reconnectAttempt++;
         this.opts.log.debug(`PlexNotifications: reconnecting in ${delay}ms (attempt ${this.reconnectAttempt})`);
-        this.reconnectTimer = setTimeout(() => {
+        this.reconnectTimer = this.opts.setTimeout(() => {
             this.reconnectTimer = undefined;
             this.connect();
         }, delay);

@@ -7,6 +7,10 @@
  * - `Player.controllable` - false for players that cannot be controlled through the Plex server
  * - `_Controls.playback.<button>` - the buttons, only for players that can be controlled
  *
+ * The title of a player may contain dots ("TV 2.0"), and so does the ID of its channel then. Which object is the
+ * channel of a player is told by its mark (`native.isPlayer`) or by its UUID at the end of its ID - not by the dots:
+ * what lies below a channel (`.Player`, `.Metadata`, `._Controls`) has dots too.
+ *
  * The history names a player by its title and - in entries written since the adapter stores it - by its UUID
  * (`playerUuid`). With the UUID the channel of that device is found: the one of this UUID. Without it a player is
  * found by the title in its channel ID. Where the UUID of a channel is known (`native.uuid` of the channel, written
@@ -27,7 +31,7 @@ export type PlayerButton = 'play' | 'pause' | 'stop' | 'skipPrevious' | 'skipNex
 export interface PlayerChannel {
     /** Full ID, `plex.0._playing.<title>-<uuid>` */
     id: string;
-    /** The last part of the ID */
+    /** The ID after `plex.0._playing.`: one part, or several if the title has dots */
     name: string;
     /** The UUID of the player (`native.uuid`) if the ID ends with it; empty if unknown */
     uuid: string;
@@ -47,13 +51,22 @@ export function cleanTitle(title: string): string {
 }
 
 /**
- * The player channel of an ID of the player setting: the channel itself or something below it
+ * The player channel of an ID of the player setting: the channel itself or something below it. An ID with a dot
+ * after `_playing.` does not tell where the channel ends - the title of the player may contain dots, or the ID is one
+ * below the channel: then the player channels of the instance tell it (`hasPlayerDots`). Without them, and for a
+ * player that is not among them, the ID is cut at the first dot.
  *
  * @param id e.g. `plex.0._playing.apple tv-1234` or `plex.0._playing.apple tv-1234.Player.title`
+ * @param channels the player channels of the instance, if they are read
  * @returns the channel, or null if the ID is no player of the Plex adapter
  */
-export function getPlayerChannelId(id: string | undefined): string | null {
-    const match = id?.trim().match(/^(plex\.\d+\._playing\.[^.]+)(\.|$)/);
+export function getPlayerChannelId(id: string | undefined, channels?: PlayerChannel[] | null): string | null {
+    const value = id?.trim() || '';
+    const found = channels?.find(channel => value === channel.id || value.startsWith(`${channel.id}.`));
+    if (found) {
+        return found.id;
+    }
+    const match = value.match(/^(plex\.\d+\._playing\.[^.]+)(\.|$)/);
     if (!match || match[1].endsWith(`.${RECENT_PLAYER}`) || /\._playing\.(players|streams)$/.test(match[1])) {
         return null;
     }
@@ -61,9 +74,22 @@ export function getPlayerChannelId(id: string | undefined): string | null {
 }
 
 /**
+ * Whether an ID of the player setting has a dot after `<namespace>._playing.`, so that only the player channels of
+ * the instance tell which channel it names
+ *
+ * @param id the ID of the player setting
+ * @param namespace `plex.<n>`
+ */
+export function hasPlayerDots(id: string | undefined, namespace: string): boolean {
+    const value = id?.trim() || '';
+    const prefix = `${namespace}._playing.`;
+    return value.startsWith(prefix) && value.slice(prefix.length).includes('.');
+}
+
+/**
  * The title in the name of a player channel, `<title>-<uuid>`
  *
- * @param name the last part of the channel ID
+ * @param name the channel ID after `plex.0._playing.`
  * @param uuid the UUID of the player, in any case
  * @returns the title as the adapter cleaned it, or null if the UUID is unknown or not the end of the name
  */
@@ -80,7 +106,8 @@ function getChannelTitle(name: string, uuid: string | undefined): string | null 
  * @param playerUuid the UUID of the player as the history names it, if it does: then it decides, not the title
  */
 export function isChannelOf(channelId: string, title: string, uuid?: string, playerUuid?: string): boolean {
-    const name = channelId.slice(channelId.lastIndexOf('.') + 1);
+    // all after `plex.0._playing.`: the title may contain dots
+    const name = channelId.replace(/^plex\.\d+\._playing\./, '');
     if (playerUuid) {
         // two devices of the same title differ in their UUID only; a channel of unknown UUID has it in its ID
         return uuid ? uuid.toLowerCase() === playerUuid.toLowerCase() : getChannelTitle(name, playerUuid) !== null;
@@ -101,12 +128,15 @@ export function toPlayerChannels(namespace: string, channels: Record<string, ioB
     const result: PlayerChannel[] = [];
     for (const id of ids) {
         const name = id.slice(prefix.length);
-        if (!id.startsWith(prefix) || !name || name.includes('.') || name === RECENT_PLAYER) {
+        const native = (channels[id]?.native || {}) as Record<string, unknown>;
+        const uuid = typeof native.uuid === 'string' ? native.uuid : '';
+        // a name with dots is a player whose title has dots - if the adapter marked it or its UUID ends the ID -
+        // or something below a player
+        const isPlayer = !name.includes('.') || native.isPlayer === true || getChannelTitle(name, uuid) !== null;
+        if (!id.startsWith(prefix) || !name || !isPlayer || name === RECENT_PLAYER) {
             continue;
         }
-        const native = (channels[id]?.native || {}) as Record<string, unknown>;
         const lastSeen = typeof native.lastSeenAt === 'string' ? Date.parse(native.lastSeenAt) || 0 : 0;
-        const uuid = typeof native.uuid === 'string' ? native.uuid : '';
         result.push({
             id,
             name,

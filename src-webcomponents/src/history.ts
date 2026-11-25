@@ -8,6 +8,7 @@
  * states below `_playing.<player>.Metadata` are emptied by the garbage collector of the adapter, so title and
  * cover are not reliable there (the same as the www page of the adapter does).
  */
+import { PAUSED_EXPIRES_S, PLAYING_EXPIRES_S } from './constants';
 
 /** One entry of `events.history` */
 export interface HistoryEvent {
@@ -115,6 +116,20 @@ export function isPlaybackEvent(event: string): boolean {
 }
 
 /**
+ * When a stream expires, in ms: `PLAYING_EXPIRES_S` after its "play" or "resume", `PAUSED_EXPIRES_S` after its
+ * "pause". Never (`Infinity`) if its event has no valid time - the history counts in seconds.
+ *
+ * @param stream the stream
+ * @param stream.paused whether its last event is a "pause"
+ * @param stream.timestamp the time of its last event, in seconds
+ */
+export function getExpiry(stream: { paused: boolean; timestamp: number }): number {
+    return stream.timestamp > 0
+        ? (stream.timestamp + (stream.paused ? PAUSED_EXPIRES_S : PLAYING_EXPIRES_S)) * 1000
+        : Infinity;
+}
+
+/**
  * The players that play something now or have paused it, newest first. The last event of play, pause, resume or
  * stop of each player counts; "watched" and "rated" come while it plays and change nothing.
  *
@@ -123,9 +138,12 @@ export function isPlaybackEvent(event: string): boolean {
  * is one of its title: a newer event of that title replaces it, with or without a UUID, and it replaces the older
  * ones of that title. So a "play" without and a later "stop" with a UUID leave no stream that plays forever.
  *
+ * A stream whose end never arrived expires (`getExpiry`): it is left out, its event stays in the history.
+ *
  * @param events the history, newest first
+ * @param now the moment to tell for, in ms
  */
-export function getActiveStreams(events: HistoryEvent[]): ActiveStream[] {
+export function getActiveStreams(events: HistoryEvent[], now = Date.now()): ActiveStream[] {
     /** The UUIDs, in lower case, of the events so far */
     const seenUuids = new Set<string>();
     /** The titles of the events so far: of those without a UUID, and of those with one */
@@ -155,7 +173,7 @@ export function getActiveStreams(events: HistoryEvent[]): ActiveStream[] {
             seenTitles.add(player);
         }
         if (!seen && (playing || paused)) {
-            result.push({
+            const stream: ActiveStream = {
                 player,
                 playerUuid,
                 account: entry.account,
@@ -167,7 +185,10 @@ export function getActiveStreams(events: HistoryEvent[]): ActiveStream[] {
                 episode: typeof entry.episode === 'number' ? entry.episode : undefined,
                 paused,
                 timestamp: Number(entry.timestamp) || 0,
-            });
+            };
+            if (now <= getExpiry(stream)) {
+                result.push(stream);
+            }
         }
     }
     return result;

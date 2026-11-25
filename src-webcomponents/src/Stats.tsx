@@ -8,8 +8,8 @@
  *
  * The adapter writes the statistics of Tautulli below `plex.<n>.statistics.users.<user>.<period>` and
  * `plex.<n>.statistics.libraries.<library>.<period>` (`total_time` in seconds, `total_plays`), for the periods
- * `01-last_24h`, `02-last_7d`, `03-last_30d` and `00-all_time`. The users and libraries are found once
- * (`getObjectViewSystem`); the element subscribes the states of the period shown and the names of the users
+ * `01-last_24h`, `02-last_7d`, `03-last_30d` and `00-all_time`. The users and libraries are found with
+ * `getObjectViewSystem` - and looked for again from time to time; the element subscribes the states of the period shown and the names of the users
  * (`users.<user>.friendly_name`) and libraries (`libraries.<library>.title`). The period can be switched in the
  * element; the setting chooses the one it starts with.
  *
@@ -29,6 +29,15 @@ import { STATS_STYLES } from './styles';
 
 /** How many entries per list if the setting has no value */
 const DEFAULT_COUNT = 5;
+
+/**
+ * How long to wait before the users and libraries are looked for again while there are none - the adapter may just
+ * start, Tautulli may answer later, or the read failed: after the first and the second try. Then as seldom as below.
+ */
+const RETRY_SUBJECTS_MS = [5_000, 30_000];
+
+/** How long to wait before the users and libraries are looked for again, to find new ones */
+const RELOAD_SUBJECTS_MS = 300_000;
 
 /** The channel of each period below a user or a library, as the adapter names them */
 const PERIOD_CHANNELS: Record<StatsPeriod, string> = {
@@ -72,9 +81,16 @@ function isPeriod(value: unknown): value is StatsPeriod {
  */
 function toSubjects(namespace: string, channels: Record<string, ioBroker.AnyObject>): Subject[] {
     const subjects: Subject[] = [];
+    const periods = Object.values(PERIOD_CHANNELS);
     for (const id of Object.keys(channels)) {
-        const match = id.slice(namespace.length + 1).match(/^statistics\.(users|libraries)\.([^.]+)$/);
-        if (match) {
+        // a user or library is what has the channel of a period below it: the title of a library - and so its
+        // ID - may contain dots ("3-tv 2.0")
+        const match = id.slice(namespace.length + 1).match(/^statistics\.(users|libraries)\.(.+)\.([^.]+)$/);
+        if (
+            match &&
+            periods.includes(match[3]) &&
+            !subjects.some(subject => subject.kind === match[1] && subject.id === match[2])
+        ) {
             subjects.push({ kind: match[1] as Kind, id: match[2] });
         }
     }
@@ -162,6 +178,12 @@ class PlexStats extends PlexElement<StatsSettings> {
 
     #subjectsSocket: WebComponentSocket | null = null;
 
+    /** When the users and libraries were looked for last, in ms */
+    #subjectsAskedAt = 0;
+
+    /** How often in a row none were found, or the read failed */
+    #subjectsMisses = 0;
+
     /** The period the user picked in the element; null: the one of the settings */
     #picked: StatsPeriod | null = null;
 
@@ -196,26 +218,44 @@ class PlexStats extends PlexElement<StatsSettings> {
             .flatMap(subject => Object.values(getIds(namespace, subject, period)));
     }
 
-    /** Find the users and libraries with statistics: once per instance and socket */
+    /**
+     * Find the users and libraries with statistics: once per instance and socket - and again later, as they may
+     * appear after the element (the adapter starts, a new user) and a read may fail: soon while there are none,
+     * seldom to find new ones. What is known stays until a read gives something else.
+     */
     #loadSubjects(namespace: string): void {
         const socket = this.socket;
-        if (!socket || (namespace === this.#subjectsFor && socket === this.#subjectsSocket)) {
+        if (!socket) {
             return;
+        }
+        if (namespace === this.#subjectsFor && socket === this.#subjectsSocket) {
+            const wait = this.#subjects?.length
+                ? RELOAD_SUBJECTS_MS
+                : (RETRY_SUBJECTS_MS[Math.max(0, this.#subjectsMisses - 1)] ?? RELOAD_SUBJECTS_MS);
+            if (this.#subjectsAskedAt + wait > Date.now()) {
+                // draw again then, even if no state changes in between
+                this.drawAt(this.#subjectsAskedAt + wait);
+                return;
+            }
+        } else {
+            this.#subjects = null;
+            this.#subjectsMisses = 0;
         }
         this.#subjectsFor = namespace;
         this.#subjectsSocket = socket;
-        this.#subjects = null;
+        this.#subjectsAskedAt = Date.now();
         const prefix = `${namespace}.statistics.`;
         socket
             .getObjectViewSystem('channel', prefix, `${prefix}香`)
             .then(channels => toSubjects(namespace, channels))
             .catch((error: unknown) => {
                 console.warn(`<${this.localName}>: cannot read the statistics of ${namespace}: ${String(error)}`);
-                return [];
+                return null;
             })
             .then(subjects => {
                 if (namespace === this.#subjectsFor && socket === this.#subjectsSocket) {
-                    this.#subjects = subjects;
+                    this.#subjectsMisses = subjects?.length ? 0 : this.#subjectsMisses + 1;
+                    this.#subjects = subjects || this.#subjects || [];
                     this.resubscribe();
                 }
             })

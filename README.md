@@ -132,15 +132,23 @@ This adapter would not have been possible without the great work of @Zefau (http
 
 ## Changelog
 
-### **WORK IN PROGRESS**
-- (copilot) Adapter requires node.js >= 22.19.0 now
-- (bluefox) Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
 - (GermanBluefox) Added dashboard tiles for Aura and other dashboards: now playing with controls, recent activity and Tautulli watch statistics
+- (bluefox) Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`
+- (copilot) Adapter requires node.js >= 22.19.0 now
+- (ticaki) Player objects below `_playing` were created without an object type ("obj.type has to exist" warning); existing objects are repaired on start - fixed #618
+- (ticaki) Fixed: playlist states contained `[object Promise]` and the playlist item count was missing
+- (ticaki) Fixed: the `...Date` states (e.g. `addedAtDate`, `lastViewedAtDate`) were one month off
+- (ticaki) Fixed: the playback position follows jumps during playback now, and `viewOffsethuman` keeps running instead of staying at the value of the last Plex event
+- (ticaki) Fixed: possible crash when the adapter was stopped while the connection to the Plex server was still being established
+- (ticaki) Entries of `events.history` now contain the UUID of the player (`playerUuid`)
+- (ticaki) Counting library and playlist items no longer loads the complete listing: far fewer disk writes on the Plex server and no more "Missing X-Plex-Container-Size" warnings in its log
+- (ticaki) Token dialog: the PIN can now be copied when admin is opened via plain http (e.g. Safari), and admin offers to save the configuration right after a new token was retrieved
+- (ticaki) Dependencies have been updated
 
 ### 3.0.0 (2026-08-16)
 - (bluefox) Breaking: Admin 8 or newer is now required — the configuration UI no longer runs under Admin 7.

@@ -138,7 +138,6 @@ This adapter would not have been possible without the great work of @Zefau (http
 -->
 ### **WORK IN PROGRESS**
 - (GermanBluefox) Added dashboard tiles for Aura and other dashboards: now playing with controls, recent activity and Tautulli watch statistics
-- (bluefox) Added the short form of the web component manifests (tag, name, icon, size) to `common.webComponents`, so that hosts like Aura can list the components before the adapter is installed; the build writes it with `iob-web-components sync-io-package`
 - (copilot) Adapter requires node.js >= 22.19.0 now
 - (ticaki) Player objects below `_playing` were created without an object type ("obj.type has to exist" warning); existing objects are repaired on start - fixed #618
 - (ticaki) Fixed: playlist states contained `[object Promise]` and the playlist item count was missing

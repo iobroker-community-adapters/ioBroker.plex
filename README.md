@@ -180,7 +180,7 @@ This adapter would not have been possible without the great work of @Zefau (http
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2023-2026 iobroker-community-adapters  
+Copyright (c) 2023-2026 iobroker-community-adapters <iobroker-community-adapters@gmx.de>  
 Copyright (c) 2019-2020 Zefau <zefau@mailbox.org>  
 
 

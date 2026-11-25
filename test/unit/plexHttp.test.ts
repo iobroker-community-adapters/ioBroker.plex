@@ -716,15 +716,83 @@ describe('PlexHttp', () => {
             }
         });
 
-        // Finding (not fixed, see report): XML character references in attribute values are not
-        // decoded, so such a device name reaches the adapter as "Rock &amp; Roll TV".
-        it.skip('decodes XML entities in attribute values', async () => {
-            const body = '<MediaContainer><Device name="Rock &amp; Roll TV" clientIdentifier="X-1"/></MediaContainer>';
+        async function nameFromXml(encoded: string): Promise<string | undefined> {
+            const body = `<MediaContainer><Device name="${encoded}" clientIdentifier="X-1"/></MediaContainer>`;
+            stub.install(() => ({ body, headers: XML }));
+            const devices = await plex().fetchPlexTvDevices('ACCOUNT-TOKEN');
+            expect(devices).to.have.length(1);
+            return devices[0].name;
+        }
+
+        // Regression: character references were not decoded, so such a device name reached the
+        // adapter (and the id of the player channel) as "Rock &amp; Roll TV".
+        it('decodes XML entities in attribute values', async () => {
+            expect(await nameFromXml('Rock &amp; Roll TV')).to.equal('Rock & Roll TV');
+        });
+
+        it('decodes all five predefined XML entities', async () => {
+            expect(await nameFromXml('&lt;Tim&apos;s &quot;big&quot; TV&gt; &amp; more')).to.equal(
+                '<Tim\'s "big" TV> & more',
+            );
+        });
+
+        it('decodes decimal and hexadecimal character references', async () => {
+            expect(await nameFromXml('Tim&#39;s TV')).to.equal("Tim's TV");
+            expect(await nameFromXml('Tim&#x27;s TV')).to.equal("Tim's TV");
+            expect(await nameFromXml('K&#252;che &#xFC;ber &#XFC;')).to.equal('Küche über &#XFC;');
+            expect(await nameFromXml('TV &#x1F4FA;')).to.equal('TV \u{1F4FA}');
+        });
+
+        it('decodes every reference exactly once', async () => {
+            expect(await nameFromXml('&amp;lt;')).to.equal('&lt;');
+            expect(await nameFromXml('&amp;amp;')).to.equal('&amp;');
+            expect(await nameFromXml('&amp;#39;')).to.equal('&#39;');
+            expect(await nameFromXml('&#38;lt;')).to.equal('&lt;');
+            expect(await nameFromXml('&#x26;amp;')).to.equal('&amp;');
+            expect(await nameFromXml('a &amp;&amp; b &amp;lt; c')).to.equal('a && b &lt; c');
+        });
+
+        it('leaves unknown, incomplete and invalid references as they are', async () => {
+            for (const raw of [
+                'Tom &nbsp; Jerry',
+                'AT&T',
+                'a &amp b',
+                '&#;',
+                '&#x;',
+                '&#0;',
+                '&#x110000;',
+                '&#12a;',
+                '&;',
+            ]) {
+                expect(await nameFromXml(raw), raw).to.equal(raw);
+            }
+        });
+
+        it('leaves values without references unchanged', async () => {
+            expect(await nameFromXml('Wohnzimmer TV (2. Generation)')).to.equal('Wohnzimmer TV (2. Generation)');
+            expect(await nameFromXml('')).to.equal('');
+        });
+
+        it('decodes entities in connection attributes as well', async () => {
+            const body =
+                '<MediaContainer><Device name="A" clientIdentifier="A-1">' +
+                '<Connection uri="http://10.0.0.5:32500/?a=1&amp;b=2" address="10.0.0.5" port="32500"/>' +
+                '</Device></MediaContainer>';
             stub.install(() => ({ body, headers: XML }));
 
             const [device] = await plex().fetchPlexTvDevices('ACCOUNT-TOKEN');
 
-            expect(device.name).to.equal('Rock & Roll TV');
+            expect(device.connections[0].uri).to.equal('http://10.0.0.5:32500/?a=1&b=2');
+            expect(device.connections[0].port).to.equal(32_500);
+        });
+
+        it('does not decode entities in a JSON answer', async () => {
+            const body = { MediaContainer: { Device: [{ name: 'Rock &amp; Roll TV', clientIdentifier: 'X-1' }] } };
+            stub.install(() => ({ body, headers: JSON_TYPE }));
+
+            const [device] = await plex().fetchPlexTvDevices('ACCOUNT-TOKEN');
+
+            expect(device.name).to.equal('Rock &amp; Roll TV');
         });
 
         it('reads devices and connections from a JSON answer', async () => {

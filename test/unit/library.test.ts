@@ -204,6 +204,25 @@ describe('Library', () => {
             expect(library.clean(null as unknown as string)).to.equal(null);
         });
 
+        // Regression: a truthy value that is not a string used to end in
+        // "TypeError: string.replace is not a function".
+        it('turns other truthy values into text instead of throwing', async () => {
+            const { library } = await createLibrary();
+
+            expect(library.clean(5 as unknown as string)).to.equal('5');
+            expect(library.clean(2.5 as unknown as string, true)).to.equal('2.5');
+            expect(library.clean(true as unknown as string)).to.equal('true');
+            expect(library.clean(['Tim*s', 'TV'] as unknown as string, true)).to.equal('tim#s#tv');
+            expect(library.clean({ a: 1 } as unknown as string)).to.be.a('string');
+        });
+
+        it('returns falsy values that are not strings unchanged', async () => {
+            const { library } = await createLibrary();
+
+            expect(library.clean(0 as unknown as string)).to.equal(0);
+            expect(library.clean(false as unknown as string, true)).to.equal(false);
+        });
+
         it('warns when the removed third/fourth parameter is still passed', async () => {
             const { adapter, library } = await createLibrary();
 
@@ -815,10 +834,11 @@ describe('Library', () => {
             expect(calls).to.deep.equal([]);
         });
 
-        // Finding (not fixed, see report): subscribeNode() only replaces or removes an entry that
-        // already exists, and nothing ever creates one. The subscription made in main.ts
-        // ("metadata.viewoffset") therefore never fires. The behaviour is identical in the last
-        // JavaScript version of the library (long-standing no-op).
+        // Skipped on purpose: subscribeNode() only replaces or removes an entry that already exists,
+        // and nothing ever creates one, so the subscription made in main.ts ("metadata.viewoffset")
+        // never fires. That is identical in the last JavaScript version - a long-standing no-op,
+        // which CLAUDE.md asks not to "fix" without a strong reason. The test documents what a
+        // working subscription would look like.
         it.skip('subscribeNode registers a callback for a node that had none', async () => {
             const { library } = await createLibrary();
             const calls: any[][] = [];
@@ -938,10 +958,10 @@ describe('Library', () => {
             expect(adapter.valuesFor('_playing.tv.Metadata.title')).to.deep.equal(['', 'Alien']);
         });
 
-        // Finding (not fixed, see report): since the JS -> TS migration a value that is delivered
-        // again unchanged no longer refreshes the "last update" time of the state, so the garbage
-        // collector treats it as stale and empties it although it was just confirmed.
-        it.skip('does not empty a state whose unchanged value was delivered again within the offset', async () => {
+        // Regression: after the JS -> TS migration a value that was delivered again unchanged no
+        // longer refreshed the "last update" time of the state, so the garbage collector treated
+        // it as stale and emptied it although it had just been confirmed.
+        it('does not empty a state whose unchanged value was delivered again within the offset', async () => {
             const { adapter, library, clock } = await setupWithStates();
             clock.tick(60_000);
             // The next "media.play" delivers the same title again ...
@@ -953,6 +973,50 @@ describe('Library', () => {
             await flush();
 
             expect(adapter.writtenIds()).to.not.include('_playing.tv.Metadata.title');
+            expect(adapter.writtenIds(), 'states that were not delivered again are still emptied').to.include(
+                '_playing.tv.Metadata.year',
+            );
+        });
+
+        it('confirming an unchanged value refreshes only the cached time, without any write to the database', async () => {
+            const { adapter, library, clock } = await setupWithStates();
+            const node = { node: '_playing.tv.Metadata.title', description: 'x' };
+            expect(library.getDeviceState(node.node, 'ts')).to.equal(T0);
+
+            clock.tick(60_000);
+            await library.set(node, 'Alien');
+            await library.readData(node.node, 'Alien', '_playing.tv');
+            await flush();
+
+            expect(library.getDeviceState(node.node, 'ts'), 'cached time of the last update').to.equal(T0 + 60_000);
+            expect(library.getDeviceState(node.node), 'cached value').to.equal('Alien');
+            expect(adapter.stateCalls, 'no setState').to.deep.equal([]);
+            expect(adapter.objectCalls, 'no extendObject').to.deep.equal([]);
+            expect(adapter.extendAsyncCalls, 'no extendObjectAsync').to.deep.equal([]);
+        });
+
+        it('a confirmed value does not notify internal subscribers again', async () => {
+            const { library, clock } = await setupWithStates();
+            const calls: any[][] = [];
+            library._SUBCSCRIPT_PLAYING['metadata.title'] = (...args) => calls.push(args);
+
+            clock.tick(60_000);
+            await library.set({ node: '_playing.tv.Metadata.title', description: 'x' }, 'Alien');
+
+            expect(calls).to.deep.equal([]);
+        });
+
+        it('empties a confirmed state again once the confirmation itself is older than the offset', async () => {
+            const { adapter, library, clock } = await setupWithStates();
+            clock.tick(60_000);
+            await library.set({ node: '_playing.tv.Metadata.title', description: 'x' }, 'Alien');
+            adapter.resetRecords();
+            clock.tick(60_000);
+
+            await library.runGarbageCollector('_playing.tv', false, 30_000);
+            await flush();
+
+            expect(adapter.lastValue('_playing.tv.Metadata.title')).to.equal('');
         });
     });
 
@@ -1117,9 +1181,10 @@ describe('Library', () => {
             expect(await extended(library, adapter, 'plex.0.events.Account')).to.deep.equal(['plex.0.events.Account']);
         });
 
-        // Finding (not fixed, see report): the fallback from "events.*" to the "playing.*" node
-        // definitions never matches, because the first pass consumes the path segments. Without
-        // user-visible effect as long as extendState does not change type/role (see above).
+        // Skipped on purpose: the fallback from "events.*" to the "playing.*" node definitions never
+        // matches, because the first pass consumes the path segments. A long-standing no-op without
+        // user-visible effect as long as extendState does not change type/role (see above), which
+        // CLAUDE.md asks not to "fix" without a strong reason.
         it.skip('falls back to the "playing" definition for an event state without own definition', async () => {
             const { adapter, library } = await createLibrary();
 
@@ -1295,16 +1360,54 @@ describe('Library', () => {
             expect(adapter.lastValue('lists.items.100')).to.equal('item 100');
         });
 
-        // Finding (not fixed, see report): the index is cut to its last three digits, so entry 1000
-        // is written into the states of entry 0 (and so on).
-        it.skip('keeps list entries from index 1000 on apart from the first ones', async () => {
+        // Regression: the index was cut to its last three digits, so entry 1000 was written into
+        // the states of entry 0 (and so on).
+        it('keeps list entries from index 1000 on apart from the first ones', async () => {
             const { adapter, library } = await createLibrary({}, { getMetadataTrees: true });
-            const list = Array.from({ length: 1001 }, (_, i) => `item ${i}`);
+            const list = Array.from({ length: 1002 }, (_, i) => `item ${i}`);
 
             await library.readData('lists.items', list, 'lists');
 
             expect(adapter.valuesFor('lists.items.000')).to.deep.equal(['item 0']);
+            expect(adapter.valuesFor('lists.items.001')).to.deep.equal(['item 1']);
+            expect(adapter.lastValue('lists.items.999')).to.equal('item 999');
             expect(adapter.lastValue('lists.items.1000')).to.equal('item 1000');
+            expect(adapter.lastValue('lists.items.1001')).to.equal('item 1001');
+        });
+
+        it('gives every entry of a long list its own state', async () => {
+            const { adapter, library } = await createLibrary({}, { getMetadataTrees: true });
+            const list = Array.from({ length: 1200 }, (_, i) => `item ${i}`);
+
+            await library.readData('lists.items', list, 'lists');
+
+            const ids = adapter.writtenIds().filter(id => id.startsWith('lists.items.'));
+            expect(ids).to.have.length(1200);
+            expect(adapter.stateCalls.filter(c => c.id.startsWith('lists.items.'))).to.have.length(1200);
+        });
+
+        it('keeps the ids of the first 1000 entries exactly three digits long', async () => {
+            const { adapter, library } = await createLibrary({}, { getMetadataTrees: true });
+            const list = Array.from({ length: 1000 }, (_, i) => `item ${i}`);
+
+            await library.readData('lists.items', list, 'lists');
+
+            const ids = adapter.writtenIds().filter(id => id.startsWith('lists.items.'));
+            const expected = Array.from({ length: 1000 }, (_, i) => `lists.items.${`00${i}`.slice(-3)}`);
+            expect(ids).to.deep.equal(expected);
+        });
+
+        it('pads numeric object keys the same way and leaves other keys alone', async () => {
+            const { adapter, library } = await createLibrary();
+            const data = { 7: 'seven', 42: 'forty-two', 2024: 'year', title: 'text', '1080p': 'resolution' };
+
+            await library.readData('stats.values', data, 'stats');
+
+            expect(adapter.lastValue('stats.values.007')).to.equal('seven');
+            expect(adapter.lastValue('stats.values.042')).to.equal('forty-two');
+            expect(adapter.lastValue('stats.values.2024')).to.equal('year');
+            expect(adapter.lastValue('stats.values.title')).to.equal('text');
+            expect(adapter.lastValue('stats.values.1080p')).to.equal('resolution');
         });
 
         it('uses the "playing" definition for an event key without own definition', async () => {
@@ -1328,6 +1431,110 @@ describe('Library', () => {
             await library.readData(`${PREFIX}.Metadata.title`, 'Alien', PREFIX, { force: true });
 
             expect(adapter.valuesFor(`${PREFIX}.Metadata.title`)).to.deep.equal(['Alien', 'Alien']);
+        });
+    });
+
+    describe('readData for players whose title contains dots', () => {
+        // The channel id is `_playing.<title>-<uuid>`; a dot in the title adds id levels (#618).
+        const DOTTED = [
+            '_playing.magentatv one (2. generation)-uuid1',
+            '_playing.192.168.178.50-uuid1',
+            '_playing.tv-a.123.b',
+        ];
+
+        for (const prefix of DOTTED) {
+            it(`uses the node definition for a state below "${prefix}"`, async () => {
+                const { adapter, library } = await createLibrary();
+
+                await library.readData(`${prefix}.Metadata.title`, 'Alien', prefix);
+                await library.readData(`${prefix}.Metadata.year`, '1979', prefix);
+
+                expect(adapter.objectsFor(`${prefix}.Metadata.title`)[0].common).to.include({
+                    name: 'Title',
+                    role: 'media.title',
+                    type: 'string',
+                });
+                expect(adapter.lastValue(`${prefix}.Metadata.title`)).to.equal('Alien');
+                expect(adapter.lastValue(`${prefix}.Metadata.year`)).to.equal(1979);
+            });
+
+            it(`expands objects and lists below "${prefix}" like for any other player`, async () => {
+                const { adapter, library } = await createLibrary({}, { getMetadataTrees: true });
+
+                await library.readData(
+                    `${prefix}.Metadata`,
+                    { title: 'Alien', Genre: [{ tag: 'Horror' }, { tag: 'Sci-Fi' }] },
+                    prefix,
+                );
+
+                expect(adapter.objectsFor(`${prefix}.Metadata`)[0].common.name).to.equal('Metadata');
+                expect(adapter.objectsFor(`${prefix}.Metadata.title`)[0].common.role).to.equal('media.title');
+                expect(adapter.objectsFor(`${prefix}.Metadata.Genre.001`)[0].common.name).to.equal('Index 001');
+                expect(adapter.lastValue(`${prefix}.Metadata.Genre.001.tag`)).to.equal('Sci-Fi');
+            });
+        }
+
+        it('creates the same definitions as for a player without dots', async () => {
+            const plain = await createLibrary();
+            const dotted = await createLibrary();
+            const data = { Metadata: { title: 'Alien', year: 1979, unknownKey: 'x' }, Player: { local: true } };
+
+            for (const key of Object.keys(data) as Array<keyof typeof data>) {
+                await plain.library.readData(`_playing.tv-uuid1.${key}`, data[key], '_playing.tv-uuid1');
+                await dotted.library.readData(
+                    `_playing.192.168.178.50-uuid1.${key}`,
+                    data[key],
+                    '_playing.192.168.178.50-uuid1',
+                );
+            }
+
+            const relative = (adapter: FakeAdapter, prefix: string): unknown[] =>
+                adapter.objectCalls.map(c => ({ id: c.id.slice(prefix.length), obj: c.obj }));
+            expect(relative(dotted.adapter, '_playing.192.168.178.50-uuid1')).to.deep.equal(
+                relative(plain.adapter, '_playing.tv-uuid1'),
+            );
+        });
+
+        it('applies conversions of the real node definitions below a dotted player', async () => {
+            const prefix = '_playing.192.168.178.50-uuid1';
+            const nodes = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', '_NODES.json'), 'utf8'));
+            const { adapter, library } = await createLibrary({ nodes });
+
+            await library.readData(`${prefix}.Metadata.viewOffset`, 3_723_000, prefix);
+            await library.readData(`${prefix}.Metadata.duration`, 7_020_000, prefix);
+
+            expect(adapter.lastValue(`${prefix}.Metadata.viewOffsethuman`)).to.equal('1:02');
+            expect(adapter.lastValue(`${prefix}.Metadata.viewOffsetSeconds`)).to.equal(3723);
+            expect(adapter.lastValue(`${prefix}.Metadata.duration`)).to.equal(117);
+        });
+
+        it('the garbage collector and the state cache work on the whole dotted prefix', async () => {
+            const clock = sinon.useFakeTimers({ now: 1_700_000_000_000, toFake: ['Date'] });
+            const prefix = '_playing.magentatv one (2. generation)-uuid1';
+            const { adapter, library } = await createLibrary();
+            await library.readData(`${prefix}.Metadata.title`, 'Alien', prefix);
+            await library.readData(
+                '_playing.magentatv one (2.Metadata.title',
+                'other player',
+                '_playing.magentatv one (2',
+            );
+            adapter.dbStates = {
+                [`plex.0.${prefix}.Metadata.title`]: { val: 'Alien' },
+                'plex.0._playing.magentatv one (2.Metadata.title': { val: 'other player' },
+            };
+            adapter.dbObjects[`${prefix}.Metadata.title`] = { common: { type: 'string' } };
+            adapter.resetRecords();
+            clock.tick(60_000);
+
+            await library.runGarbageCollector(prefix, false, 30_000);
+            await flush();
+
+            expect(adapter.stateCalls.map(c => c.id)).to.deep.equal([`${prefix}.Metadata.title`]);
+            expect(library.getDeviceStateJson(`${prefix}.Metadata`)).to.deep.equal({ title: false });
+
+            library.clearStateCache(prefix);
+            expect(library.getDeviceState(`${prefix}.Metadata.title`)).to.equal(null);
+            expect(library.getDeviceState('_playing.magentatv one (2.Metadata.title')).to.equal('other player');
         });
     });
 

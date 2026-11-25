@@ -4,7 +4,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 import { Library } from '../../src/lib/library';
-import { Controller, type Player } from '../../src/lib/players';
+import { Controller, parsePlayerChannelId, type Player } from '../../src/lib/players';
 import type { PlexHttp, PlexQueryOptions } from '../../src/lib/plexHttp';
 import { asAdapter, FakeAdapter, flush } from './helpers/fakeAdapter';
 
@@ -172,6 +172,237 @@ describe('Controller', () => {
     });
 });
 
+describe('parsePlayerChannelId', () => {
+    const ROOT = 'plex.0._playing.';
+    const marker = (uuid: string): Record<string, unknown> => ({
+        isPlayer: true,
+        uuid,
+        lastSeenAt: '2026-01-01T00:00:00.000Z',
+    });
+
+    it('splits the id of a player channel into title and uuid', () => {
+        expect(parsePlayerChannelId(`${ROOT}wohnzimmer tv-abc-123`, ROOT, marker('abc-123'))).to.deep.equal({
+            title: 'wohnzimmer tv',
+            uuid: 'abc-123',
+        });
+    });
+
+    // #618: "MagentaTV One (2. Generation)" - the dot in the title adds a level to the object id.
+    it('accepts a title with dots, although the id then has more than one level', () => {
+        const id = `${ROOT}magentatv one (2. generation)-0123456789abcdef`;
+
+        expect(parsePlayerChannelId(id, ROOT, marker('0123456789abcdef'))).to.deep.equal({
+            title: 'magentatv one (2. generation)',
+            uuid: '0123456789abcdef',
+        });
+    });
+
+    it('accepts dots and dashes in the uuid and dashes in the title', () => {
+        expect(parsePlayerChannelId(`${ROOT}tv-a-b-c.d-e.f`, ROOT, marker('c.d-e.f'))).to.deep.equal({
+            title: 'tv-a-b',
+            uuid: 'c.d-e.f',
+        });
+        expect(parsePlayerChannelId(`${ROOT}192.168.178.50-uuid1`, ROOT, marker('uuid1'))).to.deep.equal({
+            title: '192.168.178.50',
+            uuid: 'uuid1',
+        });
+    });
+
+    it('works with ids relative to the adapter namespace as well', () => {
+        expect(parsePlayerChannelId('_playing.tv-uuid1', '_playing.', marker('uuid1'))).to.deep.equal({
+            title: 'tv',
+            uuid: 'uuid1',
+        });
+    });
+
+    it('does not depend on the object type (typeless objects of #618 are recognized too)', () => {
+        const typeless = { native: marker('uuid1') };
+
+        expect(parsePlayerChannelId(`${ROOT}tv-uuid1`, ROOT, typeless.native)).to.deep.equal({
+            title: 'tv',
+            uuid: 'uuid1',
+        });
+    });
+
+    it('rejects objects without the player marker or without uuid', () => {
+        const id = `${ROOT}tv-uuid1`;
+
+        expect(parsePlayerChannelId(id, ROOT, undefined)).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, null)).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, {})).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, { uuid: 'uuid1' })).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, { isPlayer: 'true', uuid: 'uuid1' })).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, { isPlayer: true })).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, { isPlayer: true, uuid: '' })).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, { isPlayer: true, uuid: 5 })).to.equal(undefined);
+        expect(parsePlayerChannelId(id, ROOT, 'isPlayer')).to.equal(undefined);
+    });
+
+    it('rejects ids that do not end with "-<uuid>" of the marker', () => {
+        expect(parsePlayerChannelId(`${ROOT}tv-uuid1.Metadata`, ROOT, marker('uuid1'))).to.equal(undefined);
+        expect(parsePlayerChannelId(`${ROOT}tv-uuid2`, ROOT, marker('uuid1'))).to.equal(undefined);
+        expect(parsePlayerChannelId(`${ROOT}tvuuid1`, ROOT, marker('uuid1'))).to.equal(undefined);
+        expect(parsePlayerChannelId(`${ROOT}-uuid1`, ROOT, marker('uuid1')), 'empty title').to.equal(undefined);
+    });
+
+    it('rejects ids outside the player root', () => {
+        expect(parsePlayerChannelId('plex.0.events.tv-uuid1', ROOT, marker('uuid1'))).to.equal(undefined);
+        expect(parsePlayerChannelId('plex.1._playing.tv-uuid1', ROOT, marker('uuid1'))).to.equal(undefined);
+        expect(parsePlayerChannelId('plex.0._playing', ROOT, marker('uuid1'))).to.equal(undefined);
+        expect(parsePlayerChannelId(undefined as unknown as string, ROOT, marker('uuid1'))).to.equal(undefined);
+    });
+
+    describe('applied to an object tree', () => {
+        // What the adapter finds in its object tree: two players (one of them with dots in the
+        // title), their children, the "_recent" channel and a player object that lost its type.
+        const DOTTED = `${ROOT}magentatv one (2. generation)-uuid2`;
+        const tree: Record<
+            string,
+            { type?: string; common?: Record<string, unknown>; native?: Record<string, unknown> }
+        > = {
+            'plex.0._playing': { type: 'channel', native: {} },
+            [`${ROOT}players`]: { type: 'state', native: {} },
+            [`${ROOT}_recent-player`]: { type: 'channel', native: {} },
+            [`${ROOT}_recent-player.Metadata`]: { type: 'channel', native: {} },
+            [`${ROOT}wohnzimmer tv-uuid1`]: {
+                type: 'channel',
+                common: { name: 'Player Wohnzimmer TV' },
+                native: marker('uuid1'),
+            },
+            [`${ROOT}wohnzimmer tv-uuid1.Player`]: { type: 'channel', native: {} },
+            [`${ROOT}wohnzimmer tv-uuid1.Player.title`]: { type: 'state', native: {} },
+            [DOTTED]: {
+                type: 'channel',
+                common: { name: 'Player MagentaTV One (2. Generation)' },
+                native: marker('uuid2'),
+            },
+            [`${DOTTED}.Player`]: { type: 'channel', native: {} },
+            [`${DOTTED}.Metadata.title`]: { type: 'state', native: {} },
+            [`${DOTTED}._Controls.playback.play`]: { type: 'state', native: {} },
+            [`${ROOT}kueche (1. og)-uuid3`]: { native: marker('uuid3') },
+            'plex.0.events.tv-uuid1': { type: 'channel', native: marker('uuid1') },
+        };
+
+        /** Player channels as the admin cleanup list selects them: typed channels with marker. */
+        const listed = (): string[] =>
+            Object.keys(tree).filter(
+                id => tree[id].type === 'channel' && !!parsePlayerChannelId(id, ROOT, tree[id].native),
+            );
+
+        it('finds exactly the player channels, including the one with dots in the title', () => {
+            expect(listed()).to.deep.equal([`${ROOT}wohnzimmer tv-uuid1`, DOTTED]);
+        });
+
+        it('finds the typeless player object that needs a repair, with the title for its name', () => {
+            const typeless = Object.keys(tree).filter(
+                id => !tree[id].type && !!parsePlayerChannelId(id, ROOT, tree[id].native),
+            );
+
+            expect(typeless).to.deep.equal([`${ROOT}kueche (1. og)-uuid3`]);
+            expect(parsePlayerChannelId(typeless[0], ROOT, tree[typeless[0]].native)?.title).to.equal('kueche (1. og)');
+        });
+
+        it('accepts none of the children of a player for deletion', () => {
+            const children = Object.keys(tree).filter(
+                id => id.startsWith(`${DOTTED}.`) || id.startsWith(`${ROOT}wohnzimmer tv-uuid1.`),
+            );
+
+            expect(children).to.have.length(5);
+            expect(children.filter(id => !!parsePlayerChannelId(id, ROOT, tree[id].native))).to.deep.equal([]);
+        });
+
+        it('would have missed the dotted player with the former "no dot after _playing." rule', () => {
+            const formerRule = listed().filter(id => !id.slice(ROOT.length).includes('.'));
+
+            expect(formerRule).to.deep.equal([`${ROOT}wohnzimmer tv-uuid1`]);
+        });
+    });
+});
+
+describe('Player with dots in the title (#618)', () => {
+    const DOTTED = { title: 'MagentaTV One (2. Generation)', uuid: 'uuid-618' };
+    const DOTTED_PREFIX = '_playing.magentatv one (2. generation)-uuid-618';
+
+    async function dottedPlayer(s: Setup): Promise<Player> {
+        const player = s.controller.createPlayerIfNotExist({ config: { ...DOTTED } });
+        player.setClientData({
+            title: DOTTED.title,
+            machineIdentifier: DOTTED.uuid,
+            protocolCapabilities: 'timeline,playback,navigation',
+            _sources: ['/clients'],
+            _provides: 'player',
+        });
+        await flush();
+        return player;
+    }
+
+    it('keeps the id as it has always been created (the dot stays in the id)', async () => {
+        const s = await setup();
+
+        expect(s.controller.createPlayerIfNotExist({ config: { ...DOTTED } }).prefix).to.equal(DOTTED_PREFIX);
+    });
+
+    it('is found again by the prefix of one of its control states', async () => {
+        const s = await setup();
+        const player = await dottedPlayer(s);
+
+        // The way the adapter derives the player from a changed control state: drop the last
+        // three id parts (`_Controls.<mode>.<action>`) and look the rest up.
+        const parts = `${DOTTED_PREFIX}._Controls.playback.play`.split('.');
+        const prefix = parts.slice(0, -3).join('.');
+
+        expect(s.controller.existPlayer(prefix)).to.equal(player);
+        expect(parsePlayerChannelId(prefix, '_playing.', { isPlayer: true, uuid: DOTTED.uuid })?.title).to.equal(
+            'magentatv one (2. generation)',
+        );
+    });
+
+    it('gets its player states and controls with the regular definitions', async () => {
+        const s = await setup();
+
+        await dottedPlayer(s);
+
+        expect(s.adapter.objectsFor(DOTTED_PREFIX)[0].type).to.equal('channel');
+        expect(s.adapter.lastValue(`${DOTTED_PREFIX}.Player.title`)).to.equal(DOTTED.title);
+        expect(s.adapter.objectsFor(`${DOTTED_PREFIX}.Player.title`)[0].common.role).to.equal(
+            NODES['playing.player.title'].role,
+        );
+        expect(s.adapter.objectsFor(`${DOTTED_PREFIX}._Controls.playback.play`)[0].common).to.include({
+            role: 'button.play',
+            type: 'boolean',
+        });
+        expect(s.adapter.subscriptions).to.include(`${DOTTED_PREFIX}._Controls.playback.*`);
+    });
+
+    it('accepts commands and acknowledges the control state', async () => {
+        const s = await setup();
+        const player = await dottedPlayer(s);
+        s.adapter.resetRecords();
+
+        await player.action({ id: `${DOTTED_PREFIX}._Controls`, mode: 'playback', action: 'setVolume', val: 40 });
+        await flush();
+
+        expect(s.queries.map(q => new URL(q.path, 'http://pms').pathname)).to.deep.equal([
+            '/player/playback/setParameters',
+        ]);
+        expect(s.queries[0].opts?.headers).to.include({ 'X-Plex-Target-Client-Identifier': DOTTED.uuid });
+        expect(s.adapter.lastValue(`${DOTTED_PREFIX}._Controls.playback.setVolume`)).to.equal(40);
+    });
+
+    it('restores address and controllability from the cached states of the dotted prefix', async () => {
+        const s = await setup();
+        s.library.setDeviceState(`${DOTTED_PREFIX}.Player.localAddress`, '10.0.0.9');
+        s.library.setDeviceState(`${DOTTED_PREFIX}.Player.port`, 32_500);
+        s.library.setDeviceState(`${DOTTED_PREFIX}.Player.controllable`, true);
+
+        const player = s.controller.createPlayerIfNotExist({ config: { ...DOTTED } });
+
+        expect(player.address).to.equal('10.0.0.9');
+        expect(player.port).to.equal(32_500);
+        expect(player.config.controllable).to.equal(true);
+    });
+});
+
 describe('Player', () => {
     describe('identity', () => {
         it('addresses its commands to the player and identifies the adapter as controller', async () => {
@@ -273,6 +504,65 @@ describe('Player', () => {
             player.setClientData({ name: 'Renamed TV', remotePublicAddress: '203.0.113.2' });
 
             expect(player.config.title).to.equal('Renamed TV');
+            expect(player.config.publicAddress).to.equal('203.0.113.2');
+        });
+
+        // cleanUpConfig() computes "remotePublicAddress || publicAddress || previous value", but the
+        // payload is merged into the config afterwards. A `publicAddress` in the payload - also a
+        // present but undefined one, as in a promoted plex.tv device without address - used to
+        // overwrite the result again.
+        it('prefers the remote public address over a public address in the same payload', async () => {
+            const s = await setup();
+            const player = s.controller.createPlayerIfNotExist({ config: { ...TV } });
+
+            player.setClientData({ publicAddress: '203.0.113.1', remotePublicAddress: '203.0.113.2' });
+            await flush();
+
+            expect(player.config.publicAddress).to.equal('203.0.113.2');
+            expect(s.adapter.lastValue(`${TV_PREFIX}.Player.publicAddress`)).to.equal('203.0.113.2');
+        });
+
+        it('keeps the remote public address when the payload carries an undefined public address', async () => {
+            const s = await setup();
+            const player = s.controller.createPlayerIfNotExist({ config: { ...TV } });
+
+            player.setClientData({ publicAddress: undefined, remotePublicAddress: '203.0.113.2' });
+            await flush();
+
+            expect(player.config.publicAddress).to.equal('203.0.113.2');
+            expect(s.adapter.lastValue(`${TV_PREFIX}.Player.publicAddress`)).to.equal('203.0.113.2');
+        });
+
+        it('uses the public address of the payload when there is no remote one', async () => {
+            const s = await setup();
+            const player = s.controller.createPlayerIfNotExist({ config: { ...TV } });
+
+            player.setClientData({ publicAddress: '203.0.113.1' });
+
+            expect(player.config.publicAddress).to.equal('203.0.113.1');
+        });
+
+        it('keeps the known public address when a later payload has none', async () => {
+            const s = await setup();
+            const player = s.controller.createPlayerIfNotExist({ config: { ...TV } });
+
+            player.setClientData({ remotePublicAddress: '203.0.113.2' });
+            player.setClientData({ state: 'playing' });
+
+            expect(player.config.publicAddress).to.equal('203.0.113.2');
+        });
+
+        it('does not add a public address to a payload that has only a remote one', async () => {
+            const s = await setup();
+            const player = s.controller.createPlayerIfNotExist({ config: { ...TV } });
+            const sessionPlayer: Record<string, unknown> = {
+                machineIdentifier: 'abc-123',
+                remotePublicAddress: '203.0.113.2',
+            };
+
+            player.cleanUpConfig(sessionPlayer);
+
+            expect(sessionPlayer).to.not.have.property('publicAddress');
             expect(player.config.publicAddress).to.equal('203.0.113.2');
         });
 

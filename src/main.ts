@@ -16,7 +16,7 @@ import { PlexHttp } from './lib/plexHttp';
 import { PlexNotifications } from './lib/plexNotifications';
 import { PlexPinAuth } from './lib/plexPinAuth';
 import { Library } from './lib/library';
-import { Controller } from './lib/players';
+import { Controller, parsePlayerChannelId } from './lib/players';
 
 // tautulli-api ships no types — declare a minimal interface for the surface we use.
 interface TautulliLike {
@@ -701,22 +701,22 @@ class Plex extends utils.Adapter {
                 if (!id.startsWith(prefix)) {
                     continue;
                 }
-                // Player roots are exactly two segments below `_playing.`. Skip nested children.
                 const rest = id.slice(prefix.length);
-                if (rest.includes('.')) {
-                    continue;
-                }
                 const obj = objs[id];
                 if (!obj || obj.type !== 'channel') {
                     continue;
                 }
                 const native = ((obj as any).native || {}) as Record<string, unknown>;
-                if (native.isPlayer !== true || typeof native.uuid !== 'string' || !native.uuid) {
+                // The title part of the id may contain dots ("magentatv one (2. generation)"), so a
+                // player root is not necessarily a direct child of `_playing.`: it is recognized by
+                // its marker and its `-<uuid>` ending. Nested children carry no marker.
+                const player = parsePlayerChannelId(id, prefix, native);
+                if (!player) {
                     continue;
                 }
                 players.push({
                     id,
-                    uuid: native.uuid,
+                    uuid: player.uuid,
                     title: (typeof obj.common?.name === 'string' ? obj.common.name : rest) || rest,
                     product: typeof native.product === 'string' ? native.product : undefined,
                     platform: typeof native.platform === 'string' ? native.platform : undefined,
@@ -749,12 +749,21 @@ class Plex extends utils.Adapter {
         let deleted = 0;
         const errors: string[] = [];
         for (const id of ids) {
-            if (typeof id !== 'string' || !id.startsWith(prefix) || id.slice(prefix.length).includes('.')) {
+            if (typeof id !== 'string' || !id.startsWith(prefix)) {
                 errors.push(`reject: ${id}`);
                 continue;
             }
             try {
                 const relId = id.slice(`${this.name}.${this.instance}.`.length);
+                if (id.slice(prefix.length).includes('.')) {
+                    // A dot does not have to mean "nested child": the title part of a player id may
+                    // contain dots. Such an id is only accepted if the object is a player channel.
+                    const obj = await this.getObjectAsync(relId);
+                    if (!parsePlayerChannelId(id, prefix, obj?.native)) {
+                        errors.push(`reject: ${id}`);
+                        continue;
+                    }
+                }
                 // Recursive delete: channel + all its states/sub-channels.
                 await this.delObjectAsync(relId, { recursive: true });
                 this.library.clearStateCache(relId);
@@ -1976,16 +1985,14 @@ class Plex extends utils.Adapter {
                 if (!obj || obj.type || !row.id.startsWith(prefix)) {
                     continue;
                 }
-                const native = (obj.native || {}) as Record<string, unknown>;
-                const uuid = native.uuid;
-                if (native.isPlayer !== true || typeof uuid !== 'string' || !uuid || !row.id.endsWith(`-${uuid}`)) {
+                const player = parsePlayerChannelId(row.id, prefix, obj.native);
+                if (!player) {
                     continue;
                 }
                 const relId = row.id.slice(`${this.namespace}.`.length);
-                const title = row.id.slice(prefix.length, -(uuid.length + 1));
                 await this.extendObjectAsync(relId, {
                     type: 'channel',
-                    common: obj.common?.name ? {} : { name: `Player ${title}` },
+                    common: obj.common?.name ? {} : { name: `Player ${player.title}` },
                 });
                 this.log.info(`Repaired player object without type: ${row.id}`);
             }

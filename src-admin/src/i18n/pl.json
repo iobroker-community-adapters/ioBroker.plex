@@ -22,6 +22,7 @@
     "tokenDialog_apply": "Przejmij token",
     "tokenDialog_cancel": "Anulować",
     "tokenDialog_copied": "Kod PIN skopiowany do schowka",
+    "tokenDialog_copyFailed": "Kopiowanie nie powiodło się — zaznacz kod PIN i skopiuj go ręcznie",
     "tokenDialog_copyHint": "Kliknij, aby skopiować",
     "tokenDialog_openPlex": "Otwórz plex.tv/link",
     "tokenDialog_popupBlocked": "Wyskakujące okienko zablokowane — skorzystaj z linku obok przycisku",

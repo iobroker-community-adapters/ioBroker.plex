@@ -22,6 +22,7 @@
     "tokenDialog_apply": "Reprendre le jeton",
     "tokenDialog_cancel": "Annuler",
     "tokenDialog_copied": "Code PIN copié dans le presse-papiers",
+    "tokenDialog_copyFailed": "Échec de la copie — sélectionnez le code PIN et copiez-le manuellement",
     "tokenDialog_copyHint": "Cliquez pour copier",
     "tokenDialog_openPlex": "Ouvrez plex.tv/link",
     "tokenDialog_popupBlocked": "Popup bloqué — veuillez utiliser le lien à côté du bouton",

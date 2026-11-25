@@ -22,6 +22,7 @@
     "tokenDialog_apply": "Prendi il controllo del token",
     "tokenDialog_cancel": "Cancellare",
     "tokenDialog_copied": "PIN copiato negli appunti",
+    "tokenDialog_copyFailed": "Copia non riuscita: seleziona il PIN e copialo manualmente",
     "tokenDialog_copyHint": "Fare clic per copiare",
     "tokenDialog_openPlex": "Apri plex.tv/link",
     "tokenDialog_popupBlocked": "Popup bloccato: utilizza il collegamento accanto al pulsante",

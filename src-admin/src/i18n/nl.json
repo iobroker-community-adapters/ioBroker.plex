@@ -22,6 +22,7 @@
     "tokenDialog_apply": "Teken overnemen",
     "tokenDialog_cancel": "Annuleren",
     "tokenDialog_copied": "Pincode gekopieerd naar klembord",
+    "tokenDialog_copyFailed": "Kopiëren mislukt — selecteer de pincode en kopieer deze handmatig",
     "tokenDialog_copyHint": "Klik om te kopiëren",
     "tokenDialog_openPlex": "Open plex.tv/link",
     "tokenDialog_popupBlocked": "Pop-up geblokkeerd. Gebruik de link naast de knop",

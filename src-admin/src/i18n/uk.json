@@ -22,6 +22,7 @@
     "tokenDialog_apply": "Прийміть жетон",
     "tokenDialog_cancel": "Скасувати",
     "tokenDialog_copied": "PIN-код скопійовано в буфер обміну",
+    "tokenDialog_copyFailed": "Не вдалося скопіювати — виділіть PIN-код і скопіюйте його вручну",
     "tokenDialog_copyHint": "Натисніть, щоб скопіювати",
     "tokenDialog_openPlex": "Відкрийте plex.tv/link",
     "tokenDialog_popupBlocked": "Спливаюче вікно заблоковано — скористайтеся посиланням поруч із кнопкою",

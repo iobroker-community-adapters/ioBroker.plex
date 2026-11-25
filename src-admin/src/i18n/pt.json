@@ -22,6 +22,7 @@
     "tokenDialog_apply": "Assumir o token",
     "tokenDialog_cancel": "Cancelar",
     "tokenDialog_copied": "PIN copiado para a área de transferência",
+    "tokenDialog_copyFailed": "Não foi possível copiar — selecione o PIN e copie-o manualmente",
     "tokenDialog_copyHint": "Clique para copiar",
     "tokenDialog_openPlex": "Abra plex.tv/link",
     "tokenDialog_popupBlocked": "Pop-up bloqueado — use o link ao lado do botão",

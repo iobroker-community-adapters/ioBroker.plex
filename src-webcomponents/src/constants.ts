@@ -90,3 +90,14 @@ export function getNamespace(instance: string | undefined): string | null {
     }
     return /^plex\.\d+$/.test(value) ? value : null;
 }
+
+/**
+ * How long a stream counts as playing after its last "play" or "resume", in seconds. A "pause" or "stop" ends it at
+ * once; this limit is for a stream whose end never arrived - the server, the adapter or the host was not reachable,
+ * the webhook was not delivered, the device disappeared. Every new item (next episode, next track) is a new event,
+ * so 12 hours do not cut a stream that still plays.
+ */
+export const PLAYING_EXPIRES_S = 12 * 3600;
+
+/** How long a paused stream is shown after its "pause", in seconds */
+export const PAUSED_EXPIRES_S = 24 * 3600;

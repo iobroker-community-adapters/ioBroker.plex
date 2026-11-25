@@ -87,7 +87,9 @@ export function Timeline(): JSX.Element {
             if (!Array.isArray(parsed)) {
                 return [];
             }
-            return [...parsed].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            // Newest first. The adapter appends and counts whole seconds, so of two events of the
+            // same second the later one in the array is the newer one (the sort is stable).
+            return [...parsed].reverse().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         } catch {
             return [];
         }

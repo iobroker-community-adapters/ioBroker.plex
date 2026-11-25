@@ -139,7 +139,7 @@ export class Library {
             this._adapter.log.warn(msg);
         } else if (kill === true) {
             this._adapter.log.error(msg);
-            setTimeout(() => this._adapter.terminate(msg, reason || 11), 5000);
+            this._adapter.setTimeout(() => this._adapter.terminate(msg, reason || 11), 5000);
         }
 
         return false;
@@ -161,7 +161,9 @@ export class Library {
             this._adapter.log.warn('library error 101, please create a github issue');
         }
 
-        const cleaned = string.replace((this._adapter as any).FORBIDDEN_CHARS, '#');
+        // A truthy non-string (number, object, ...) has no replace(): convert it instead of throwing.
+        const text = typeof string == 'string' ? string : String(string);
+        const cleaned = text.replace((this._adapter as any).FORBIDDEN_CHARS, '#');
         return lowerCase ? cleaned.toLowerCase() : cleaned;
     }
 
@@ -218,6 +220,8 @@ export class Library {
             if (prefix == '_playing') {
                 prefix = 'playing';
             }
+            // Long-standing no-op: the fallback from 'events' to 'playing' never matches, because
+            // the first pass has already consumed splitState. Left as is on purpose, see CLAUDE.md.
             for (const p of prefix === 'events' ? ['events', 'playing'] : [prefix]) {
                 prefix = p;
                 while (0 < splitState.length) {
@@ -250,8 +254,8 @@ export class Library {
         }
     }
 
-    wait(time: number, callback: () => void): NodeJS.Timeout {
-        return setTimeout(() => callback(), time);
+    wait(time: number, callback: () => void): ioBroker.Timeout | undefined {
+        return this._adapter.setTimeout(() => callback(), time);
     }
 
     encode(key: string, string: string): string {
@@ -490,6 +494,9 @@ export class Library {
     }
 
     subscribeNode(node: string, callback?: SubscribeCallback): void {
+        // Long-standing no-op (same in the JS version): only an existing entry is replaced or
+        // removed, and nothing ever creates one - so no callback is ever registered. Left as is
+        // on purpose, see CLAUDE.md ("Do not fix long-standing NO-OPs").
         if (node && this._SUBCSCRIPT_PLAYING[node] !== undefined) {
             if (callback !== undefined && typeof callback == 'function') {
                 this._SUBCSCRIPT_PLAYING[node] = callback;
@@ -667,9 +674,10 @@ export class Library {
                     );
                     this.setDeviceState(state, value);
                 } else {
-                    if (entry?.val !== value) {
-                        this.setDeviceProperties(state);
-                    }
+                    // Unchanged value: no write to the state DB, but the value was confirmed, so
+                    // refresh the time of the last update in the cache. runGarbageCollector()
+                    // relies on it and would otherwise empty states that are still current.
+                    this.setDeviceProperties(state);
                 }
             } catch (err) {
                 this._adapter.log.debug(
@@ -694,9 +702,13 @@ export class Library {
             return false;
         }
 
-        let nodeKey = key;
+        // The player part of the key (`_playing.<title>-<uuid>`) may contain dots and digits itself,
+        // e.g. a title like "192.168.178.50": look for list indexes only behind the prefix.
+        const keyPrefix = key.startsWith(`${prefix}.`) ? prefix : '';
+        let nodeKey = key.slice(keyPrefix.length);
         nodeKey = nodeKey.replace(/\[0-9]{3}\./gi, '.');
         nodeKey = (nodeKey.search(/\.[0-9]{3}/gi) != -1 && `${nodeKey.replace(/\.[0-9]{3}/gi, '')}.list`) || nodeKey;
+        nodeKey = keyPrefix + nodeKey;
 
         nodeKey =
             nodeKey.indexOf('_playing') > -1
@@ -751,9 +763,11 @@ export class Library {
 
                 let indexKey: string | number;
                 for (const nestedKey in data) {
+                    // Pad to at least three characters, never cut: with slice(-3) entry 1000 was
+                    // written into the states of entry 000.
                     indexKey =
                         typeof nestedKey === 'string' && !isNaN(parseInt(nestedKey))
-                            ? `00${nestedKey}`.slice(-3)
+                            ? nestedKey.padStart(3, '0')
                             : nestedKey;
 
                     if (data[nestedKey] !== undefined && data[nestedKey] !== 'undefined') {
@@ -798,6 +812,19 @@ export class Library {
         }
     }
 
+    /**
+     * Format a duration for the `...human` states: `m:ss` below one hour, `h:mm` from one hour on.
+     *
+     * @param ms Duration in milliseconds
+     */
+    readableTime(ms: number): string {
+        const d = new Date(ms);
+        const hours = d.getUTCHours() > 0 ? d.getUTCHours().toString() : '';
+        return hours
+            ? `${hours}:${`0${d.getUTCMinutes()}`.slice(-2)}`
+            : `${d.getUTCMinutes().toString()}:${`0${d.getUTCSeconds().toString()}`.slice(-2)}`;
+    }
+
     async convertNode(node: NodeDef, data: any): Promise<any> {
         if (!(node && node.convert)) {
             return data;
@@ -810,7 +837,8 @@ export class Library {
                     data = Math.floor(new Date(data).getTime() / 1000);
                 } else {
                     const ts = new Date(data * 1000);
-                    date = `${ts.getFullYear()}-${`0${ts.getMonth()}`.substr(-2)}-${`0${ts.getDate()}`.substr(-2)}`;
+                    // getMonth() is zero-based
+                    date = `${ts.getFullYear()}-${`0${ts.getMonth() + 1}`.substr(-2)}-${`0${ts.getDate()}`.substr(-2)}`;
                 }
                 await this.set(
                     {
@@ -823,11 +851,7 @@ export class Library {
                 );
                 break;
             case 'seconds-readable': {
-                const d = new Date(Number(data));
-                let value = d.getUTCHours() > 0 ? d.getUTCHours().toString() : '';
-                value += value
-                    ? `:${`0${d.getUTCMinutes()}`.slice(-2)}`
-                    : `${d.getUTCMinutes().toString()}:${`0${d.getUTCSeconds().toString()}`.slice(-2)}`;
+                const value = this.readableTime(Number(data));
                 await this.set(
                     {
                         node: `${node.key}human`,

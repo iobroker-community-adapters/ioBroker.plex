@@ -12,6 +12,7 @@
     "tokenDialog_apply": "Token übernehmen",
     "tokenDialog_cancel": "Abbrechen",
     "tokenDialog_copied": "PIN in Zwischenablage kopiert",
+    "tokenDialog_copyFailed": "Kopieren nicht möglich — PIN bitte markieren und manuell kopieren",
     "tokenDialog_copyHint": "Klicken zum Kopieren",
     "tokenDialog_applied": "Token übernommen — Konfiguration speichern nicht vergessen",
     "tokenDialog_unchanged": "Token unverändert — Plex hat denselben Token zurückgegeben, Speichern nicht nötig",

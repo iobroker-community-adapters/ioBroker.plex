@@ -44,6 +44,11 @@ export abstract class PlexElement<TSettings extends WebComponentSettings> extend
     /** The states `getStateIds` named last - what the base class has subscribed */
     #subscribed = '';
 
+    /** The timer of `drawAt` and the moment it runs at, in ms */
+    #drawTimer: ReturnType<typeof setTimeout> | null = null;
+
+    #drawTimerAt = 0;
+
     protected constructor(css: string) {
         super();
         const shadow = this.attachShadow({ mode: 'open' });
@@ -80,6 +85,43 @@ export abstract class PlexElement<TSettings extends WebComponentSettings> extend
     protected resubscribe(): void {
         const settings = this.settings;
         this.settings = settings;
+    }
+
+    override disconnectedCallback(): void {
+        super.disconnectedCallback();
+        if (this.#drawTimer) {
+            clearTimeout(this.#drawTimer);
+            this.#drawTimer = null;
+        }
+    }
+
+    /**
+     * Draw again at a moment, even if no state changes until then - to read objects again, or because what is shown
+     * expires. One timer for all: the earliest moment asked for counts, and the drawing then asks for the next one.
+     *
+     * @param at the moment, in ms
+     */
+    protected drawAt(at: number): void {
+        if (!Number.isFinite(at)) {
+            return;
+        }
+        if (this.#drawTimer) {
+            if (this.#drawTimerAt <= at) {
+                return;
+            }
+            clearTimeout(this.#drawTimer);
+        }
+        this.#drawTimerAt = at;
+        this.#drawTimer = setTimeout(
+            () => {
+                this.#drawTimer = null;
+                if (this.isConnected) {
+                    this.resubscribe();
+                }
+            },
+            // a timer cannot wait longer than 2^31 ms: it draws then and asks again
+            Math.min(Math.max(0, at - Date.now()), 2 ** 31 - 1),
+        );
     }
 
     /**

@@ -73,6 +73,35 @@ export interface PlayerActionInput {
 }
 
 /**
+ * Recognize the object of a player channel and split its id.
+ *
+ * Player channels are `<root><title>-<uuid>` and carry `native.isPlayer` and `native.uuid`. The
+ * title is the cleaned player name and may contain dots (e.g. "magentatv one (2. generation)"),
+ * so the channel is not necessarily a direct child of the root: it is identified by its marker
+ * and by an id ending in `-<uuid>`, never by counting id segments.
+ *
+ * @param id Object id
+ * @param root Id of the player root including the trailing dot, e.g. `plex.0._playing.`
+ * @param native `native` part of the object
+ * @returns Title and uuid, or undefined if this is not the object of a player channel
+ */
+export function parsePlayerChannelId(
+    id: string,
+    root: string,
+    native: unknown,
+): { title: string; uuid: string } | undefined {
+    if (typeof id !== 'string' || !id.startsWith(root) || !native || typeof native !== 'object') {
+        return undefined;
+    }
+    const { isPlayer, uuid } = native as Record<string, unknown>;
+    if (isPlayer !== true || typeof uuid !== 'string' || !uuid || !id.endsWith(`-${uuid}`)) {
+        return undefined;
+    }
+    const title = id.slice(root.length, -(uuid.length + 1));
+    return title ? { title, uuid } : undefined;
+}
+
+/**
  * Controller — manages all known Plex players for the adapter instance.
  */
 export class Controller {
@@ -322,6 +351,12 @@ export class Player {
         this.port = o.config.port || this.config.port || this.port;
         this.config.port = this.port;
         this.config.publicAddress = o.config.remotePublicAddress || o.config.publicAddress || this.config.publicAddress;
+        // The payload is merged into the config below (and again in updateStates): its own
+        // `publicAddress` - even a present but undefined one - would undo the preference for
+        // `remotePublicAddress` again.
+        if (o.config.remotePublicAddress && 'publicAddress' in o.config) {
+            o.config.publicAddress = o.config.remotePublicAddress;
+        }
 
         ['address', 'machineIdentifier', 'remotePublicAddress', 'name', 'config', '_sources', '_provides'].forEach(
             key => delete o.config[key],

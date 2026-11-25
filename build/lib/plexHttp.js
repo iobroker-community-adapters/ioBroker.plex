@@ -366,7 +366,7 @@ function parseDevicesXml(body) {
     const attrs = {};
     let am;
     while ((am = attrRe.exec(m[1])) !== null) {
-      attrs[am[1]] = am[2];
+      attrs[am[1]] = decodeXmlEntities(am[2]);
     }
     const inner = m[2] || "";
     const connections = [];
@@ -375,13 +375,26 @@ function parseDevicesXml(body) {
       const cAttrs = {};
       let cam;
       while ((cam = attrRe.exec(cm[1])) !== null) {
-        cAttrs[cam[1]] = cam[2];
+        cAttrs[cam[1]] = decodeXmlEntities(cam[2]);
       }
       connections.push(cAttrs);
     }
     result.push(normalizeDevice({ ...attrs, Connection: connections }));
   }
   return result;
+}
+const XML_ENTITIES = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
+function decodeXmlEntities(value) {
+  if (!value.includes("&")) {
+    return value;
+  }
+  return value.replace(/&(#x[0-9a-fA-F]+|#[0-9]+|amp|lt|gt|quot|apos);/g, (match, ref) => {
+    if (ref[0] !== "#") {
+      return XML_ENTITIES[ref];
+    }
+    const code = ref[1] === "x" ? parseInt(ref.slice(2), 16) : parseInt(ref.slice(1), 10);
+    return code > 0 && code <= 1114111 ? String.fromCodePoint(code) : match;
+  });
 }
 function normalizeDevice(d) {
   const conns = Array.isArray(d.Connection) ? d.Connection : [];

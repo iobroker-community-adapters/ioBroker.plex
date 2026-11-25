@@ -52,6 +52,7 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
     private _pollTimer: number | null = null;
     private _polling = false;
     private _visibilityHandler: (() => void) | null = null;
+    private readonly _pinRef = React.createRef<HTMLSpanElement>();
 
     constructor(props: ConfigGenericProps) {
         super(props);
@@ -223,22 +224,45 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
             ok = false;
         }
         if (!ok) {
-            // Fallback for non-secure contexts.
-            try {
-                const ta = document.createElement('textarea');
-                ta.value = pinCode;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.select();
-                ok = document.execCommand('copy');
-                document.body.removeChild(ta);
-            } catch {
-                ok = false;
-            }
+            ok = this.copyPinLegacy(pinCode);
         }
-        if (ok) {
-            this.setState({ snackbar: I18n.t('tokenDialog_copied') });
+        this.setState({ snackbar: I18n.t(ok ? 'tokenDialog_copied' : 'tokenDialog_copyFailed') });
+    }
+
+    /**
+     * Copy without the async Clipboard API, which only exists in secure contexts (https or
+     * localhost) — admin is usually opened via plain http on the LAN.
+     *
+     * Selects the visible PIN itself instead of a helper textarea, so nothing depends on moving
+     * focus out of the modal dialog. If the browser still refuses, the PIN stays selected and can
+     * be copied by hand.
+     *
+     * @param pinCode PIN to put on the clipboard
+     */
+    private copyPinLegacy(pinCode: string): boolean {
+        const node = this._pinRef.current;
+        const selection = window.getSelection();
+        if (!node || !selection) {
+            return false;
+        }
+        const range = document.createRange();
+        range.selectNodeContents(node);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        const onCopy = (event: ClipboardEvent): void => {
+            if (event.clipboardData) {
+                event.clipboardData.setData('text/plain', pinCode);
+                event.preventDefault();
+            }
+        };
+        document.addEventListener('copy', onCopy);
+        try {
+            return document.execCommand('copy');
+        } catch {
+            return false;
+        } finally {
+            document.removeEventListener('copy', onCopy);
         }
     }
 
@@ -272,10 +296,13 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
             if (r && r.result && r.token) {
                 const previousToken = (this.props.data as Record<string, unknown> | undefined)?.plexToken;
                 const unchanged = typeof previousToken === 'string' && previousToken === r.token;
-                // Use the inherited ConfigGeneric.onChange — it clones the current
-                // data, sets only this field, then forwards to props.onChange. Calling
-                // props.onChange directly with (attr, value) wipes the rest of the form.
-                await this.onChange('plexToken', r.token);
+                // props.onChange takes the COMPLETE form data — calling it with (attr, value)
+                // wipes the rest of the form. The fourth argument asks admin to save right
+                // away (it confirms with the user first), so a new token does not sit unsaved
+                // in the form; for an unchanged token there is nothing to save.
+                const data = JSON.parse(JSON.stringify(this.props.data ?? {})) as Record<string, unknown>;
+                data.plexToken = r.token;
+                this.props.onChange(data, undefined, undefined, !unchanged);
                 this.setState({
                     loadingToken: false,
                     statusMsg: unchanged
@@ -388,6 +415,7 @@ class TokenWizard extends ConfigGeneric<ConfigGenericProps, TokenWizardState> {
                                         <Typography
                                             variant="h4"
                                             component="span"
+                                            ref={this._pinRef}
                                             sx={{ fontFamily: 'monospace', letterSpacing: '0.2em' }}
                                         >
                                             {pinCode}

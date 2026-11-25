@@ -6,6 +6,8 @@ import type { JSX } from 'react';
 
 export interface ActiveStream {
     player: string;
+    /** UUID of the player, if the event names it: tells two devices of the same title apart */
+    playerUuid?: string;
     account?: string;
     media?: string;
     message?: string;

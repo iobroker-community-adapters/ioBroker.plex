@@ -20,13 +20,14 @@ import { defineWebComponent } from '@iobroker/web-components/element';
 
 import { getNamespace, NOW_PLAYING_TAG, type NowPlayingSettings } from './constants';
 import { formatTime } from './format';
-import { formatEpisode, getActiveStreams, parseHistory, type ActiveStream } from './history';
+import { formatEpisode, getActiveStreams, getExpiry, parseHistory, type ActiveStream } from './history';
 import type { WordKey } from './i18n';
 import { getMediaIcon, Icon, type IconName } from './icons';
 import { Hint, PlexElement } from './PlexElement';
 import {
     findPlayerChannel,
     getPlayerChannelId,
+    hasPlayerDots,
     isChannelOf,
     toPlayerChannels,
     type PlayerButton,
@@ -334,13 +335,13 @@ function NowPlayingView(props: ViewProps): JSX.Element {
             {entries.map(entry =>
                 compact ? (
                     <Row
-                        key={entry.stream.player}
+                        key={entry.stream.playerUuid || entry.stream.player}
                         {...props}
                         entry={entry}
                     />
                 ) : (
                     <Card
-                        key={entry.stream.player}
+                        key={entry.stream.playerUuid || entry.stream.player}
                         {...props}
                         entry={entry}
                     />
@@ -384,35 +385,47 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
     /** The players without a channel when the channels were asked for last */
     #channelsMissing = '';
 
-    #reloadTimer: ReturnType<typeof setTimeout> | null = null;
-
     constructor() {
         super(NOW_PLAYING_STYLES);
     }
 
-    override disconnectedCallback(): void {
-        super.disconnectedCallback();
-        if (this.#reloadTimer) {
-            clearTimeout(this.#reloadTimer);
-            this.#reloadTimer = null;
+    /**
+     * The player channel of the settings: null if they name none - and undefined while the player channels are read
+     * that tell where the channel ends in an ID with dots (a title with a dot, or an ID below the channel)
+     */
+    #getFilter(settings: NowPlayingSettings, namespace: string): string | null | undefined {
+        if (!settings.player) {
+            return null;
         }
+        const channels = this.#getChannels(namespace);
+        return channels || !hasPlayerDots(settings.player, namespace)
+            ? getPlayerChannelId(settings.player, channels)
+            : undefined;
     }
 
     /** The streams to show, each with its player channel if it is known */
     #getStreams(settings: NowPlayingSettings, namespace: string): { stream: ActiveStream; channel: string | null }[] {
-        const filter = settings.player ? getPlayerChannelId(settings.player) : null;
+        const filter = this.#getFilter(settings, namespace);
+        if (filter === undefined) {
+            return [];
+        }
         let streams = getActiveStreams(parseHistory(this.states[`${namespace}.events.history`]?.val));
         if (settings.showPaused === false) {
             streams = streams.filter(stream => !stream.paused);
         }
         if (filter) {
+            // with the UUID of the player the title in its channel ID is known: "tv" is not "tv-kitchen" - and a
+            // stream that names its UUID is the one of this player only if it is the same
+            const state = this.states[`${filter}.Player.uuid`]?.val;
+            const uuid = typeof state === 'string' ? state : undefined;
             return streams
-                .filter(stream => isChannelOf(filter, stream.player))
+                .filter(stream => isChannelOf(filter, stream.player, uuid, stream.playerUuid))
                 .map(stream => ({ stream, channel: filter }));
         }
+        const channels = this.#getChannels(namespace) || [];
         return streams.map(stream => ({
             stream,
-            channel: findPlayerChannel(this.#getChannels(namespace) || [], stream.player)?.id || null,
+            channel: findPlayerChannel(channels, stream.player, stream.playerUuid)?.id || null,
         }));
     }
 
@@ -426,16 +439,36 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
             return [];
         }
         const ids = [`${namespace}.events.history`];
+        const filter = this.#getFilter(settings, namespace);
+        if (filter) {
+            ids.push(`${filter}.Player.uuid`);
+        }
         for (const { channel } of this.#getStreams(settings, namespace)) {
             if (channel) {
                 ids.push(`${channel}.Metadata.viewOffset`, `${channel}.Metadata.durationSeconds`);
                 if (settings.showControls !== false) {
-                    // the object of the button tells whether the player has controls at all
-                    ids.push(`${channel}.Player.controllable`, `${channel}._Controls.playback.play`);
+                    ids.push(`${channel}.Player.controllable`);
                 }
             }
         }
         return ids;
+    }
+
+    /**
+     * The object of the button "play" of each player shown: it tells whether the player has controls at all. The
+     * adapter may create it only after the stream began (a player it sees for the first time), so it is kept up to
+     * date instead of read once.
+     *
+     * @param settings the settings of the element
+     */
+    protected override getObjectIds(settings: NowPlayingSettings): string[] {
+        const namespace = getSettingsNamespace(settings);
+        if (!namespace || settings.showControls === false) {
+            return [];
+        }
+        return this.#getStreams(settings, namespace)
+            .filter(({ channel }) => channel)
+            .map(({ channel }) => `${channel}._Controls.playback.play`);
     }
 
     /**
@@ -457,17 +490,13 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
             if (!missingKey) {
                 return;
             }
-            const delay =
-                (missingKey === this.#channelsMissing ? RELOAD_CHANNELS_MS : NEW_PLAYER_DELAY_MS) -
-                (Date.now() - this.#channelsAskedAt);
-            if (delay > 0) {
-                // draw again then, even if no state changes in between
-                this.#reloadTimer ||= setTimeout(() => {
-                    this.#reloadTimer = null;
-                    if (this.isConnected) {
-                        this.resubscribe();
-                    }
-                }, delay);
+            const due =
+                this.#channelsAskedAt +
+                (missingKey === this.#channelsMissing ? RELOAD_CHANNELS_MS : NEW_PLAYER_DELAY_MS);
+            if (due > Date.now()) {
+                // draw again then, even if no state changes in between - sooner than a timer that waits for a
+                // player without a channel, if this is a new one
+                this.drawAt(due);
                 return;
             }
         } else {
@@ -506,7 +535,16 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
                 />
             );
         }
-        const filter = settings.player ? getPlayerChannelId(settings.player) : null;
+        const filter = this.#getFilter(settings, namespace);
+        if (hasPlayerDots(settings.player, namespace)) {
+            // the channels tell which one the player of the settings is; read them again if it is not among them
+            const found = !!filter && !!this.#getChannels(namespace)?.some(channel => channel.id === filter);
+            this.#loadChannels(namespace, found || !settings.player ? [] : [settings.player]);
+        }
+        if (filter === undefined) {
+            // not read yet
+            return <div className="streams" />;
+        }
         if (settings.player && (!filter || !filter.startsWith(`${namespace}.`))) {
             return (
                 <Hint
@@ -528,6 +566,8 @@ class PlexNowPlaying extends PlexElement<NowPlayingSettings> {
                 streams.filter(({ channel }) => !channel).map(({ stream }) => stream.player),
             );
         }
+        // a stream whose end never arrived expires: draw again then, also without a new event
+        this.drawAt(Math.min(...streams.map(({ stream }) => getExpiry(stream))) + 1000);
 
         const entries: StreamEntry[] = streams.map(({ stream, channel }) => {
             const offset = channel ? toNumber(this.states[`${channel}.Metadata.viewOffset`]) : null;

@@ -22,6 +22,7 @@
     "tokenDialog_apply": "接管令牌",
     "tokenDialog_cancel": "取消",
     "tokenDialog_copied": "PIN 码已复制到剪贴板",
+    "tokenDialog_copyFailed": "复制失败 - 请选中 PIN 码并手动复制",
     "tokenDialog_copyHint": "点击复制",
     "tokenDialog_openPlex": "打开 plex.tv/链接",
     "tokenDialog_popupBlocked": "弹出窗口被阻止 - 请使用按钮旁边的链接",

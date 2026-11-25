@@ -29,10 +29,22 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var players_exports = {};
 __export(players_exports, {
   Controller: () => Controller,
-  Player: () => Player
+  Player: () => Player,
+  parsePlayerChannelId: () => parsePlayerChannelId
 });
 module.exports = __toCommonJS(players_exports);
 var import_axios = __toESM(require("axios"));
+function parsePlayerChannelId(id, root, native) {
+  if (typeof id !== "string" || !id.startsWith(root) || !native || typeof native !== "object") {
+    return void 0;
+  }
+  const { isPlayer, uuid } = native;
+  if (isPlayer !== true || typeof uuid !== "string" || !uuid || !id.endsWith(`-${uuid}`)) {
+    return void 0;
+  }
+  const title = id.slice(root.length, -(uuid.length + 1));
+  return title ? { title, uuid } : void 0;
+}
 class Controller {
   static garbageExcluded = ["Player", "_Controls"];
   players = [];
@@ -242,6 +254,9 @@ class Player {
     this.port = o.config.port || this.config.port || this.port;
     this.config.port = this.port;
     this.config.publicAddress = o.config.remotePublicAddress || o.config.publicAddress || this.config.publicAddress;
+    if (o.config.remotePublicAddress && "publicAddress" in o.config) {
+      o.config.publicAddress = o.config.remotePublicAddress;
+    }
     ["address", "machineIdentifier", "remotePublicAddress", "name", "config", "_sources", "_provides"].forEach(
       (key) => delete o.config[key]
     );
@@ -942,6 +957,7 @@ class Lyric {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Controller,
-  Player
+  Player,
+  parsePlayerChannelId
 });
 //# sourceMappingURL=players.js.map

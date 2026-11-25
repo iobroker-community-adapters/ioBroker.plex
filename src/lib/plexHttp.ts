@@ -419,7 +419,7 @@ function parseDevicesXml(body: string): Plex.Tv.Device[] {
         const attrs: Record<string, string> = {};
         let am: RegExpExecArray | null;
         while ((am = attrRe.exec(m[1])) !== null) {
-            attrs[am[1]] = am[2];
+            attrs[am[1]] = decodeXmlEntities(am[2]);
         }
         const inner = m[2] || '';
         const connections: Array<Record<string, string>> = [];
@@ -428,13 +428,36 @@ function parseDevicesXml(body: string): Plex.Tv.Device[] {
             const cAttrs: Record<string, string> = {};
             let cam: RegExpExecArray | null;
             while ((cam = attrRe.exec(cm[1])) !== null) {
-                cAttrs[cam[1]] = cam[2];
+                cAttrs[cam[1]] = decodeXmlEntities(cam[2]);
             }
             connections.push(cAttrs);
         }
         result.push(normalizeDevice({ ...attrs, Connection: connections }));
     }
     return result;
+}
+
+const XML_ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+
+/**
+ * Decode the XML character references of an attribute value: the five predefined entities and
+ * numeric references (`&#39;`, `&#x27;`). Everything is replaced in a single pass, so the result of
+ * one replacement is never decoded again (`&amp;lt;` becomes `&lt;`, not `<`). Unknown or invalid
+ * references are left untouched.
+ *
+ * @param value - Raw attribute value as it appears in the XML
+ */
+function decodeXmlEntities(value: string): string {
+    if (!value.includes('&')) {
+        return value;
+    }
+    return value.replace(/&(#x[0-9a-fA-F]+|#[0-9]+|amp|lt|gt|quot|apos);/g, (match: string, ref: string) => {
+        if (ref[0] !== '#') {
+            return XML_ENTITIES[ref];
+        }
+        const code = ref[1] === 'x' ? parseInt(ref.slice(2), 16) : parseInt(ref.slice(1), 10);
+        return code > 0 && code <= 0x10_ff_ff ? String.fromCodePoint(code) : match;
+    });
 }
 
 function normalizeDevice(d: Record<string, unknown>): Plex.Tv.Device {

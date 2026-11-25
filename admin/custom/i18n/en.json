@@ -12,6 +12,7 @@
     "tokenDialog_apply": "Take over token",
     "tokenDialog_cancel": "Cancel",
     "tokenDialog_copied": "PIN copied to clipboard",
+    "tokenDialog_copyFailed": "Copying failed — please select the PIN and copy it manually",
     "tokenDialog_copyHint": "Click to copy",
     "tokenDialog_applied": "Token applied — don't forget to save the configuration",
     "tokenDialog_unchanged": "Token unchanged — Plex returned the same token, no save needed",

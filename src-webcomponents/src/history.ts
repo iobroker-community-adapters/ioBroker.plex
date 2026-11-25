@@ -8,6 +8,7 @@
  * states below `_playing.<player>.Metadata` are emptied by the garbage collector of the adapter, so title and
  * cover are not reliable there (the same as the www page of the adapter does).
  */
+import { PAUSED_EXPIRES_S, PLAYING_EXPIRES_S } from './constants';
 
 /** One entry of `events.history` */
 export interface HistoryEvent {
@@ -19,6 +20,8 @@ export interface HistoryEvent {
     account?: string;
     /** The title of the player */
     player?: string;
+    /** The UUID of the player; missing in entries written before the adapter stored it, or if the event has none */
+    playerUuid?: string;
     /** `movie`, `episode`, `track`, ... */
     media?: string;
     /** Without `media.`: `play`, `pause`, `resume`, `stop`, `scrobble`, `rate`, or e.g. `library.new` */
@@ -37,6 +40,8 @@ export interface HistoryEvent {
 export interface ActiveStream {
     /** The title of the player */
     player: string;
+    /** The UUID of the player, if the event names it */
+    playerUuid?: string;
     account?: string;
     media?: string;
     message?: string;
@@ -89,6 +94,9 @@ export function parseHistory(raw: ioBroker.StateValue | undefined): HistoryEvent
                     (entry): entry is HistoryEvent =>
                         !!entry && typeof entry === 'object' && typeof (entry as HistoryEvent).event === 'string',
                 )
+                // the adapter appends and counts whole seconds: of two events of one second the later one in the
+                // array is the newer one - the sort is stable, so turned around first it stays in front
+                .reverse()
                 .sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
         }
     } catch {
@@ -108,18 +116,44 @@ export function isPlaybackEvent(event: string): boolean {
 }
 
 /**
+ * When a stream expires, in ms: `PLAYING_EXPIRES_S` after its "play" or "resume", `PAUSED_EXPIRES_S` after its
+ * "pause". Never (`Infinity`) if its event has no valid time - the history counts in seconds.
+ *
+ * @param stream the stream
+ * @param stream.paused whether its last event is a "pause"
+ * @param stream.timestamp the time of its last event, in seconds
+ */
+export function getExpiry(stream: { paused: boolean; timestamp: number }): number {
+    return stream.timestamp > 0
+        ? (stream.timestamp + (stream.paused ? PAUSED_EXPIRES_S : PLAYING_EXPIRES_S)) * 1000
+        : Infinity;
+}
+
+/**
  * The players that play something now or have paused it, newest first. The last event of play, pause, resume or
  * stop of each player counts; "watched" and "rated" come while it plays and change nothing.
  *
+ * A player is a device: two events are of two players only if both name a UUID (`playerUuid`) and these differ, so
+ * two devices of the same title are told apart. An event without a UUID - written before the adapter stored it -
+ * is one of its title: a newer event of that title replaces it, with or without a UUID, and it replaces the older
+ * ones of that title. So a "play" without and a later "stop" with a UUID leave no stream that plays forever.
+ *
+ * A stream whose end never arrived expires (`getExpiry`): it is left out, its event stays in the history.
+ *
  * @param events the history, newest first
+ * @param now the moment to tell for, in ms
  */
-export function getActiveStreams(events: HistoryEvent[]): ActiveStream[] {
-    const seen = new Set<string>();
+export function getActiveStreams(events: HistoryEvent[], now = Date.now()): ActiveStream[] {
+    /** The UUIDs, in lower case, of the events so far */
+    const seenUuids = new Set<string>();
+    /** The titles of the events so far: of those without a UUID, and of those with one */
+    const seenTitles = new Set<string>();
+    const seenUuidTitles = new Set<string>();
     const result: ActiveStream[] = [];
     for (const entry of events) {
         const player = entry.player;
         const event = entry.event;
-        if (!player || seen.has(player)) {
+        if (!player) {
             continue;
         }
         const playing = PLAY_EVENTS.has(event);
@@ -127,10 +161,21 @@ export function getActiveStreams(events: HistoryEvent[]): ActiveStream[] {
         if (!playing && !paused && !STOP_EVENTS.has(event)) {
             continue;
         }
-        seen.add(player);
-        if (playing || paused) {
-            result.push({
+        const playerUuid = typeof entry.playerUuid === 'string' && entry.playerUuid ? entry.playerUuid : undefined;
+        const uuid = playerUuid?.toLowerCase();
+        const seen = uuid
+            ? seenUuids.has(uuid) || seenTitles.has(player)
+            : seenTitles.has(player) || seenUuidTitles.has(player);
+        if (uuid) {
+            seenUuids.add(uuid);
+            seenUuidTitles.add(player);
+        } else {
+            seenTitles.add(player);
+        }
+        if (!seen && (playing || paused)) {
+            const stream: ActiveStream = {
                 player,
+                playerUuid,
                 account: entry.account,
                 media: entry.media,
                 message: entry.message,
@@ -140,7 +185,10 @@ export function getActiveStreams(events: HistoryEvent[]): ActiveStream[] {
                 episode: typeof entry.episode === 'number' ? entry.episode : undefined,
                 paused,
                 timestamp: Number(entry.timestamp) || 0,
-            });
+            };
+            if (now <= getExpiry(stream)) {
+                result.push(stream);
+            }
         }
     }
     return result;

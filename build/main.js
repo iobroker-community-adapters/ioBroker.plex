@@ -102,7 +102,7 @@ class Plex extends utils.Adapter {
   knownPlayerIds = /* @__PURE__ */ new Set();
   alertsClient;
   /** Dedupe rapid bursts of `playing` events (Plex sends ~1/s during playback). */
-  alertsRefreshTimer = null;
+  alertsRefreshTimer;
   history = [];
   notifications = {};
   retryCycle;
@@ -199,8 +199,9 @@ class Plex extends utils.Adapter {
       });
     }
     if (!this.config.plexIp || !this.config.plexToken) {
+      const missing = [!this.config.plexIp && "Plex IP", !this.config.plexToken && "Plex Token"].filter(Boolean).join(" and ");
       this.library.terminate(
-        "Plex IP and Plex Token not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token."
+        `${missing} not configured! Please go to settings, fill in Plex IP and retrieve a Plex Token.`
       );
       return;
     }
@@ -646,8 +647,8 @@ class Plex extends utils.Adapter {
         this.alertsClient = void 0;
       }
       if (this.alertsRefreshTimer) {
-        clearTimeout(this.alertsRefreshTimer);
-        this.alertsRefreshTimer = null;
+        this.clearTimeout(this.alertsRefreshTimer);
+        this.alertsRefreshTimer = void 0;
       }
       if (this.retryCycle) {
         this.clearTimeout(this.retryCycle);
@@ -836,32 +837,32 @@ class Plex extends utils.Adapter {
       this.log.debug(`Stack-Trace: ${JSON.stringify(err instanceof Error ? err.stack : String(err))}`);
       const m = err instanceof Error ? err.message : String(err);
       if (m.indexOf("EHOSTUNREACH") > -1 || m.indexOf("ECONNREFUSED") > -1 || m.indexOf("ETIMEDOUT") > -1 || m.indexOf("ENOTFOUND") > -1 || m.indexOf("ECONNABORTED") > -1) {
-        const wait = nextBackoff(this.networkRetryCount++);
-        this.config.retry = wait;
+        const waitMin = nextBackoff(this.networkRetryCount++);
+        this.config.retry = waitMin;
         this.log.info(
-          `Plex Media Server(${this.config.plexIp}:${this.config.plexPort}) not reachable! Will try again in ${wait} minute(s)...`
+          `Plex Media Server(${this.config.plexIp}:${this.config.plexPort}) not reachable! Will try again in ${waitMin} minute(s)...`
         );
         await this.setConnectionState(false);
         this.lastErrorKind = "network";
-        this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
+        this.retryCycle = this.setTimeout(() => this.init(), waitMin * 60 * 1e3);
       } else if (m.indexOf("Permission denied") > -1 || m.indexOf("401") > -1 || m.indexOf("Unauthorized") > -1 || m.indexOf("unauthorized") > -1) {
-        const wait = nextBackoff(this.authRetryCount++);
-        this.config.retry = wait;
+        const waitMin = nextBackoff(this.authRetryCount++);
+        this.config.retry = waitMin;
         this.log.warn(
-          `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${wait} minute(s).`
+          `Plex Media Server rejected the request as unauthorized. If this persists, retrieve a new token in the adapter settings. Will retry in ${waitMin} minute(s).`
         );
         await this.setConnectionState(false);
         this.lastErrorKind = "unauthorized";
-        this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
+        this.retryCycle = this.setTimeout(() => this.init(), waitMin * 60 * 1e3);
       } else {
-        const wait = nextBackoff(this.networkRetryCount++);
-        this.config.retry = wait;
+        const waitMin = nextBackoff(this.networkRetryCount++);
+        this.config.retry = waitMin;
         this.log.warn(
-          `Unexpected error connecting to Plex Media Server: ${m}. Will retry in ${wait} minute(s).`
+          `Unexpected error connecting to Plex Media Server: ${m}. Will retry in ${waitMin} minute(s).`
         );
         await this.setConnectionState(false);
         this.lastErrorKind = "network";
-        this.retryCycle = this.setTimeout(() => this.init(), wait * 60 * 1e3);
+        this.retryCycle = this.setTimeout(() => this.init(), waitMin * 60 * 1e3);
       }
     });
   }
@@ -897,7 +898,7 @@ class Plex extends utils.Adapter {
    * @param prefixIn The prefix of the event
    */
   async setEvent(dataIn, source, prefixIn) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     let data = dataIn;
     let prefix = prefixIn;
     this.log.debug(
@@ -1039,10 +1040,11 @@ class Plex extends utils.Adapter {
           datetime: data.datetime,
           account: (_e = data.Account) == null ? void 0 : _e.title,
           player: (_f = data.Player) == null ? void 0 : _f.title,
+          ...typeof ((_g = data.Player) == null ? void 0 : _g.uuid) === "string" && data.Player.uuid ? { playerUuid: data.Player.uuid } : {},
           media: data.media,
           event,
-          ...data.media === "episode" && ((_g = data.Metadata) == null ? void 0 : _g.parentIndex) != null ? { season: data.Metadata.parentIndex } : {},
-          ...data.media === "episode" && ((_h = data.Metadata) == null ? void 0 : _h.index) != null ? { episode: data.Metadata.index } : {},
+          ...data.media === "episode" && ((_h = data.Metadata) == null ? void 0 : _h.parentIndex) != null ? { season: data.Metadata.parentIndex } : {},
+          ...data.media === "episode" && ((_i = data.Metadata) == null ? void 0 : _i.index) != null ? { episode: data.Metadata.index } : {},
           thumb: message.thumb ? `${this.library.AXIOS_OPTIONS._protocol}//${this.config.plexIp}:${this.config.plexPort}${this.replacePlaceholders(message.thumb, eventData)}?X-Plex-Token=${this.config.plexToken}` : "",
           message: this.replacePlaceholders(message.message, eventData),
           caption: this.replacePlaceholders(message.caption, eventData),
@@ -1085,8 +1087,8 @@ class Plex extends utils.Adapter {
         "_Commands"
       ]);
     }
-    if (prefix.indexOf("_playing") > -1 && ["media.play", "media.resume"].indexOf((_i = data == null ? void 0 : data.event) != null ? _i : "") > -1) {
-      this.createMetadataCommandStates(prefix, (_j = data == null ? void 0 : data.Metadata) == null ? void 0 : _j.ratingKey);
+    if (prefix.indexOf("_playing") > -1 && ["media.play", "media.resume"].indexOf((_j = data == null ? void 0 : data.event) != null ? _j : "") > -1) {
+      this.createMetadataCommandStates(prefix, (_k = data == null ? void 0 : data.Metadata) == null ? void 0 : _k.ratingKey);
     }
     return true;
   }
@@ -1133,7 +1135,9 @@ class Plex extends utils.Adapter {
     if (!this.config.getAllItems) {
       return;
     }
-    this.plex.query(path).then(async (res) => {
+    const countPath = `${path}${path.includes("?") ? "&" : "?"}X-Plex-Container-Start=0&X-Plex-Container-Size=0`;
+    this.plex.query(countPath).then(async (res) => {
+      var _a;
       await this.library.set(
         {
           node: `${node}.itemsCount`,
@@ -1141,7 +1145,7 @@ class Plex extends utils.Adapter {
           role: this.library.getNode(`${key.toLowerCase()}.itemscount`).role,
           description: this.library.getNode(`${key.toLowerCase()}.itemscount`).description
         },
-        res.MediaContainer.size
+        (_a = res.MediaContainer.totalSize) != null ? _a : res.MediaContainer.size
       );
     }).catch((err) => {
       this.log.debug(`Could not retrieve items for ${key} from Plex!`);
@@ -1479,16 +1483,21 @@ class Plex extends utils.Adapter {
         for (const key in entry) {
           const node = this.library.getNode(`playlists.${key.toLowerCase()}`);
           node.key = `playlists.${playlistId}.${key}`;
-          entry[key] = this.library.convertNode(node, entry[key]);
-          void this.library.set(
-            {
-              node: `playlists.${playlistId}.${key}`,
-              type: node.type,
-              role: node.role,
-              description: node.description
-            },
-            entry[key]
-          );
+          this.library.convertNode(node, entry[key]).then(
+            (value) => this.library.set(
+              {
+                node: `playlists.${playlistId}.${key}`,
+                type: node.type,
+                role: node.role,
+                description: node.description
+              },
+              value
+            )
+          ).catch((err) => {
+            this.log.debug(
+              `Could not set playlist value ${playlistId}.${key}: ${err instanceof Error ? err.message : String(err)}`
+            );
+          });
         }
         this.getItems(entry.key, "playlists", `playlists.${playlistId}`);
       });
@@ -1540,6 +1549,8 @@ class Plex extends utils.Adapter {
         error: (m) => this.log.error(m)
       },
       rejectUnauthorized: this.library.AXIOS_OPTIONS.rejectUnauthorized === true,
+      setTimeout: (cb, ms) => this.setTimeout(cb, ms),
+      clearTimeout: (timer) => this.clearTimeout(timer),
       // Identity headers — same set we send on REST. Some Plex setups (especially behind
       // reverse proxies) don't deliver notifications without a recognizable client identity.
       headers: {
@@ -1562,19 +1573,20 @@ class Plex extends utils.Adapter {
    * reacting per frame.
    *
    * @param type Notification type string from the PMS WebSocket (e.g. `playing`, `activity`)
-   * @param _payload Raw notification payload (currently unused)
+   * @param payload Type-specific payload of the notification
    */
-  handlePlexNotification(type, _payload) {
+  handlePlexNotification(type, payload) {
     if (this.unloaded) {
       return;
     }
     switch (type) {
       case "playing": {
+        this.syncViewOffsets(payload);
         if (this.alertsRefreshTimer) {
           return;
         }
-        this.alertsRefreshTimer = setTimeout(() => {
-          this.alertsRefreshTimer = null;
+        this.alertsRefreshTimer = this.setTimeout(() => {
+          this.alertsRefreshTimer = void 0;
           void this.getPlayers();
         }, 500);
         break;
@@ -1585,7 +1597,60 @@ class Plex extends utils.Adapter {
         break;
     }
   }
+  /**
+   * Take over the playback position Plex reports with every `playing` notification (about every
+   * 10 seconds, and right after a seek). Between Plex events the adapter counts the position up
+   * by itself (see `refreshViewOffset`) and would otherwise never notice a jump.
+   *
+   * @param payload `PlaySessionStateNotification` list of the notification
+   */
+  syncViewOffsets(payload) {
+    if (!Array.isArray(payload)) {
+      return;
+    }
+    for (const session of payload) {
+      const viewOffset = Number(session == null ? void 0 : session.viewOffset);
+      const player = typeof (session == null ? void 0 : session.clientIdentifier) === "string" && Number.isFinite(viewOffset) ? this.playingDevice.find((entry) => entry.playerIdentifier === session.clientIdentifier) : void 0;
+      if (player) {
+        this.library.setDeviceState(`${player.prefix}.Metadata.viewOffset`, viewOffset);
+      }
+    }
+  }
+  /**
+   * Repair player objects that earlier versions left without `type` (#618): `_playing.<title>-<uuid>`
+   * carrying the `native.isPlayer` marker but no object type. `getAdapterObjectsAsync()` only
+   * returns typed objects, so these are invisible to `loadKnownPlayers()` and the admin Cleanup
+   * tab — look them up by id range instead. Existing `common`/`native` are kept (extendObject).
+   */
+  async repairTypelessPlayerObjects() {
+    var _a;
+    try {
+      const prefix = `${this.namespace}._playing.`;
+      const list = await this.getObjectListAsync({ startkey: prefix, endkey: `${prefix}\u9999` });
+      for (const row of list.rows) {
+        const obj = row.value;
+        if (!obj || obj.type || !row.id.startsWith(prefix)) {
+          continue;
+        }
+        const native = obj.native || {};
+        const uuid = native.uuid;
+        if (native.isPlayer !== true || typeof uuid !== "string" || !uuid || !row.id.endsWith(`-${uuid}`)) {
+          continue;
+        }
+        const relId = row.id.slice(`${this.namespace}.`.length);
+        const title = row.id.slice(prefix.length, -(uuid.length + 1));
+        await this.extendObjectAsync(relId, {
+          type: "channel",
+          common: ((_a = obj.common) == null ? void 0 : _a.name) ? {} : { name: `Player ${title}` }
+        });
+        this.log.info(`Repaired player object without type: ${row.id}`);
+      }
+    } catch (err) {
+      this.log.debug(`repairTypelessPlayerObjects failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
   async loadKnownPlayers() {
+    await this.repairTypelessPlayerObjects();
     try {
       const objs = await this.getAdapterObjectsAsync();
       this.knownPlayerIds.clear();
@@ -1921,17 +1986,23 @@ class Plex extends utils.Adapter {
         _sources: player.sources,
         _provides: player.provides
       });
-      void this.extendObject(playerTemp.prefix, {
-        native: {
-          uuid: player.uuid,
-          isPlayer: true,
-          lastSeenAt: (/* @__PURE__ */ new Date()).toISOString(),
-          lastSeenSource: player.sources.join("+"),
-          product: player.product,
-          platform: player.platform,
-          device: player.device
-        }
-      });
+      void this.extendObject(
+        playerTemp.prefix,
+        {
+          type: "channel",
+          common: { name: `Player ${player.title}` },
+          native: {
+            uuid: player.uuid,
+            isPlayer: true,
+            lastSeenAt: (/* @__PURE__ */ new Date()).toISOString(),
+            lastSeenSource: player.sources.join("+"),
+            product: player.product,
+            platform: player.platform,
+            device: player.device
+          }
+        },
+        { preserve: { common: ["name"] } }
+      );
       this.knownPlayerIds.add(player.uuid);
     }
   }
@@ -2051,6 +2122,16 @@ class Plex extends utils.Adapter {
             description: node.description
           },
           value / 1e3
+        );
+        node = this.library.getNode("playing.metadata.viewOffsethuman", true);
+        void this.library.set(
+          {
+            node: `${player.prefix}.Metadata.viewOffsethuman`,
+            type: node.type,
+            role: node.role,
+            description: node.description
+          },
+          this.library.readableTime(value)
         );
       });
     }

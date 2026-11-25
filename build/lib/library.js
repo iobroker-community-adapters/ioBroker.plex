@@ -102,7 +102,7 @@ class Library {
       this._adapter.log.warn(msg);
     } else if (kill === true) {
       this._adapter.log.error(msg);
-      setTimeout(() => this._adapter.terminate(msg, reason || 11), 5e3);
+      this._adapter.setTimeout(() => this._adapter.terminate(msg, reason || 11), 5e3);
     }
     return false;
   }
@@ -194,7 +194,7 @@ class Library {
     }
   }
   wait(time, callback) {
-    return setTimeout(() => callback(), time);
+    return this._adapter.setTimeout(() => callback(), time);
   }
   encode(key, string) {
     let result = "";
@@ -635,6 +635,16 @@ class Library {
       );
     }
   }
+  /**
+   * Format a duration for the `...human` states: `m:ss` below one hour, `h:mm` from one hour on.
+   *
+   * @param ms Duration in milliseconds
+   */
+  readableTime(ms) {
+    const d = new Date(ms);
+    const hours = d.getUTCHours() > 0 ? d.getUTCHours().toString() : "";
+    return hours ? `${hours}:${`0${d.getUTCMinutes()}`.slice(-2)}` : `${d.getUTCMinutes().toString()}:${`0${d.getUTCSeconds().toString()}`.slice(-2)}`;
+  }
   async convertNode(node, data) {
     if (!(node && node.convert)) {
       return data;
@@ -647,7 +657,7 @@ class Library {
           data = Math.floor(new Date(data).getTime() / 1e3);
         } else {
           const ts = new Date(data * 1e3);
-          date = `${ts.getFullYear()}-${`0${ts.getMonth()}`.substr(-2)}-${`0${ts.getDate()}`.substr(-2)}`;
+          date = `${ts.getFullYear()}-${`0${ts.getMonth() + 1}`.substr(-2)}-${`0${ts.getDate()}`.substr(-2)}`;
         }
         await this.set(
           {
@@ -660,9 +670,7 @@ class Library {
         );
         break;
       case "seconds-readable": {
-        const d = new Date(Number(data));
-        let value = d.getUTCHours() > 0 ? d.getUTCHours().toString() : "";
-        value += value ? `:${`0${d.getUTCMinutes()}`.slice(-2)}` : `${d.getUTCMinutes().toString()}:${`0${d.getUTCSeconds().toString()}`.slice(-2)}`;
+        const value = this.readableTime(Number(data));
         await this.set(
           {
             node: `${node.key}human`,

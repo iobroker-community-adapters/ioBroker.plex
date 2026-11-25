@@ -58,13 +58,15 @@ class PlexNotifications {
   stop() {
     this.stopped = true;
     if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
+      this.opts.clearTimeout(this.reconnectTimer);
       this.reconnectTimer = void 0;
     }
     this.clearIdleTimer();
     if (this.ws) {
       try {
         this.ws.removeAllListeners();
+        this.ws.on("error", () => {
+        });
         this.ws.close();
       } catch {
       }
@@ -191,7 +193,7 @@ class PlexNotifications {
    */
   armIdleTimer() {
     this.clearIdleTimer();
-    this.idleTimer = setTimeout(() => {
+    this.idleTimer = this.opts.setTimeout(() => {
       this.opts.log.debug(
         `PlexNotifications: idle timeout (${IDLE_TIMEOUT_MS / 1e3}s without frame), forcing reconnect`
       );
@@ -205,7 +207,7 @@ class PlexNotifications {
   }
   clearIdleTimer() {
     if (this.idleTimer) {
-      clearTimeout(this.idleTimer);
+      this.opts.clearTimeout(this.idleTimer);
       this.idleTimer = void 0;
     }
   }
@@ -216,7 +218,7 @@ class PlexNotifications {
     const delay = RECONNECT_DELAYS_MS[Math.min(this.reconnectAttempt, RECONNECT_DELAYS_MS.length - 1)];
     this.reconnectAttempt++;
     this.opts.log.debug(`PlexNotifications: reconnecting in ${delay}ms (attempt ${this.reconnectAttempt})`);
-    this.reconnectTimer = setTimeout(() => {
+    this.reconnectTimer = this.opts.setTimeout(() => {
       this.reconnectTimer = void 0;
       this.connect();
     }, delay);

@@ -566,20 +566,18 @@ class Plex extends utils.Adapter {
           continue;
         }
         const rest = id.slice(prefix.length);
-        if (rest.includes(".")) {
-          continue;
-        }
         const obj = objs[id];
         if (!obj || obj.type !== "channel") {
           continue;
         }
         const native = obj.native || {};
-        if (native.isPlayer !== true || typeof native.uuid !== "string" || !native.uuid) {
+        const player = (0, import_players.parsePlayerChannelId)(id, prefix, native);
+        if (!player) {
           continue;
         }
         players.push({
           id,
-          uuid: native.uuid,
+          uuid: player.uuid,
           title: (typeof ((_a = obj.common) == null ? void 0 : _a.name) === "string" ? obj.common.name : rest) || rest,
           product: typeof native.product === "string" ? native.product : void 0,
           platform: typeof native.platform === "string" ? native.platform : void 0,
@@ -611,12 +609,19 @@ class Plex extends utils.Adapter {
     let deleted = 0;
     const errors = [];
     for (const id of ids) {
-      if (typeof id !== "string" || !id.startsWith(prefix) || id.slice(prefix.length).includes(".")) {
+      if (typeof id !== "string" || !id.startsWith(prefix)) {
         errors.push(`reject: ${id}`);
         continue;
       }
       try {
         const relId = id.slice(`${this.name}.${this.instance}.`.length);
+        if (id.slice(prefix.length).includes(".")) {
+          const obj = await this.getObjectAsync(relId);
+          if (!(0, import_players.parsePlayerChannelId)(id, prefix, obj == null ? void 0 : obj.native)) {
+            errors.push(`reject: ${id}`);
+            continue;
+          }
+        }
         await this.delObjectAsync(relId, { recursive: true });
         this.library.clearStateCache(relId);
         deleted++;
@@ -1652,16 +1657,14 @@ class Plex extends utils.Adapter {
         if (!obj || obj.type || !row.id.startsWith(prefix)) {
           continue;
         }
-        const native = obj.native || {};
-        const uuid = native.uuid;
-        if (native.isPlayer !== true || typeof uuid !== "string" || !uuid || !row.id.endsWith(`-${uuid}`)) {
+        const player = (0, import_players.parsePlayerChannelId)(row.id, prefix, obj.native);
+        if (!player) {
           continue;
         }
         const relId = row.id.slice(`${this.namespace}.`.length);
-        const title = row.id.slice(prefix.length, -(uuid.length + 1));
         await this.extendObjectAsync(relId, {
           type: "channel",
-          common: ((_a = obj.common) == null ? void 0 : _a.name) ? {} : { name: `Player ${title}` }
+          common: ((_a = obj.common) == null ? void 0 : _a.name) ? {} : { name: `Player ${player.title}` }
         });
         this.log.info(`Repaired player object without type: ${row.id}`);
       }

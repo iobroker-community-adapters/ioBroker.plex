@@ -121,7 +121,8 @@ class Library {
     if (n1 !== void 0 || n2 !== void 0) {
       this._adapter.log.warn("library error 101, please create a github issue");
     }
-    const cleaned = string.replace(this._adapter.FORBIDDEN_CHARS, "#");
+    const text = typeof string == "string" ? string : String(string);
+    const cleaned = text.replace(this._adapter.FORBIDDEN_CHARS, "#");
     return lowerCase ? cleaned.toLowerCase() : cleaned;
   }
   replaceDescription(description, a, b) {
@@ -543,9 +544,7 @@ class Library {
           );
           this.setDeviceState(state, value);
         } else {
-          if ((entry == null ? void 0 : entry.val) !== value) {
-            this.setDeviceProperties(state);
-          }
+          this.setDeviceProperties(state);
         }
       } catch (err) {
         this._adapter.log.debug(
@@ -561,9 +560,11 @@ class Library {
     if (data === void 0 || data === "undefined") {
       return false;
     }
-    let nodeKey = key;
+    const keyPrefix = key.startsWith(`${prefix}.`) ? prefix : "";
+    let nodeKey = key.slice(keyPrefix.length);
     nodeKey = nodeKey.replace(/\[0-9]{3}\./gi, ".");
     nodeKey = nodeKey.search(/\.[0-9]{3}/gi) != -1 && `${nodeKey.replace(/\.[0-9]{3}/gi, "")}.list` || nodeKey;
+    nodeKey = keyPrefix + nodeKey;
     nodeKey = nodeKey.indexOf("_playing") > -1 ? `playing${nodeKey.substr(nodeKey.indexOf(".", prefix.length))}` : nodeKey;
     let node = this.getNode(nodeKey, true);
     if (node.notExist && prefix == "events") {
@@ -600,7 +601,7 @@ class Library {
         );
         let indexKey;
         for (const nestedKey in data) {
-          indexKey = typeof nestedKey === "string" && !isNaN(parseInt(nestedKey)) ? `00${nestedKey}`.slice(-3) : nestedKey;
+          indexKey = typeof nestedKey === "string" && !isNaN(parseInt(nestedKey)) ? nestedKey.padStart(3, "0") : nestedKey;
           if (data[nestedKey] !== void 0 && data[nestedKey] !== "undefined") {
             if (typeof data[nestedKey] == "object" && (!Array.isArray(data[nestedKey]) || Array.isArray(data[nestedKey]) && this._adapter.config.getMetadataTrees) && !expandNestedData) {
               await this.set(
